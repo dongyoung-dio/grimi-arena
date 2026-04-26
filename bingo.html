@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRIMI BINGO GAME</title>
+<link rel="icon" type="image/png" href="grimi-logo.png">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'Pretendard', 'Noto Sans KR', sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  /* ===== 로비 ===== */
+  .lobby {
+    max-width: 420px;
+    margin: 80px auto;
+    text-align: center;
+  }
+  .lobby h1 {
+    font-size: 38px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .lobby p {
+    color: #94a3b8;
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+  .lobby-box {
+    background: #1e293b;
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 16px;
+    border: 1px solid #334155;
+  }
+  .lobby-box h2 {
+    font-size: 16px;
+    margin-bottom: 16px;
+    color: #cbd5e1;
+  }
+  .lobby input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #334155;
+    border-radius: 10px;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 6px;
+    outline: none;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .lobby input:focus { border-color: #3b82f6; }
+  .lobby input::placeholder { letter-spacing: 2px; font-size: 14px; color: #475569; }
+  .lobby .btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-create {
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: white;
+    margin-bottom: 8px;
+  }
+  .btn-create:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(59,130,246,0.4); }
+  .btn-join {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+  }
+  .btn-join:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(16,185,129,0.4); }
+  .btn-join:disabled, .btn-create:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .error-msg {
+    color: #f87171;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+  .or-divider {
+    color: #475569;
+    font-size: 13px;
+    margin: 20px 0;
+  }
+
+  /* ===== 게임 화면 ===== */
+  .game { display: none; }
+
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .header h1 {
+    font-size: 34px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 4px;
+  }
+  .room-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #1e293b;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 8px;
+    border: 1px solid #334155;
+  }
+  .room-code {
+    font-weight: 800;
+    color: #fbbf24;
+    letter-spacing: 3px;
+    font-size: 15px;
+  }
+  .copy-btn {
+    background: none;
+    border: 1px solid #475569;
+    color: #94a3b8;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { border-color: #60a5fa; color: #60a5fa; }
+  .online-count {
+    font-size: 12px;
+    color: #64748b;
+  }
+  .online-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #10b981;
+    border-radius: 50%;
+    margin-right: 4px;
+  }
+
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: white;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(59,130,246,0.4); }
+  .btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+  }
+  .btn-danger:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(239,68,68,0.4); }
+  .btn-back {
+    background: #334155;
+    color: #94a3b8;
+  }
+  .btn-back:hover { background: #475569; }
+
+  /* 스코어보드 */
+  .scoreboard {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .score-chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #1e293b;
+    border: 1px solid #334155;
+    transition: all 0.3s;
+  }
+  .score-chip.has-bingo {
+    border-color: #10b981;
+    box-shadow: 0 0 10px rgba(16,185,129,0.3);
+  }
+  .score-chip .lines { color: #fbbf24; font-weight: 800; }
+
+  /* 팀 그리드 */
+  .teams {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  @media (max-width: 900px) { .teams { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .teams { grid-template-columns: 1fr; max-width: 400px; } }
+
+  .team-card {
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 14px;
+    border: 2px solid #334155;
+    transition: all 0.3s;
+  }
+  .team-card.has-bingo {
+    border-color: #10b981;
+    box-shadow: 0 0 25px rgba(16,185,129,0.25);
+  }
+
+  .team-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .team-name { font-size: 17px; font-weight: 700; }
+  .team-score { font-size: 13px; color: #64748b; }
+  .team-score strong { color: #fbbf24; }
+
+  .bingo-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+  }
+  .bingo-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s;
+    background: #334155;
+    color: #e2e8f0;
+    border: 2px solid transparent;
+  }
+  .bingo-cell:hover { border-color: #60a5fa; transform: scale(1.05); }
+  .bingo-cell:active { transform: scale(0.95); }
+  .bingo-cell.marked {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1e293b;
+    border-color: #fbbf24;
+    box-shadow: 0 0 12px rgba(251,191,36,0.4);
+  }
+  .bingo-cell.in-bingo-line {
+    box-shadow: 0 0 16px rgba(16,185,129,0.6);
+    border-color: #10b981;
+    background: linear-gradient(135deg, #10b981, #059669);
+  }
+
+  .bingo-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-left: 6px;
+    animation: pulse 1s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+
+  .team-card:nth-child(1) .team-name { color: #60a5fa; }
+  .team-card:nth-child(2) .team-name { color: #f87171; }
+  .team-card:nth-child(3) .team-name { color: #34d399; }
+  .team-card:nth-child(4) .team-name { color: #fb923c; }
+  .team-card:nth-child(5) .team-name { color: #a78bfa; }
+  .team-card:nth-child(6) .team-name { color: #f472b6; }
+
+  .footer {
+    text-align: center;
+    margin-top: 20px;
+    color: #475569;
+    font-size: 12px;
+  }
+
+  /* 위험 버튼 영역 (우측 하단 고정) */
+  .danger-zone {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 100;
+  }
+  .btn-danger-small {
+    padding: 8px 16px;
+    border: 1px solid #475569;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: #1e293b;
+    color: #94a3b8;
+    transition: all 0.2s;
+  }
+  .btn-danger-small:hover {
+    border-color: #ef4444;
+    color: #f87171;
+  }
+
+  /* 커스텀 모달 */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-box {
+    background: #1e293b;
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 360px;
+    width: 90%;
+    border: 1px solid #334155;
+    text-align: center;
+  }
+  .modal-box h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: #f87171;
+  }
+  .modal-box p {
+    font-size: 14px;
+    color: #94a3b8;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .modal-code-input {
+    width: 120px;
+    padding: 10px;
+    border: 2px solid #334155;
+    border-radius: 8px;
+    background: #0f172a;
+    color: #fbbf24;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 4px;
+    outline: none;
+    margin-bottom: 16px;
+  }
+  .modal-code-input:focus { border-color: #ef4444; }
+  .modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  .modal-btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .modal-btn-cancel {
+    background: #334155;
+    color: #94a3b8;
+  }
+  .modal-btn-confirm {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+  }
+  .modal-btn-confirm:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: #64748b;
+  }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid #334155;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ===== 로비 화면 ===== -->
+<div class="lobby" id="lobby">
+  <h1>GRIMI BINGO GAME</h1>
+  <p>실시간으로 같은 빙고판을 공유하세요</p>
+
+  <div class="lobby-box">
+    <h2>새 게임 만들기</h2>
+    <button class="btn btn-create" onclick="createRoom()">방 만들기</button>
+  </div>
+
+  <div class="or-divider">— 또는 —</div>
+
+  <div class="lobby-box">
+    <h2>기존 방에 참가하기</h2>
+    <input type="text" id="roomInput" placeholder="방 코드 입력" maxlength="6"
+           oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+           onkeydown="if(event.key==='Enter')joinRoom()">
+    <button class="btn btn-join" id="joinBtn" onclick="joinRoom()" disabled>참가하기</button>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+</div>
+
+<!-- ===== 게임 화면 ===== -->
+<div class="game" id="game">
+  <div class="header">
+    <h1>GRIMI BINGO GAME</h1>
+    <div class="room-info">
+      방 코드 : <span class="room-code" id="displayCode"></span>
+      <button class="copy-btn" onclick="copyCode()">복사</button>
+    </div>
+    <div class="online-count">
+      <span class="online-dot"></span><span id="onlineCount">1</span>명 접속 중
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-primary" onclick="tryNewGame()">새 게임 (랜덤 재생성)</button>
+    <button class="btn btn-back" onclick="leaveRoom()">나가기</button>
+  </div>
+
+  <div class="scoreboard" id="scoreboard"></div>
+  <div class="teams" id="teamsContainer">
+    <div class="loading"><div class="spinner"></div>로딩 중...</div>
+  </div>
+  <div class="footer">같은 방 코드로 접속하면 실시간으로 동일한 빙고판을 공유합니다</div>
+
+  <!-- 위험 버튼 (우측 하단) -->
+  <div class="danger-zone" id="dangerZone" style="display:none;">
+    <button class="btn-danger-small" onclick="showModal('reset')">전체 표시 초기화</button>
+  </div>
+
+  <!-- 확인 모달 -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+      <h3 id="modalTitle">정말 초기화할까요?</h3>
+      <p id="modalDesc">실수 방지를 위해 아래에 <strong>1234</strong>를 입력해주세요.</p>
+      <input type="text" class="modal-code-input" id="modalCodeInput" maxlength="4" placeholder="····"
+             oninput="checkModalCode()">
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-cancel" onclick="closeModal()">취소</button>
+        <button class="modal-btn modal-btn-confirm" id="modalConfirmBtn" disabled onclick="executeModalAction()">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// ★★★ 아래 Firebase 설정을 본인 프로젝트 값으로 교체하세요 ★★★
+// ============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyABoG4B0ahW0OAZURa3WZAz9HDST49A2K4",
+  authDomain: "grimi-pubg.firebaseapp.com",
+  databaseURL: "https://grimi-pubg-default-rtdb.firebaseio.com",
+  projectId: "grimi-pubg",
+  storageBucket: "grimi-pubg.firebasestorage.app",
+  messagingSenderId: "507556279092",
+  appId: "1:507556279092:web:71182597db9c8c8a71ab61",
+  measurementId: "G-CSLVJYCB77"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ============================================================
+const TEAM_COUNT = 6;
+const GRID_SIZE = 5;
+const NUM_RANGE = 99;
+const TEAM_NAMES = ['1팀','2팀','3팀','4팀','5팀','6팀'];
+const TEAM_COLORS = ['#60a5fa','#f87171','#34d399','#fb923c','#a78bfa','#f472b6'];
+
+let currentRoom = null;
+let roomRef = null;
+let presenceRef = null;
+let myPresenceRef = null;
+
+// ===== 로비 =====
+document.getElementById('roomInput').addEventListener('input', function() {
+  document.getElementById('joinBtn').disabled = this.value.length < 4;
+  document.getElementById('errorMsg').textContent = '';
+});
+
+function generateRoomCode() {
+  const chars = '0123456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function getRandomNumbers(count, max) {
+  const pool = [];
+  for (let i = 1; i <= max; i++) pool.push(i);
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, count);
+}
+
+function generateTeamsData() {
+  const teamsData = {};
+  for (let t = 0; t < TEAM_COUNT; t++) {
+    const nums = getRandomNumbers(GRID_SIZE * GRID_SIZE, NUM_RANGE);
+    const grid = {};
+    for (let r = 0; r < GRID_SIZE; r++) {
+      for (let c = 0; c < GRID_SIZE; c++) {
+        grid[r + '_' + c] = { value: nums[r * GRID_SIZE + c], marked: false };
+      }
+    }
+    teamsData['team_' + t] = grid;
+  }
+  return teamsData;
+}
+
+async function createRoom() {
+  const code = generateRoomCode();
+  const teamsData = generateTeamsData();
+  await db.ref('rooms/' + code).set({
+    created: Date.now(),
+    teams: teamsData
+  });
+  enterRoom(code);
+}
+
+async function joinRoom() {
+  const code = document.getElementById('roomInput').value.trim();
+  if (code.length < 4) return;
+  const snapshot = await db.ref('rooms/' + code).once('value');
+  if (!snapshot.exists()) {
+    document.getElementById('errorMsg').textContent = '존재하지 않는 방 코드입니다';
+    return;
+  }
+  enterRoom(code);
+}
+
+function enterRoom(code) {
+  currentRoom = code;
+  roomRef = db.ref('rooms/' + code + '/teams');
+
+  document.getElementById('lobby').style.display = 'none';
+  document.getElementById('game').style.display = 'block';
+  document.getElementById('dangerZone').style.display = 'flex';
+  document.getElementById('displayCode').textContent = code;
+
+  // 접속자 수 (presence)
+  presenceRef = db.ref('rooms/' + code + '/presence');
+  myPresenceRef = presenceRef.push();
+  myPresenceRef.set(true);
+  myPresenceRef.onDisconnect().remove();
+
+  presenceRef.on('value', snap => {
+    const count = snap.exists() ? Object.keys(snap.val()).length : 1;
+    document.getElementById('onlineCount').textContent = count;
+  });
+
+  // 실시간 데이터 리스닝
+  roomRef.on('value', snap => {
+    if (!snap.exists()) return;
+    renderFromData(snap.val());
+  });
+}
+
+function leaveRoom() {
+  if (myPresenceRef) myPresenceRef.remove();
+  if (roomRef) roomRef.off();
+  if (presenceRef) presenceRef.off();
+  currentRoom = null;
+  roomRef = null;
+
+  document.getElementById('lobby').style.display = 'block';
+  document.getElementById('game').style.display = 'none';
+  document.getElementById('dangerZone').style.display = 'none';
+  document.getElementById('roomInput').value = '';
+  document.getElementById('errorMsg').textContent = '';
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(currentRoom).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '복사됨!';
+    setTimeout(() => btn.textContent = '복사', 1500);
+  });
+}
+
+// ===== 게임 액션 =====
+function hasAnyMarked() {
+  return roomRef.once('value').then(snap => {
+    const data = snap.val();
+    if (!data) return false;
+    for (let t = 0; t < TEAM_COUNT; t++) {
+      const team = data['team_' + t];
+      if (!team) continue;
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+          if (team[r + '_' + c] && team[r + '_' + c].marked) return true;
+        }
+      }
+    }
+    return false;
+  });
+}
+
+function tryNewGame() {
+  hasAnyMarked().then(anyMarked => {
+    if (anyMarked) {
+      showModal('newGame');
+    } else {
+      roomRef.set(generateTeamsData());
+    }
+  });
+}
+
+function toggleCell(teamIdx, row, col) {
+  const path = 'team_' + teamIdx + '/' + row + '_' + col + '/marked';
+  roomRef.child(path).once('value').then(snap => {
+    roomRef.child(path).set(!snap.val());
+  });
+}
+
+// ===== 모달 시스템 =====
+let currentModalAction = null;
+let confirmCode = '';
+
+function generateConfirmCode() {
+  return String(Math.floor(1000 + Math.random() * 9000));
+}
+
+function showModal(action) {
+  currentModalAction = action;
+  confirmCode = generateConfirmCode();
+
+  const modal = document.getElementById('confirmModal');
+  const title = document.getElementById('modalTitle');
+  const desc = document.getElementById('modalDesc');
+  const input = document.getElementById('modalCodeInput');
+  const btn = document.getElementById('modalConfirmBtn');
+
+  if (action === 'newGame') {
+    title.textContent = '새 게임을 시작할까요?';
+    desc.innerHTML = '현재 빙고판이 모두 사라집니다.<br>실수 방지를 위해 아래에 <strong>' + confirmCode + '</strong>를 입력해주세요.';
+  } else if (action === 'reset') {
+    title.textContent = '전체 표시를 초기화할까요?';
+    desc.innerHTML = '모든 팀의 체크 표시가 해제됩니다.<br>실수 방지를 위해 아래에 <strong>' + confirmCode + '</strong>를 입력해주세요.';
+  }
+
+  input.value = '';
+  btn.disabled = true;
+  modal.classList.add('active');
+  setTimeout(() => input.focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('confirmModal').classList.remove('active');
+  currentModalAction = null;
+}
+
+function checkModalCode() {
+  const input = document.getElementById('modalCodeInput').value;
+  document.getElementById('modalConfirmBtn').disabled = (input !== confirmCode);
+}
+
+function executeModalAction() {
+  if (currentModalAction === 'newGame') {
+    roomRef.set(generateTeamsData());
+  } else if (currentModalAction === 'reset') {
+    const updates = {};
+    for (let t = 0; t < TEAM_COUNT; t++) {
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+          updates['team_' + t + '/' + r + '_' + c + '/marked'] = false;
+        }
+      }
+    }
+    roomRef.update(updates);
+  }
+  closeModal();
+}
+
+// ===== 렌더링 =====
+function getBingoInfo(markedGrid) {
+  let lines = 0;
+  const bingoSet = new Set();
+
+  for (let r = 0; r < GRID_SIZE; r++) {
+    let ok = true;
+    for (let c = 0; c < GRID_SIZE; c++) { if (!markedGrid[r][c]) { ok = false; break; } }
+    if (ok) { lines++; for (let c = 0; c < GRID_SIZE; c++) bingoSet.add(r+','+c); }
+  }
+  for (let c = 0; c < GRID_SIZE; c++) {
+    let ok = true;
+    for (let r = 0; r < GRID_SIZE; r++) { if (!markedGrid[r][c]) { ok = false; break; } }
+    if (ok) { lines++; for (let r = 0; r < GRID_SIZE; r++) bingoSet.add(r+','+c); }
+  }
+  let d1 = true, d2 = true;
+  for (let i = 0; i < GRID_SIZE; i++) {
+    if (!markedGrid[i][i]) d1 = false;
+    if (!markedGrid[i][GRID_SIZE-1-i]) d2 = false;
+  }
+  if (d1) { lines++; for (let i = 0; i < GRID_SIZE; i++) bingoSet.add(i+','+i); }
+  if (d2) { lines++; for (let i = 0; i < GRID_SIZE; i++) bingoSet.add(i+','+(GRID_SIZE-1-i)); }
+
+  return { lines, bingoSet };
+}
+
+function renderFromData(teamsData) {
+  const container = document.getElementById('teamsContainer');
+  const sb = document.getElementById('scoreboard');
+  container.innerHTML = '';
+  sb.innerHTML = '';
+
+  for (let t = 0; t < TEAM_COUNT; t++) {
+    const teamData = teamsData['team_' + t];
+    if (!teamData) continue;
+
+    const values = [], marked = [];
+    for (let r = 0; r < GRID_SIZE; r++) {
+      values[r] = [];
+      marked[r] = [];
+      for (let c = 0; c < GRID_SIZE; c++) {
+        const cell = teamData[r + '_' + c];
+        values[r][c] = cell.value;
+        marked[r][c] = !!cell.marked;
+      }
+    }
+
+    const { lines, bingoSet } = getBingoInfo(marked);
+    const markedCount = marked.flat().filter(v => v).length;
+
+    // 스코어 칩
+    const chip = document.createElement('div');
+    chip.className = 'score-chip' + (lines > 0 ? ' has-bingo' : '');
+    chip.innerHTML = `<span style="color:${TEAM_COLORS[t]}">${TEAM_NAMES[t]}</span> <span class="lines">${lines}줄</span>`;
+    sb.appendChild(chip);
+
+    // 팀 카드
+    const card = document.createElement('div');
+    card.className = 'team-card' + (lines > 0 ? ' has-bingo' : '');
+
+    let html = `
+      <div class="team-header">
+        <div>
+          <span class="team-name">${TEAM_NAMES[t]}</span>
+          ${lines > 0 ? `<span class="bingo-badge">${lines} BINGO!</span>` : ''}
+        </div>
+        <span class="team-score">체크 <strong>${markedCount}</strong>/25</span>
+      </div>
+      <div class="bingo-grid">
+    `;
+
+    for (let r = 0; r < GRID_SIZE; r++) {
+      for (let c = 0; c < GRID_SIZE; c++) {
+        const isMarked = marked[r][c];
+        const inBingo = bingoSet.has(r+','+c);
+        let cls = 'bingo-cell';
+        if (isMarked && inBingo) cls += ' marked in-bingo-line';
+        else if (isMarked) cls += ' marked';
+        html += `<div class="${cls}" onclick="toggleCell(${t},${r},${c})">${values[r][c]}</div>`;
+      }
+    }
+
+    html += '</div>';
+    card.innerHTML = html;
+    container.appendChild(card);
+  }
+}
+</script>
+</body>
+</html>
