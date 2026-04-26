@@ -414,12 +414,24 @@ input:focus,select:focus{border-color:#3b82f6;}
       <div class="card setup-section"><h3>라운드 <span class="round-indicator">현재 <strong id="roundDisplay">0</strong>R</span></h3><div class="setup-row" style="margin-bottom:8px;"><label>맵</label><select id="newRoundMap" style="width:100px;"><option>에란겔</option><option>사녹</option><option>테이고</option><option>미라마</option><option>비켄디</option><option>파라모</option><option>카라킨</option><option>론도</option></select><button class="btn btn-sm btn-green" onclick="addRound()">+ 라운드</button><button class="btn btn-sm btn-gray" onclick="removeRound()">- 삭제</button></div><div id="roundListArea" class="round-list"></div></div>
       <div class="card setup-section"><h3>타이머</h3><div class="setup-row"><input type="number" id="timerMinutes" value="120" min="1" max="600" style="width:70px;text-align:center;font-size:14px;padding:6px;"><span style="font-size:13px;color:#64748b;">분</span><button class="btn btn-sm btn-blue" onclick="startTimer()">시작</button><button class="btn btn-sm btn-gray" onclick="stopTimer()">정지</button></div></div>
       <div class="card setup-section"><h3>치킨/광탈 점수</h3>
-        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:10px;">
-          <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;color:#94a3b8;font-weight:700;">큰맵</span><span style="font-size:13px;color:#94a3b8;">±</span><input type="number" id="chickenBig" min="1" max="50" value="8" style="width:50px;font-size:13px;padding:5px 8px;text-align:center;" onchange="saveChickenPts()"><span style="font-size:13px;color:#94a3b8;">점</span></div>
-          <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;color:#94a3b8;font-weight:700;">작은맵</span><span style="font-size:13px;color:#94a3b8;">±</span><input type="number" id="chickenSmall" min="1" max="50" value="5" style="width:50px;font-size:13px;padding:5px 8px;text-align:center;" onchange="saveChickenPts()"><span style="font-size:13px;color:#94a3b8;">점</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:10px;">
+          <div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:10px 14px;">
+            <div style="font-size:13px;font-weight:700;color:#94a3b8;margin-bottom:6px;">🗺️ 큰맵</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:12px;color:#10b981;font-weight:600;">치킨 +</span><input type="number" id="bigChicken" min="1" max="50" value="8" style="width:46px;font-size:13px;padding:5px 6px;text-align:center;" onchange="saveChickenPts()">
+              <span style="font-size:12px;color:#ef4444;font-weight:600;">광탈 -</span><input type="number" id="bigElim" min="1" max="50" value="8" style="width:46px;font-size:13px;padding:5px 6px;text-align:center;" onchange="saveChickenPts()">
+            </div>
+          </div>
+          <div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:10px 14px;">
+            <div style="font-size:13px;font-weight:700;color:#94a3b8;margin-bottom:6px;">📍 작은맵</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:12px;color:#10b981;font-weight:600;">치킨 +</span><input type="number" id="smallChicken" min="1" max="50" value="5" style="width:46px;font-size:13px;padding:5px 6px;text-align:center;" onchange="saveChickenPts()">
+              <span style="font-size:12px;color:#ef4444;font-weight:600;">광탈 -</span><input type="number" id="smallElim" min="1" max="50" value="5" style="width:46px;font-size:13px;padding:5px 6px;text-align:center;" onchange="saveChickenPts()">
+            </div>
+          </div>
         </div>
         <div id="mapCategoryArea" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
-        <p class="setup-info">맵 클릭해서 큰맵/작은맵 전환 · 치킨 +점수, 광탈 -점수</p>
+        <p class="setup-info">맵 클릭해서 큰맵/작은맵 전환</p>
       </div>
       <div class="card setup-section"><h3>승급/강등 규칙</h3>
         <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
@@ -801,10 +813,10 @@ const ALL_MAPS=['에란겔','미라마','테이고','사녹','비켄디','파라
 const DEFAULT_BIG=['에란겔','미라마','테이고'];
 function getBigMaps(){return appData.chickenPts?.bigMaps||DEFAULT_BIG;}
 function isBigMap(mapName){return getBigMaps().includes(mapName);}
-function getChickenPts(mapName){const cp=appData.chickenPts||{};return isBigMap(mapName)?(cp.big||8):(cp.small||5);}
-function saveChickenPts(){if(!isAdmin)return;const big=parseInt(document.getElementById('chickenBig').value)||8;const small=parseInt(document.getElementById('chickenSmall').value)||5;const bigMaps=getBigMaps();dataRef.child('chickenPts').set({big,small,bigMaps});}
-function toggleMapCategory(mapName){if(!isAdmin)return;const cur=getBigMaps().slice();const idx=cur.indexOf(mapName);if(idx>=0)cur.splice(idx,1);else cur.push(mapName);const cp=appData.chickenPts||{};dataRef.child('chickenPts').set({big:cp.big||8,small:cp.small||5,bigMaps:cur});}
-function loadChickenPts(){const cp=appData.chickenPts||{};const bEl=document.getElementById('chickenBig');const sEl=document.getElementById('chickenSmall');if(bEl&&bEl!==document.activeElement)bEl.value=cp.big||8;if(sEl&&sEl!==document.activeElement)sEl.value=cp.small||5;
+function getChickenPts(mapName){const cp=appData.chickenPts||{};const big=isBigMap(mapName);return{chicken:big?(cp.bigChicken||cp.big||8):(cp.smallChicken||cp.small||5),elim:big?(cp.bigElim||cp.big||8):(cp.smallElim||cp.small||5)};}
+function saveChickenPts(){if(!isAdmin)return;const bigChicken=parseInt(document.getElementById('bigChicken').value)||8;const bigElim=parseInt(document.getElementById('bigElim').value)||8;const smallChicken=parseInt(document.getElementById('smallChicken').value)||5;const smallElim=parseInt(document.getElementById('smallElim').value)||5;const bigMaps=getBigMaps();dataRef.child('chickenPts').set({bigChicken,bigElim,smallChicken,smallElim,bigMaps});}
+function toggleMapCategory(mapName){if(!isAdmin)return;const cur=getBigMaps().slice();const idx=cur.indexOf(mapName);if(idx>=0)cur.splice(idx,1);else cur.push(mapName);const cp=appData.chickenPts||{};dataRef.child('chickenPts').set({bigChicken:cp.bigChicken||cp.big||8,bigElim:cp.bigElim||cp.big||8,smallChicken:cp.smallChicken||cp.small||5,smallElim:cp.smallElim||cp.small||5,bigMaps:cur});}
+function loadChickenPts(){const cp=appData.chickenPts||{};const bcEl=document.getElementById('bigChicken');const beEl=document.getElementById('bigElim');const scEl=document.getElementById('smallChicken');const seEl=document.getElementById('smallElim');if(bcEl&&bcEl!==document.activeElement)bcEl.value=cp.bigChicken||cp.big||8;if(beEl&&beEl!==document.activeElement)beEl.value=cp.bigElim||cp.big||8;if(scEl&&scEl!==document.activeElement)scEl.value=cp.smallChicken||cp.small||5;if(seEl&&seEl!==document.activeElement)seEl.value=cp.smallElim||cp.small||5;
   const area=document.getElementById('mapCategoryArea');if(!area)return;const bigMaps=getBigMaps();
   area.innerHTML=ALL_MAPS.map(m=>{const isBig=bigMaps.includes(m);return`<span onclick="toggleMapCategory('${m}')" style="padding:5px 12px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:2px solid ${isBig?'#f59e0b':'#334155'};background:${isBig?'rgba(245,158,11,.12)':'#0f172a'};color:${isBig?'#f59e0b':'#64748b'};">${isBig?'🗺️':'📍'} ${m}</span>`;}).join('');
 }
@@ -862,15 +874,15 @@ function renderGame(){
           h+=`<div class="input-row"><div class="input-player"><span>${mt.name}</span><span class="input-player-score">${st.total}/${it}</span></div><div class="input-field"><label>킬</label><input class="r-input" type="number" min="0" placeholder="0" value="${rd.kill||''}" data-fk="${tid}_${mid}_${selR}_k" onchange="updateScore('${tid}','${mid}',${selR},'kill',this.value)"${dis}></div><div class="input-field"><label>딜</label><input class="r-input" type="number" min="0" placeholder="0" value="${rd.damage||''}" data-fk="${tid}_${mid}_${selR}_d" onchange="updateScore('${tid}','${mid}',${selR},'damage',this.value)"${dis}></div></div>`;
         });
         // 치킨/광탈 입력
-        const chickenData=((scores[tid]||{})['_team']||{})['r'+selR]||{};const curMap=maps['r'+selR]||'에란겔';const pts=getChickenPts(curMap);const dis=isGuest?' disabled':'';
+        const chickenData=((scores[tid]||{})['_team']||{})['r'+selR]||{};const curMap=maps['r'+selR]||'에란겔';const cpts=getChickenPts(curMap);const dis=isGuest?' disabled':'';const cv=chickenData.chicken||0;
         h+=`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:2px solid #334155;margin-top:6px;">
           <span style="font-size:13px;font-weight:700;color:#94a3b8;">치킨/광탈</span>
           <select class="m-select" style="font-size:13px;" data-fk="${tid}_chicken_${selR}" onchange="updateChicken('${tid}',${selR},this.value)"${dis}>
-            <option value="0" ${(chickenData.chicken||0)===0?'selected':''}>없음</option>
-            <option value="${pts}" ${(chickenData.chicken||0)===pts?'selected':''}>치킨 (+${pts})</option>
-            <option value="${-pts}" ${(chickenData.chicken||0)===-pts?'selected':''}>광탈 (${-pts})</option>
+            <option value="0" ${cv===0?'selected':''}>없음</option>
+            <option value="${cpts.chicken}" ${cv===cpts.chicken?'selected':''}>🍗 치킨 (+${cpts.chicken})</option>
+            <option value="${-cpts.elim}" ${cv===-cpts.elim?'selected':''}>💀 광탈 (-${cpts.elim})</option>
           </select>
-          <span style="font-size:12px;color:#64748b;">${isBigMap(curMap)?'큰맵':'작은맵'} (±${pts})</span>
+          <span style="font-size:12px;color:#64748b;">${isBigMap(curMap)?'큰맵':'작은맵'} (치킨+${cpts.chicken} / 광탈-${cpts.elim})</span>
         </div>`;
       }
       const teamChk=getTeamChicken(tid);
@@ -1586,7 +1598,7 @@ const GUIDE_DATA={
 <div class="g-warn">⚠️ 타이머 종료해도 이벤트가 자동 종료되지 않습니다. 직접 "이벤트 종료"를 눌러야 합니다.</div>
 
 <h3>치킨/광탈 점수</h3>
-<p>큰맵/작은맵 점수를 각각 설정합니다.</p>
+<p>큰맵/작은맵별로 치킨 보너스, 광탈 패널티를 각각 설정합니다.</p>
 <p>맵 이름 클릭으로 큰맵(🗺️)/작은맵(📍) 전환. 기본 큰맵 : 에란겔, 미라마, 테이고</p>
 
 <h3>승급/강등 규칙</h3>
