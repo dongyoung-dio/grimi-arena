@@ -462,7 +462,7 @@
   </div>
 
   <div class="controls">
-    <button class="btn btn-primary" onclick="tryNewGame()">새 게임 (랜덤 재생성)</button>
+    <button class="btn btn-primary bingo-guest-hide" onclick="tryNewGame()">새 게임 (랜덤 재생성)</button>
     <button class="btn btn-back" onclick="leaveRoom()">나가기</button>
   </div>
 
@@ -511,6 +511,8 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 // ============================================================
+const IS_GUEST = new URLSearchParams(window.location.search).has('guest');
+document.addEventListener('DOMContentLoaded',()=>{if(IS_GUEST){const boxes=document.querySelectorAll('.lobby-box');if(boxes[0])boxes[0].style.display='none';const orDiv=document.querySelector('.or-divider');if(orDiv)orDiv.style.display='none';document.querySelectorAll('.bingo-guest-hide').forEach(b=>b.style.display='none');}});
 const TEAM_COUNT = 6;
 const GRID_SIZE = 5;
 const NUM_RANGE = 99;
@@ -649,6 +651,7 @@ function hasAnyMarked() {
 }
 
 function tryNewGame() {
+  if(IS_GUEST)return;
   hasAnyMarked().then(anyMarked => {
     if (anyMarked) {
       showModal('newGame');
@@ -659,6 +662,7 @@ function tryNewGame() {
 }
 
 function toggleCell(teamIdx, row, col) {
+  if(IS_GUEST)return;
   const path = 'team_' + teamIdx + '/' + row + '_' + col + '/marked';
   roomRef.child(path).once('value').then(snap => {
     roomRef.child(path).set(!snap.val());
