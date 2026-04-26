@@ -382,11 +382,12 @@ input:focus,select:focus{border-color:#3b82f6;}
       <div class="card setup-section"><h3>라운드 <span class="round-indicator">현재 <strong id="roundDisplay">0</strong>R</span></h3><div class="setup-row" style="margin-bottom:8px;"><label>맵</label><select id="newRoundMap" style="width:100px;"><option>에란겔</option><option>사녹</option><option>테이고</option><option>미라마</option><option>비켄디</option><option>파라모</option><option>카라킨</option><option>론도</option></select><button class="btn btn-sm btn-green" onclick="addRound()">+ 라운드</button><button class="btn btn-sm btn-gray" onclick="removeRound()">- 삭제</button></div><div id="roundListArea" class="round-list"></div></div>
       <div class="card setup-section"><h3>타이머</h3><div class="setup-row"><input type="number" id="timerMinutes" value="120" min="1" max="600" style="width:70px;text-align:center;font-size:14px;padding:6px;"><span style="font-size:13px;color:#64748b;">분</span><button class="btn btn-sm btn-blue" onclick="startTimer()">시작</button><button class="btn btn-sm btn-gray" onclick="stopTimer()">정지</button></div></div>
       <div class="card setup-section"><h3>치킨/광탈 점수</h3>
-        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
-          <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;color:#94a3b8;font-weight:700;">큰맵</span><span style="font-size:12px;color:#64748b;">(에란겔/미라마/테이고)</span><span style="font-size:13px;color:#94a3b8;">±</span><input type="number" id="chickenBig" min="1" max="50" value="8" style="width:50px;font-size:13px;padding:5px 8px;text-align:center;" onchange="saveChickenPts()"><span style="font-size:13px;color:#94a3b8;">점</span></div>
-          <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;color:#94a3b8;font-weight:700;">작은맵</span><span style="font-size:12px;color:#64748b;">(나머지)</span><span style="font-size:13px;color:#94a3b8;">±</span><input type="number" id="chickenSmall" min="1" max="50" value="5" style="width:50px;font-size:13px;padding:5px 8px;text-align:center;" onchange="saveChickenPts()"><span style="font-size:13px;color:#94a3b8;">점</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;color:#94a3b8;font-weight:700;">큰맵</span><span style="font-size:13px;color:#94a3b8;">±</span><input type="number" id="chickenBig" min="1" max="50" value="8" style="width:50px;font-size:13px;padding:5px 8px;text-align:center;" onchange="saveChickenPts()"><span style="font-size:13px;color:#94a3b8;">점</span></div>
+          <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;color:#94a3b8;font-weight:700;">작은맵</span><span style="font-size:13px;color:#94a3b8;">±</span><input type="number" id="chickenSmall" min="1" max="50" value="5" style="width:50px;font-size:13px;padding:5px 8px;text-align:center;" onchange="saveChickenPts()"><span style="font-size:13px;color:#94a3b8;">점</span></div>
         </div>
-        <p class="setup-info">치킨 시 +점수, 광탈 시 -점수로 반영됩니다</p>
+        <div id="mapCategoryArea" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+        <p class="setup-info">맵 클릭해서 큰맵/작은맵 전환 · 치킨 +점수, 광탈 -점수</p>
       </div>
       <div class="card setup-section"><h3>승급/강등 규칙</h3>
         <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
@@ -760,11 +761,17 @@ let timerAlerted=false;
 function updateTimer(){const t=appData.timer;const bar=document.getElementById('timerBar');const disp=document.getElementById('timerDisplay');if(!t||!t.active){bar.classList.add('hidden');if(timerInterval){clearInterval(timerInterval);timerInterval=null;}timerAlerted=false;return;}bar.classList.remove('hidden');const rem=Math.max(0,t.endTime-Date.now());if(rem<=0){disp.textContent='시간 종료!';disp.className='timer-display timer-expired';if(!timerAlerted){timerAlerted=true;try{const actx=new(window.AudioContext||window.webkitAudioContext)();for(let i=0;i<3;i++){const osc=actx.createOscillator();const g=actx.createGain();osc.connect(g);g.connect(actx.destination);osc.frequency.value=880;g.gain.value=0.3;osc.start(actx.currentTime+i*0.3);osc.stop(actx.currentTime+i*0.3+0.2);}}catch(e){}setTimeout(()=>alert('⏰ 타이머가 종료되었습니다!'),100);}return;}timerAlerted=false;disp.className='timer-display';const h=Math.floor(rem/3600000),m=Math.floor((rem%3600000)/60000),s=Math.floor((rem%60000)/1000);disp.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;if(!timerInterval)timerInterval=setInterval(updateTimer,1000);}
 
 // 점수 (딜 전체 합산 + 치킨/광탈)
-const BIG_MAPS=['에란겔','미라마','테이고'];
-function isBigMap(mapName){return BIG_MAPS.includes(mapName);}
+const ALL_MAPS=['에란겔','미라마','테이고','사녹','비켄디','파라모','카라킨','론도'];
+const DEFAULT_BIG=['에란겔','미라마','테이고'];
+function getBigMaps(){return appData.chickenPts?.bigMaps||DEFAULT_BIG;}
+function isBigMap(mapName){return getBigMaps().includes(mapName);}
 function getChickenPts(mapName){const cp=appData.chickenPts||{};return isBigMap(mapName)?(cp.big||8):(cp.small||5);}
-function saveChickenPts(){if(!isAdmin)return;const big=parseInt(document.getElementById('chickenBig').value)||8;const small=parseInt(document.getElementById('chickenSmall').value)||5;dataRef.child('chickenPts').set({big,small});}
-function loadChickenPts(){const cp=appData.chickenPts||{};const bEl=document.getElementById('chickenBig');const sEl=document.getElementById('chickenSmall');if(bEl&&bEl!==document.activeElement)bEl.value=cp.big||8;if(sEl&&sEl!==document.activeElement)sEl.value=cp.small||5;}
+function saveChickenPts(){if(!isAdmin)return;const big=parseInt(document.getElementById('chickenBig').value)||8;const small=parseInt(document.getElementById('chickenSmall').value)||5;const bigMaps=getBigMaps();dataRef.child('chickenPts').set({big,small,bigMaps});}
+function toggleMapCategory(mapName){if(!isAdmin)return;const cur=getBigMaps().slice();const idx=cur.indexOf(mapName);if(idx>=0)cur.splice(idx,1);else cur.push(mapName);const cp=appData.chickenPts||{};dataRef.child('chickenPts').set({big:cp.big||8,small:cp.small||5,bigMaps:cur});}
+function loadChickenPts(){const cp=appData.chickenPts||{};const bEl=document.getElementById('chickenBig');const sEl=document.getElementById('chickenSmall');if(bEl&&bEl!==document.activeElement)bEl.value=cp.big||8;if(sEl&&sEl!==document.activeElement)sEl.value=cp.small||5;
+  const area=document.getElementById('mapCategoryArea');if(!area)return;const bigMaps=getBigMaps();
+  area.innerHTML=ALL_MAPS.map(m=>{const isBig=bigMaps.includes(m);return`<span onclick="toggleMapCategory('${m}')" style="padding:5px 12px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:2px solid ${isBig?'#f59e0b':'#334155'};background:${isBig?'rgba(245,158,11,.12)':'#0f172a'};color:${isBig?'#f59e0b':'#64748b'};">${isBig?'🗺️':'📍'} ${m}</span>`;}).join('');
+}
 function updateScore(tid,mid,r,type,val){dataRef.child('scores/'+tid+'/'+mid+'/r'+r+'/'+type).set(parseInt(val)||0);}
 function updateChicken(tid,r,val){dataRef.child('scores/'+tid+'/_team/r'+r+'/chicken').set(parseInt(val)||0);}
 function getTeamTarget(tid){const team=(appData.teams||{})[tid];if(!team||!team.members)return 1;let t=0;Object.keys(team.members).forEach(mid=>{t+=mScore(team.members[mid]);});return t||1;}
@@ -1040,14 +1047,8 @@ function buildMarbleMap(){
       for(let c=0;c<numP;c++)marblePegs.push({x:sx+c*colW+shift,y:topY+r*rowH});
     }
   }
-  // 사이드 핀 제거하되 안쪽 여유 줄임 (좁은 간격)
-  marblePegs=marblePegs.filter(p=>p.x>M_PEG_R+8&&p.x<W-M_PEG_R-8);
-  // 사이드 경사 가이드 (공이 안쪽으로 자연스럽게 밀리도록)
-  for(let r=0;r<rows;r++){
-    const y=topY+r*rowH;
-    marblePegs.push({x:8,y,side:true});
-    marblePegs.push({x:W-8,y,side:true});
-  }
+  // 사이드 핀 제거 (벽 물리로 처리)
+  marblePegs=marblePegs.filter(p=>p.x>M_PEG_R+15&&p.x<W-M_PEG_R-15);
   // 범퍼
   const bPositions=[
     [W*0.15,topY+rowH*1.5],[W*0.5,topY+rowH*1.5],[W*0.85,topY+rowH*1.5],
@@ -1066,10 +1067,8 @@ function drawMarbleBoard(){
   const n=plinkoEntries.length;
   if(n<2){ctx.fillStyle='#64748b';ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('2명 이상 추가하세요',W/2,H/2);return;}
   buildMarbleMap();
-  // 핀 (사이드 가이드는 보이지 않음)
-  marblePegs.forEach(p=>{if(p.side)return;ctx.beginPath();ctx.arc(p.x,p.y,M_PEG_R,0,Math.PI*2);const g=ctx.createRadialGradient(p.x-1,p.y-1,0,p.x,p.y,M_PEG_R);g.addColorStop(0,'#94a3b8');g.addColorStop(1,'#475569');ctx.fillStyle=g;ctx.fill();});
-  // 사이드 벽 라인
-  ctx.strokeStyle='#33415566';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(4,40);ctx.lineTo(4,H-30);ctx.stroke();ctx.beginPath();ctx.moveTo(W-4,40);ctx.lineTo(W-4,H-30);ctx.stroke();
+  // 핀
+  marblePegs.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,M_PEG_R,0,Math.PI*2);const g=ctx.createRadialGradient(p.x-1,p.y-1,0,p.x,p.y,M_PEG_R);g.addColorStop(0,'#94a3b8');g.addColorStop(1,'#475569');ctx.fillStyle=g;ctx.fill();});
   // 범퍼
   marbleBumpers.forEach(b=>{ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);const g=ctx.createRadialGradient(b.x-2,b.y-2,1,b.x,b.y,b.r);g.addColorStop(0,'#f472b6');g.addColorStop(1,'#be185d');ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='#f9a8d4';ctx.lineWidth=1.5;ctx.stroke();});
   // 골인 라인
@@ -1127,19 +1126,10 @@ function startMarbleRace(){
       b.x+=b.vx;b.y+=b.vy;
       // 핀 충돌
       marblePegs.forEach(p=>{const dx=b.x-p.x,dy=b.y-p.y,dist=Math.sqrt(dx*dx+dy*dy);
-        if(dist<M_BALL_R+M_PEG_R){
-          if(p.side){
-            // 사이드 가이드: 안쪽으로 부드럽게 밀기
-            const inward=p.x<W/2?1.5:-1.5;
-            b.vx+=inward;b.vy*=0.95;
-            const ov=M_BALL_R+M_PEG_R-dist+1;b.x+=(p.x<W/2?ov:-ov);
-          }else{
-            const nx=dx/dist,ny=dy/dist;const dot=b.vx*nx+b.vy*ny;
-            b.vx-=2*dot*nx;b.vy-=2*dot*ny;b.vx*=M_DAMP;b.vy*=M_DAMP;
-            b.vx+=(Math.random()-0.5)*2.0;
-            const ov=M_BALL_R+M_PEG_R-dist+0.5;b.x+=nx*ov;b.y+=ny*ov;
-          }
-        }
+        if(dist<M_BALL_R+M_PEG_R){const nx=dx/dist,ny=dy/dist;const dot=b.vx*nx+b.vy*ny;
+          b.vx-=2*dot*nx;b.vy-=2*dot*ny;b.vx*=M_DAMP;b.vy*=M_DAMP;
+          b.vx+=(Math.random()-0.5)*2.0;
+          const ov=M_BALL_R+M_PEG_R-dist+0.5;b.x+=nx*ov;b.y+=ny*ov;}
       });
       // 범퍼 충돌
       marbleBumpers.forEach(bp=>{const dx=b.x-bp.x,dy=b.y-bp.y,dist=Math.sqrt(dx*dx+dy*dy);
@@ -1154,9 +1144,12 @@ function startMarbleRace(){
           if(relV<0){b.vx-=relV*nx*0.5;b.vy-=relV*ny*0.5;o.vx+=relV*nx*0.5;o.vy+=relV*ny*0.5;}
           const ov=M_BALL_R*2-dist+0.3;b.x+=nx*ov*0.5;b.y+=ny*ov*0.5;o.x-=nx*ov*0.5;o.y-=ny*ov*0.5;}
       });
-      // 벽 (자연스럽게 튕김)
-      if(b.x<M_BALL_R+2){b.x=M_BALL_R+2;b.vx=Math.abs(b.vx)*0.6+1.0;}
-      if(b.x>W-M_BALL_R-2){b.x=W-M_BALL_R-2;b.vx=-Math.abs(b.vx)*0.6-1.0;}
+      // 벽 바운스 + 사이드 근처 중앙 끌어당김
+      const edgeZone=40;
+      if(b.x<edgeZone)b.vx+=(edgeZone-b.x)*0.008;
+      if(b.x>W-edgeZone)b.vx-=(b.x-(W-edgeZone))*0.008;
+      if(b.x<M_BALL_R+2){b.x=M_BALL_R+2;b.vx=Math.abs(b.vx)*0.5+1.5;}
+      if(b.x>W-M_BALL_R-2){b.x=W-M_BALL_R-2;b.vx=-Math.abs(b.vx)*0.5-1.5;}
       // 골인
       if(b.y>=finishY&&!b.finished){b.finished=true;marbleFinished.push({name:b.name,color:b.color});plinkoOrder.push({name:b.name,color:b.color});renderPlinkoUI();}
     });
@@ -1344,6 +1337,165 @@ function runLadder(){
     }
   }
   ladderAnim=requestAnimationFrame(animate);
+}
+
+// ===== 달팽이 경주 =====
+const SNAIL_CHARS=['🐌','🐛','🐢','🐞','🦗','🐜','🐝','🦋','🐾','🦎','🦀','🐙'];
+const SNAIL_EVENTS=[
+  {msg:'{name} 터보 발동!',type:'boost',multiplier:2.5},
+  {msg:'{name} 속도가 느려집니다!',type:'slow',multiplier:0.3},
+  {msg:'{name} 넘어졌다!',type:'trip',multiplier:0},
+  {msg:'{name} 바람을 타고 가속!',type:'boost',multiplier:2.0},
+  {msg:'{name} 미끄러졌다!',type:'slow',multiplier:0.2},
+  {msg:'{name} 에너지 폭발!',type:'boost',multiplier:3.0},
+  {msg:'{name} 잠깐 쉬어간다...',type:'slow',multiplier:0.1},
+  {msg:'{name} 치킨 냄새 맡고 전력질주!',type:'boost',multiplier:2.8},
+  {msg:'{name} 상대를 추월한다!',type:'boost',multiplier:2.2},
+  {msg:'{name} 역풍을 맞았다!',type:'slow',multiplier:0.4},
+];
+let snailEntries=[],snailRacers=[],snailAnim=null,snailRunning=false,snailFinishOrder=[];
+
+function addSnailName(){
+  const inp=document.getElementById('snailNameInput');const raw=inp.value.trim();if(!raw)return;
+  if(!snailEntries.find(e=>e.name===raw))snailEntries.push({name:raw,color:PCOLORS[snailEntries.length%PCOLORS.length],emoji:SNAIL_CHARS[snailEntries.length%SNAIL_CHARS.length]});
+  inp.value='';renderSnailUI();
+}
+function removeSnailEntry(i){snailEntries.splice(i,1);snailEntries.forEach((e,j)=>{e.color=PCOLORS[j%PCOLORS.length];e.emoji=SNAIL_CHARS[j%SNAIL_CHARS.length];});renderSnailUI();}
+function resetSnailRace(){snailEntries=[];snailRacers=[];snailFinishOrder=[];snailRunning=false;if(snailAnim)cancelAnimationFrame(snailAnim);
+  document.getElementById('snailCanvas').style.display='none';document.getElementById('snailCommentary').style.display='none';
+  document.getElementById('snailResult').classList.add('hidden');renderSnailUI();}
+function renderSnailUI(){
+  document.getElementById('snailNameTags').innerHTML=snailEntries.map((e,i)=>`<span class="plinko-tag" style="background:${e.color}">${e.emoji} ${e.name}<span class="pt-remove" onclick="removeSnailEntry(${i})">✕</span></span>`).join('');
+  document.getElementById('snailBtn').disabled=snailEntries.length<2||snailRunning;
+}
+
+function startSnailRace(){
+  const n=snailEntries.length;if(n<2||snailRunning)return;
+  snailRunning=true;snailFinishOrder=[];
+  document.getElementById('snailBtn').disabled=true;
+  const cv=document.getElementById('snailCanvas');
+  const laneH=60;cv.height=n*laneH+60;cv.style.display='block';
+  const cmtEl=document.getElementById('snailCommentary');cmtEl.style.display='block';cmtEl.textContent='3... 2... 1... 출발!';
+  document.getElementById('snailResult').classList.add('hidden');
+  const W=cv.width,H=cv.height;
+  const trackStart=60,trackEnd=W-50;
+  snailRacers=snailEntries.map((e,i)=>({
+    name:e.name,color:e.color,emoji:e.emoji,
+    x:trackStart,lane:i,
+    baseSpeed:0.4+Math.random()*0.3,
+    speed:0,eventTimer:0,eventType:null,
+    finished:false,finishTime:0
+  }));
+  let frame=0,lastEvent=0;
+  function drawSnailTrack(){
+    const ctx=cv.getContext('2d');ctx.clearRect(0,0,W,H);
+    // 트랙 배경
+    snailRacers.forEach((r,i)=>{
+      const y=i*laneH+30;
+      ctx.fillStyle=i%2===0?'#1e293b':'#0f172a';
+      ctx.fillRect(0,y,W,laneH);
+      // 레인 구분선
+      ctx.strokeStyle='#33415544';ctx.lineWidth=1;ctx.setLineDash([8,6]);
+      ctx.beginPath();ctx.moveTo(trackStart,y+laneH);ctx.lineTo(trackEnd,y+laneH);ctx.stroke();ctx.setLineDash([]);
+    });
+    // 출발선
+    ctx.fillStyle='#ffffff22';ctx.fillRect(trackStart-2,28,4,n*laneH+4);
+    // 결승선 (체크무늬)
+    const fW=12;
+    for(let fy=28;fy<n*laneH+32;fy+=fW){
+      for(let fx=0;fx<2;fx++){
+        ctx.fillStyle=((fy/fW+fx)%2===0)?'#fff':'#000';
+        ctx.fillRect(trackEnd+fx*fW,fy,fW,fW);
+      }
+    }
+    // 달팽이들
+    snailRacers.forEach((r,i)=>{
+      const y=i*laneH+30+laneH/2;
+      // 이벤트 이펙트
+      if(r.eventType==='boost'){ctx.fillStyle=r.color+'33';ctx.beginPath();ctx.arc(r.x,y,20,0,Math.PI*2);ctx.fill();}
+      if(r.eventType==='trip'||r.eventType==='slow'){ctx.fillStyle='#ef444433';ctx.beginPath();ctx.arc(r.x,y,16,0,Math.PI*2);ctx.fill();}
+      // 달팽이 캐릭터
+      ctx.font='28px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(r.emoji,r.x,y);
+      // 이름
+      ctx.font='bold 12px sans-serif';ctx.fillStyle=r.color;ctx.textAlign='center';
+      ctx.fillText(r.name,r.x,y-22);
+      // 순위 번호
+      if(r.finished){
+        const rank=snailFinishOrder.indexOf(r)+1;
+        ctx.fillStyle='#fbbf24';ctx.font='bold 14px sans-serif';
+        ctx.fillText('#'+rank,r.x,y+22);
+      }
+    });
+    // 하단 진행바
+    const barY=H-24;
+    ctx.fillStyle='#334155';ctx.fillRect(10,barY,W-20,8);
+    snailRacers.forEach(r=>{
+      const pct=Math.min((r.x-trackStart)/(trackEnd-trackStart),1);
+      ctx.fillStyle=r.color;ctx.beginPath();ctx.arc(10+(W-20)*pct,barY+4,5,0,Math.PI*2);ctx.fill();
+    });
+    // 상태 표시
+    ctx.fillStyle='#64748b';ctx.font='11px sans-serif';ctx.textAlign='left';
+    const elapsed=(frame/60).toFixed(1);
+    ctx.fillText(`${elapsed}s`,10,20);
+    ctx.textAlign='right';
+    ctx.fillText(`${snailFinishOrder.length}/${n} 완주`,W-10,20);
+  }
+  function step(){
+    frame++;
+    const active=snailRacers.filter(r=>!r.finished);
+    if(active.length===0){endSnailRace();return;}
+    active.forEach(r=>{
+      // 기본 속도 + 랜덤 변동
+      let spd=r.baseSpeed*(0.7+Math.random()*0.6);
+      // 이벤트 효과
+      if(r.eventTimer>0){r.eventTimer--;
+        if(r.eventType==='boost')spd*=1.8;
+        else if(r.eventType==='slow')spd*=0.3;
+        else if(r.eventType==='trip')spd=0;
+        if(r.eventTimer<=0)r.eventType=null;
+      }
+      r.speed=spd;r.x+=spd;
+      // 결승
+      if(r.x>=trackEnd&&!r.finished){r.finished=true;r.x=trackEnd;r.finishTime=frame;snailFinishOrder.push(r);}
+    });
+    // 랜덤 이벤트 (3초마다 정도)
+    if(frame-lastEvent>120+Math.random()*120&&active.length>0){
+      lastEvent=frame;
+      const target=active[Math.floor(Math.random()*active.length)];
+      if(target.eventTimer<=0){
+        const ev=SNAIL_EVENTS[Math.floor(Math.random()*SNAIL_EVENTS.length)];
+        target.eventType=ev.type;target.eventTimer=40+Math.floor(Math.random()*40);
+        const emoji=ev.type==='boost'?'⚡':'💨';
+        document.getElementById('snailCommentary').innerHTML=`<span style="color:${ev.type==='boost'?'#10b981':'#ef4444'};">${emoji}</span> ${ev.msg.replace('{name}',`<span style="color:${target.color};font-weight:800;">${target.name}</span>`)}`;
+      }
+    }
+    drawSnailTrack();
+    snailAnim=requestAnimationFrame(step);
+  }
+  // 카운트다운
+  let countdown=3;
+  const cdInterval=setInterval(()=>{
+    countdown--;
+    if(countdown>0)cmtEl.textContent=countdown+'...';
+    else{clearInterval(cdInterval);cmtEl.textContent='출발!';snailAnim=requestAnimationFrame(step);}
+  },700);
+}
+function endSnailRace(){
+  snailRunning=false;document.getElementById('snailBtn').disabled=false;
+  const res=document.getElementById('snailResult');res.classList.remove('hidden');
+  const medals=['🥇','🥈','🥉'];
+  res.innerHTML=`<div style="text-align:center;margin-bottom:10px;font-size:18px;font-weight:800;color:#fbbf24;">🏆 경주 결과</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">${snailFinishOrder.map((r,i)=>{
+    const medal=medals[i]||'#'+(i+1);
+    return`<div style="padding:10px 16px;border-radius:10px;background:${i===0?'rgba(251,191,36,.1)':'#0f172a'};border:2px solid ${i===0?'#fbbf24':i===1?'#c0c0c0':i===2?'#cd7f32':'#334155'};text-align:center;min-width:80px;">
+      <div style="font-size:24px;">${r.emoji}</div>
+      <div style="font-size:16px;font-weight:800;margin:4px 0;">${medal}</div>
+      <div style="font-size:14px;font-weight:700;color:${r.color};">${r.name}</div>
+      <div style="font-size:11px;color:#64748b;">${(r.finishTime/60).toFixed(1)}s</div>
+    </div>`;
+  }).join('')}</div>`;
+  document.getElementById('snailCommentary').innerHTML=`🏆 <span style="color:#fbbf24;font-weight:800;">${snailFinishOrder[0].name}</span> 우승!`;
 }
 
 init();
