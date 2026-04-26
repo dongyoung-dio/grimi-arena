@@ -352,7 +352,7 @@ input:focus,select:focus{border-color:#3b82f6;}
       <span id="userAvatarTop" style="font-size:20px;cursor:pointer;" onclick="openProfile()"></span>
       <span class="user-name-display" id="dispName" onclick="openProfile()"></span>
       <span id="roleBadge"></span>
-      <span style="font-size:12px;"><span style="display:inline-block;width:7px;height:7px;background:#10b981;border-radius:50%;margin-right:3px;"></span><span id="onlineCount">1</span>명</span>
+      <span style="font-size:12px;"><span style="display:inline-block;width:7px;height:7px;background:#10b981;border-radius:50%;margin-right:3px;"></span><span id="onlineCount">1</span>명 <span id="guestCountLabel" style="color:#64748b;"></span></span>
       <button class="btn btn-xs btn-gray" onclick="logout()">로그아웃</button>
     </div>
   </div>
@@ -369,6 +369,7 @@ input:focus,select:focus{border-color:#3b82f6;}
   </div>
   <div class="main">
     <div id="tab-game">
+      <div id="gameEndEventArea" class="guest-hide" style="margin-bottom:12px;text-align:right;"></div>
       <div id="rankDashboard" class="rank-dashboard hidden"></div>
       <div id="gameTeams" class="teams-grid"></div>
       <div id="noTeamsMsg" class="card" style="text-align:center;color:#64748b;padding:40px;font-size:16px;">아직 팀이 배정되지 않았습니다.<br>관리자가 "팀 배정" 탭에서 설정해주세요.</div>
@@ -380,13 +381,20 @@ input:focus,select:focus{border-color:#3b82f6;}
       <div class="card setup-section"><h3>팀 구성</h3><div class="setup-row"><label>팀당 최대</label><select id="teamSize"><option value="2">2명</option><option value="3">3명</option><option value="4" selected>4명</option></select><button class="btn btn-sm btn-blue" onclick="previewTeams('balance')">밸런스 랜덤</button><button class="btn btn-sm btn-gray" onclick="previewTeams('full')">올 랜덤</button></div><p class="setup-info">선택 <strong id="availableCount">0</strong>명 → <strong id="teamCountCalc">0</strong>팀</p><div id="teamPreviewArea" class="hidden" style="margin-top:14px;"></div><div style="margin-top:10px;"><button class="btn btn-sm btn-gray" onclick="toggleManualMode()">수동 배정 모드</button></div><div id="manualArea" class="manual-area hidden"></div></div>
       <div class="card setup-section"><h3>라운드 <span class="round-indicator">현재 <strong id="roundDisplay">0</strong>R</span></h3><div class="setup-row" style="margin-bottom:8px;"><label>맵</label><select id="newRoundMap" style="width:100px;"><option>에란겔</option><option>사녹</option><option>테이고</option><option>미라마</option><option>비켄디</option><option>파라모</option><option>카라킨</option><option>론도</option></select><button class="btn btn-sm btn-green" onclick="addRound()">+ 라운드</button><button class="btn btn-sm btn-gray" onclick="removeRound()">- 삭제</button></div><div id="roundListArea" class="round-list"></div></div>
       <div class="card setup-section"><h3>타이머</h3><div class="setup-row"><input type="number" id="timerMinutes" value="120" min="1" max="600" style="width:70px;text-align:center;font-size:14px;padding:6px;"><span style="font-size:13px;color:#64748b;">분</span><button class="btn btn-sm btn-blue" onclick="startTimer()">시작</button><button class="btn btn-sm btn-gray" onclick="stopTimer()">정지</button></div></div>
+      <div class="card setup-section"><h3>치킨/광탈 점수</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+          <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;color:#94a3b8;font-weight:700;">큰맵</span><span style="font-size:12px;color:#64748b;">(에란겔/미라마/테이고)</span><span style="font-size:13px;color:#94a3b8;">±</span><input type="number" id="chickenBig" min="1" max="50" value="8" style="width:50px;font-size:13px;padding:5px 8px;text-align:center;" onchange="saveChickenPts()"><span style="font-size:13px;color:#94a3b8;">점</span></div>
+          <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;color:#94a3b8;font-weight:700;">작은맵</span><span style="font-size:12px;color:#64748b;">(나머지)</span><span style="font-size:13px;color:#94a3b8;">±</span><input type="number" id="chickenSmall" min="1" max="50" value="5" style="width:50px;font-size:13px;padding:5px 8px;text-align:center;" onchange="saveChickenPts()"><span style="font-size:13px;color:#94a3b8;">점</span></div>
+        </div>
+        <p class="setup-info">치킨 시 +점수, 광탈 시 -점수로 반영됩니다</p>
+      </div>
       <div class="card setup-section"><h3>승급/강등 규칙</h3>
         <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
-          <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;color:#10b981;font-weight:700;">▲ 승급</span><span style="font-size:13px;color:#94a3b8;">1위 ~</span><input type="number" id="rulePromoTo" min="1" max="20" style="width:50px;font-size:13px;padding:5px 8px;text-align:center;" onchange="saveRule()"><span style="font-size:13px;color:#94a3b8;">위</span></div>
-          <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;color:#ef4444;font-weight:700;">▼ 강등</span><input type="number" id="ruleRelegFrom" min="1" max="20" style="width:50px;font-size:13px;padding:5px 8px;text-align:center;" onchange="saveRule()"><span style="font-size:13px;color:#94a3b8;">위 ~</span></div>
+          <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;color:#10b981;font-weight:700;">▲ 승급</span><span style="font-size:13px;color:#94a3b8;">상위</span><input type="number" id="rulePromoTo" min="1" max="20" style="width:50px;font-size:13px;padding:5px 8px;text-align:center;" onchange="saveRule()"><span style="font-size:13px;color:#94a3b8;">팀</span></div>
+          <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;color:#ef4444;font-weight:700;">▼ 강등</span><span style="font-size:13px;color:#94a3b8;">하위</span><select id="ruleRelegBottom" style="font-size:13px;padding:5px 8px;border:1px solid #334155;border-radius:6px;background:#0f172a;color:#e2e8f0;" onchange="saveRule()"><option value="1">꼴등만</option><option value="2">2팀</option><option value="3">3팀</option><option value="4">4팀</option><option value="5">5팀</option></select></div>
           <span style="font-size:12px;color:#64748b;">그 사이는 유지</span>
         </div>
-        <p class="setup-info">예 : 승급 1~2위, 강등 4위~ → 3위는 유지</p>
+        <p class="setup-info" id="rulePreviewText">예 : 승급 상위 1팀, 강등 꼴등만 → 나머지는 유지</p>
       </div>
       <div class="card setup-section"><h3>이벤트 관리</h3><div class="setup-row" style="gap:8px;"><button class="btn btn-sm btn-green" onclick="endEvent()">종료 (결과 저장 + 승급)</button><button class="btn btn-sm btn-red" onclick="resetEvent()">초기화</button></div><p class="setup-info" id="rulePreview">승급/강등 규칙에 따라 자동 반영</p></div>
     </div>
@@ -425,6 +433,18 @@ input:focus,select:focus{border-color:#3b82f6;}
               <h4>도착 순서</h4>
               <div id="plinkoOrderList" class="plinko-order-list"></div>
               <div id="plinkoNoResult" style="text-align:center;color:#475569;font-size:13px;padding:20px;">아직 결과가 없습니다</div>
+              <div id="plinkoTeamDiv" class="guest-hide" style="display:none;margin-top:14px;border-top:1px solid #334155;padding-top:12px;">
+                <h4 style="font-size:14px;font-weight:700;color:#94a3b8;margin-bottom:8px;">팀 나누기</h4>
+                <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+                  <span style="font-size:13px;color:#64748b;">팀당</span>
+                  <select id="plinkoTeamSize" style="font-size:13px;padding:4px 8px;background:#0f172a;color:#e2e8f0;border:1px solid #334155;border-radius:6px;" onchange="renderPlinkoTeams()">
+                    <option value="2">2명</option><option value="3">3명</option><option value="4" selected>4명</option><option value="5">5명</option>
+                  </select>
+                  <button class="btn btn-xs btn-gray" data-mode="seq" onclick="plinkoTeamMode='seq';renderPlinkoTeams()" style="font-size:12px;" title="1~4번→1팀, 5~8번→2팀 ...">순서대로</button>
+                  <button class="btn btn-xs btn-gray" data-mode="zig" onclick="plinkoTeamMode='zig';renderPlinkoTeams()" style="font-size:12px;" title="1번→1팀, 2번→2팀, 3번→1팀, 4번→2팀 ... (스네이크 드래프트)">지그재그</button>
+                </div>
+                <div id="plinkoTeamResult"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -443,11 +463,11 @@ input:focus,select:focus{border-color:#3b82f6;}
           </div>
           <div id="ladderNameArea" class="guest-hide" style="margin-bottom:10px;"></div>
           <div id="ladderResultArea" class="guest-hide" style="margin-bottom:10px;"></div>
+          <div id="ladderResult" class="plinko-result hidden" style="margin-bottom:10px;"></div>
           <div class="guest-hide" style="margin-bottom:10px;text-align:center;">
             <button class="btn btn-blue" onclick="runLadder()" id="ladderBtn" style="font-size:16px;padding:12px 36px;">사다리 타기!</button>
           </div>
           <canvas id="ladderCanvas" width="600" height="500" style="border-radius:12px;background:#0f172a;border:1px solid #334155;max-width:100%;cursor:pointer;display:none;" onclick="onLadderCanvasClick(event)"></canvas>
-          <div id="ladderResult" class="plinko-result hidden" style="margin-top:10px;"></div>
         </div>
       </div>
     </div>
@@ -470,7 +490,7 @@ const TS={1:{upper:60,mid:50,lower:40},2:{upper:40,mid:35,lower:30},3:{upper:30,
 const SL={upper:'상',mid:'중',lower:'하'};const EMOJIS=['😀','😎','🤗','🥳','😈','👻','🤖','👽','🦊','🐶','🐱','🐯','🦁','🐸','🐧','🔥','⭐','💀','🎮','🎯','🏆','🎪','🍗','🍕'];
 function mScore(m){return(TS[m.tier||4]||TS[4])[m.subTier||'mid'];}
 
-let currentUser=null,isAdmin=false,isGuest=false,appData={},loginMembers={},timerInterval=null,selectedRounds={};
+let currentUser=null,isAdmin=false,isGuest=false,appData={},loginMembers={},timerInterval=null,selectedRounds={},presenceData={};
 let pendingLoginId=null,pendingLoginData=null;
 let selectedParticipants=new Set(),participantsInit=false,manualMode=false,manualAssign={};
 
@@ -487,6 +507,9 @@ function setupPinInputs(cid,autoFocus,onComplete){
 }
 function getPinValue(cid){return Array.from(document.getElementById(cid).querySelectorAll('.pin-digit')).map(i=>i.value).join('');}
 
+function getOnlineIds(){return new Set(Object.values(presenceData).filter(p=>p.type==='member'&&p.id).map(p=>p.id));}
+function getGuestCount(){return Object.values(presenceData).filter(p=>p.type==='guest').length;}
+function updateOnlineDisplay(){const total=Object.keys(presenceData).length;const guests=getGuestCount();const el=document.getElementById('onlineCount');if(el)el.textContent=total;const gEl=document.getElementById('guestCountLabel');if(gEl)gEl.textContent=guests>0?`(게스트 ${guests})`:'';}
 function init(){
   dataRef.child('members').on('value',snap=>{loginMembers=snap.val()||{};if(!document.getElementById('loginScreen').classList.contains('hidden'))renderLoginList(loginMembers);});
   const saved=localStorage.getItem('grimi_kill_user');
@@ -500,7 +523,7 @@ function renderLoginList(members){
   const list=document.getElementById('memberSelectList');const ids=Object.keys(members);
   const q=(document.getElementById('memberSearch')?.value||'').toLowerCase();
   if(!ids.length){list.innerHTML='<div class="no-result">등록된 멤버가 없습니다.</div>';return;}
-  const filtered=ids.filter(id=>members[id].name.toLowerCase().includes(q));
+  const filtered=ids.filter(id=>!members[id].hidden&&members[id].name.toLowerCase().includes(q));
   if(!filtered.length){list.innerHTML='<div class="no-result">검색 결과 없음</div>';return;}
   list.innerHTML=`<div class="login-grid">${filtered.map(id=>{
     const m=members[id];const av=getAvatar(m);const c=nameColor(m.name);
@@ -530,8 +553,8 @@ function enterAsGuest(){isGuest=true;isAdmin=false;currentUser={id:'guest',name:
   document.getElementById('dispName').textContent='게스트';document.getElementById('userAvatarTop').textContent='👤';
   document.getElementById('roleBadge').innerHTML='<span class="badge-member">구경</span>';
   document.querySelectorAll('.tab[data-tab="members"],.tab[data-tab="setup"]').forEach(el=>el.style.display='none');
-  const presRef=dataRef.child('presence');const myRef=presRef.push();myRef.set({name:'게스트'});myRef.onDisconnect().remove();
-  presRef.on('value',s=>{document.getElementById('onlineCount').textContent=s.exists()?Object.keys(s.val()).length:1;});
+  const presRef=dataRef.child('presence');const myRef=presRef.push();myRef.set({name:'게스트',type:'guest'});myRef.onDisconnect().remove();
+  presRef.on('value',s=>{presenceData=s.exists()?s.val():{};updateOnlineDisplay();});
   dataRef.on('value',snap=>{appData=snap.val()||{};renderAll();});
 }
 function enterApp(id,memberData){
@@ -543,8 +566,8 @@ function enterApp(id,memberData){
   document.getElementById('roleBadge').innerHTML=isAdmin?'<span class="badge-admin">관리자</span>':'<span class="badge-member">일반</span>';
   if(!isAdmin)document.querySelectorAll('.tab[data-tab="members"],.tab[data-tab="setup"]').forEach(el=>el.style.display='none');
   else document.querySelectorAll('.tab[data-tab="members"],.tab[data-tab="setup"]').forEach(el=>el.style.display='');
-  const presRef=dataRef.child('presence');const myRef=presRef.push();myRef.set({name:memberData.name});myRef.onDisconnect().remove();
-  presRef.on('value',s=>{document.getElementById('onlineCount').textContent=s.exists()?Object.keys(s.val()).length:1;});
+  const presRef=dataRef.child('presence');const myRef=presRef.push();myRef.set({name:memberData.name,id:id,type:'member'});myRef.onDisconnect().remove();
+  presRef.on('value',s=>{presenceData=s.exists()?s.val():{};updateOnlineDisplay();});
   dataRef.on('value',snap=>{appData=snap.val()||{};if(appData.members&&appData.members[id]){currentUser={id,...appData.members[id]};isAdmin=appData.members[id].role==='admin';document.getElementById('userAvatarTop').textContent=appData.members[id].avatar||appData.members[id].name.charAt(0);}renderAll();});
 }
 function logout(){localStorage.removeItem('grimi_kill_user');isGuest=false;location.reload();}
@@ -554,9 +577,9 @@ function switchMiniGame(mg){document.querySelectorAll('.mini-tab').forEach(t=>t.
 // 프로필
 function openProfile(){
   if(isGuest)return;document.getElementById('profileModal').classList.remove('hidden');
-  const m=currentUser;const av=m.avatar||'🎮';
-  let h=`<div class="profile-avatar-big" ${!av?`style="background:${nameColor(m.name)};font-size:28px;font-weight:800;color:#fff;"`:''}>${av||m.name.charAt(0)}</div>`;
-  h+=`<div class="profile-field"><label>아바타 선택</label><div class="emoji-grid"><div class="emoji-pick ${!av||av===''?'active':''}" onclick="setAvatar('')" style="font-size:14px;font-weight:700;color:#94a3b8;">없음</div>${EMOJIS.map(e=>`<div class="emoji-pick ${e===av?'active':''}" onclick="setAvatar('${e}')">${e}</div>`).join('')}</div></div>`;
+  const m=currentUser;const av=m.avatar;const hasAv=av&&av!=='';
+  let h=`<div class="profile-avatar-big" ${!hasAv?`style="background:${nameColor(m.name)};font-size:28px;font-weight:800;color:#fff;"`:''}>${hasAv?av:m.name.charAt(0)}</div>`;
+  h+=`<div class="profile-field"><label>아바타 선택</label><div class="emoji-grid"><div class="emoji-pick ${!hasAv?'active':''}" onclick="setAvatar('')" style="font-size:14px;font-weight:700;color:#94a3b8;">없음</div>${EMOJIS.map(e=>`<div class="emoji-pick ${e===av?'active':''}" onclick="setAvatar('${e}')">${e}</div>`).join('')}</div></div>`;
   h+=`<div class="profile-field"><label>이름</label><p style="font-size:17px;font-weight:700;">${m.name}</p></div>`;
   h+=`<div class="profile-field"><label>티어</label><p><span class="tier-badge tier-${m.tier||4}">${m.tier||4}T ${SL[m.subTier||'mid']}</span> <span style="color:#fbbf24;font-weight:700;">${mScore(m)}점</span></p></div>`;
   h+=`<button class="btn btn-sm btn-gray" onclick="changeMyPin()" style="width:100%;">비밀번호 변경</button>`;
@@ -578,6 +601,7 @@ function removeMember(id,name){if(!isAdmin||!confirm(name+' 삭제?'))return;dat
 function changeTier(id,tier){if(!isAdmin)return;dataRef.child('members/'+id+'/tier').set(parseInt(tier));}
 function changeSubTier(id,sub){if(!isAdmin)return;dataRef.child('members/'+id+'/subTier').set(sub);}
 function changeRole(id,role){if(!isAdmin)return;dataRef.child('members/'+id+'/role').set(role);}
+function toggleHidden(id,hidden){if(!isAdmin)return;dataRef.child('members/'+id+'/hidden').set(hidden||null);}
 function resetPin(id,name){if(!isAdmin||!confirm(name+' PIN 초기화?'))return;dataRef.child('members/'+id+'/pin').set('0000');}
 
 // 참가자
@@ -677,8 +701,9 @@ function changeRoundMap(r,map){if(!isAdmin)return;dataRef.child('roundMaps/r'+r)
 // 이벤트 종료 + 승급
 function endEvent(){
   if(!isAdmin)return;const teams=appData.teams||{};if(!Object.keys(teams).length){alert('진행 중 이벤트 없음');return;}
-  const rule=appData.tierRule||{};const promoTo=rule.promoTo||1;const relegFrom=rule.relegFrom||3;
-  if(!confirm(`종료하고 결과 저장?\n승급: 1~${promoTo}위 / 강등: ${relegFrom}위~`))return;
+  const rule=appData.tierRule||{};const promoTo=rule.promoTo||1;const relegBottom=rule.relegBottom||1;
+  const totalTeams=Object.keys(teams).length;const relegFrom=totalTeams-relegBottom+1;
+  if(!confirm(`종료하고 결과 저장?\n승급: 상위 ${promoTo}팀 / 강등: 하위 ${relegBottom===1?'꼴등만':relegBottom+'팀'}`))return;
   const history=appData.history||{};const eventNum=Object.keys(history).length+1;
   const today=new Date();const dateStr=(today.getMonth()+1)+'/'+(today.getDate());
   const tids=Object.keys(teams);const rounds=appData.rounds||0;const members=appData.members||{};
@@ -705,20 +730,23 @@ function endEvent(){
   updates['teams']=null;updates['scores']=null;updates['rounds']=0;updates['roundMaps']=null;updates['eventStatus']='idle';updates['timer']=null;
   dataRef.update(updates);if(timerInterval)clearInterval(timerInterval);selectedRounds={};switchTab('ranking');
 }
-function saveRule(){if(!isAdmin)return;const promoTo=parseInt(document.getElementById('rulePromoTo').value)||1;const relegFrom=parseInt(document.getElementById('ruleRelegFrom').value)||3;dataRef.child('tierRule').set({promoTo,relegFrom});}
-function loadRule(){const rule=appData.tierRule||{};const promoTo=rule.promoTo||1;const relegFrom=rule.relegFrom||3;const pEl=document.getElementById('rulePromoTo');const rEl=document.getElementById('ruleRelegFrom');if(pEl&&pEl!==document.activeElement)pEl.value=promoTo;if(rEl&&rEl!==document.activeElement)rEl.value=relegFrom;}
+function saveRule(){if(!isAdmin)return;const promoTo=parseInt(document.getElementById('rulePromoTo').value)||1;const relegBottom=parseInt(document.getElementById('ruleRelegBottom').value)||1;dataRef.child('tierRule').set({promoTo,relegBottom});}
+function loadRule(){const rule=appData.tierRule||{};const promoTo=rule.promoTo||1;const relegBottom=rule.relegBottom||(rule.relegFrom?null:1);const pEl=document.getElementById('rulePromoTo');const rEl=document.getElementById('ruleRelegBottom');if(pEl&&pEl!==document.activeElement)pEl.value=promoTo;if(rEl&&relegBottom!==null&&rEl!==document.activeElement)rEl.value=relegBottom;const preview=document.getElementById('rulePreviewText');if(preview)preview.textContent=`승급 상위 ${promoTo}팀, 강등 하위 ${(relegBottom||1)===1?'꼴등만':relegBottom+'팀'} → 나머지는 유지`;}
 function resetEvent(){if(!isAdmin||!confirm('초기화? 결과 저장 안됨'))return;dataRef.update({teams:null,scores:null,rounds:0,roundMaps:null,eventStatus:'idle',timer:null});if(timerInterval)clearInterval(timerInterval);selectedRounds={};}
 function deleteHistory(ek){if(!isAdmin||!confirm(ek.replace('event_','')+'회차 삭제?'))return;dataRef.child('history/'+ek).remove();}
 
 // 타이머
 function startTimer(){if(!isAdmin)return;dataRef.child('timer').set({endTime:Date.now()+(parseInt(document.getElementById('timerMinutes').value)||120)*60000,active:true});}
 function stopTimer(){if(!isAdmin)return;dataRef.child('timer').set({active:false});if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
-function updateTimer(){const t=appData.timer;const bar=document.getElementById('timerBar');const disp=document.getElementById('timerDisplay');if(!t||!t.active){bar.classList.add('hidden');if(timerInterval){clearInterval(timerInterval);timerInterval=null;}return;}bar.classList.remove('hidden');const rem=Math.max(0,t.endTime-Date.now());if(rem<=0){disp.textContent='시간 종료!';disp.className='timer-display timer-expired';return;}disp.className='timer-display';const h=Math.floor(rem/3600000),m=Math.floor((rem%3600000)/60000),s=Math.floor((rem%60000)/1000);disp.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;if(!timerInterval)timerInterval=setInterval(updateTimer,1000);}
+let timerAlerted=false;
+function updateTimer(){const t=appData.timer;const bar=document.getElementById('timerBar');const disp=document.getElementById('timerDisplay');if(!t||!t.active){bar.classList.add('hidden');if(timerInterval){clearInterval(timerInterval);timerInterval=null;}timerAlerted=false;return;}bar.classList.remove('hidden');const rem=Math.max(0,t.endTime-Date.now());if(rem<=0){disp.textContent='시간 종료!';disp.className='timer-display timer-expired';if(!timerAlerted){timerAlerted=true;try{const actx=new(window.AudioContext||window.webkitAudioContext)();for(let i=0;i<3;i++){const osc=actx.createOscillator();const g=actx.createGain();osc.connect(g);g.connect(actx.destination);osc.frequency.value=880;g.gain.value=0.3;osc.start(actx.currentTime+i*0.3);osc.stop(actx.currentTime+i*0.3+0.2);}}catch(e){}setTimeout(()=>alert('⏰ 타이머가 종료되었습니다!'),100);}return;}timerAlerted=false;disp.className='timer-display';const h=Math.floor(rem/3600000),m=Math.floor((rem%3600000)/60000),s=Math.floor((rem%60000)/1000);disp.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;if(!timerInterval)timerInterval=setInterval(updateTimer,1000);}
 
 // 점수 (딜 전체 합산 + 치킨/광탈)
 const BIG_MAPS=['에란겔','미라마','테이고'];
 function isBigMap(mapName){return BIG_MAPS.includes(mapName);}
-function getChickenPts(mapName){return isBigMap(mapName)?8:5;}
+function getChickenPts(mapName){const cp=appData.chickenPts||{};return isBigMap(mapName)?(cp.big||8):(cp.small||5);}
+function saveChickenPts(){if(!isAdmin)return;const big=parseInt(document.getElementById('chickenBig').value)||8;const small=parseInt(document.getElementById('chickenSmall').value)||5;dataRef.child('chickenPts').set({big,small});}
+function loadChickenPts(){const cp=appData.chickenPts||{};const bEl=document.getElementById('chickenBig');const sEl=document.getElementById('chickenSmall');if(bEl&&bEl!==document.activeElement)bEl.value=cp.big||8;if(sEl&&sEl!==document.activeElement)sEl.value=cp.small||5;}
 function updateScore(tid,mid,r,type,val){dataRef.child('scores/'+tid+'/'+mid+'/r'+r+'/'+type).set(parseInt(val)||0);}
 function updateChicken(tid,r,val){dataRef.child('scores/'+tid+'/_team/r'+r+'/chicken').set(parseInt(val)||0);}
 function getTeamTarget(tid){const team=(appData.teams||{})[tid];if(!team||!team.members)return 1;let t=0;Object.keys(team.members).forEach(mid=>{t+=mScore(team.members[mid]);});return t||1;}
@@ -736,6 +764,8 @@ function renderEventStatus(){const bar=document.getElementById('eventStatusBar')
 function renderGame(){
   const teams=appData.teams||{},tids=Object.keys(teams),rounds=appData.rounds||0,scores=appData.scores||{},maps=appData.roundMaps||{};
   const dash=document.getElementById('rankDashboard');
+  const endArea=document.getElementById('gameEndEventArea');
+  if(endArea){if(isAdmin&&tids.length>0)endArea.innerHTML=`<button class="btn btn-sm btn-green" onclick="endEvent()">이벤트 종료 (결과 저장 + 승급)</button>`;else endArea.innerHTML='';}
   document.getElementById('noTeamsMsg').classList.toggle('hidden',tids.length>0);
   const c=document.getElementById('gameTeams');
   if(!tids.length){dash.classList.add('hidden');c.innerHTML='';return;}
@@ -756,7 +786,7 @@ function renderGame(){
   nat.forEach(tid=>{
     const team=teams[tid],mids=Object.keys(team.members||{}),total=totals[tid],target=targets[tid];
     const pct=Math.min(Math.round((total/target)*100),999);const rank=rankMap[tid];
-    const selR=selectedRounds[tid]||(rounds>0?rounds:0);const selMap=maps['r'+selR]||'';
+    const selR=selectedRounds[tid]||(rounds>0?1:0);const selMap=maps['r'+selR]||'';
     const isTop=rank===1&&total>0;
     let h=`<div class="team-card ${isTop?'gold-border':''} ${pct>=100?'progress-100':''}">
       <div class="team-card-header"><div style="display:flex;align-items:center;gap:10px;"><span class="team-card-title" style="color:${teamColor(tid)}">${team.name}</span><span style="font-size:15px;font-weight:800;color:${isTop?'#fbbf24':'#64748b'};">#${rank}</span></div></div>
@@ -853,18 +883,19 @@ function renderMembers(){
   if(isAdmin){addArea.innerHTML=`<div class="add-member-bar"><input type="text" id="addMemberName" placeholder="새 멤버 이름" onkeydown="if(event.key==='Enter')addMember()"><select id="addMemberTier" style="width:65px;">${[1,2,3,4,5,6].map(t=>`<option value="${t}" ${t===4?'selected':''}>${t}T</option>`).join('')}</select><select id="addMemberSubTier" style="width:80px;"><option value="upper">상</option><option value="mid" selected>중</option><option value="lower">하</option></select><button class="btn btn-blue" onclick="addMember()" style="padding:18px 48px;font-size:20px;font-weight:800;border-radius:12px;min-width:120px;">+ 추가</button></div>`;}else addArea.innerHTML='';
   const area=document.getElementById('memberTableArea');
   if(!ids.length){area.innerHTML='<p style="color:#64748b;text-align:center;padding:20px;">멤버 없음</p>';return;}
-  let h=`<table class="member-table"><thead><tr><th>이름</th><th>티어</th><th>등급</th><th>점수</th>${isAdmin?'<th>역할</th><th>PIN</th><th></th>':''}</tr></thead><tbody>`;
-  ids.forEach(id=>{const m=members[id];const sc=mScore(m);
-    h+=`<tr><td><span class="m-name">${m.name}</span> ${m.role==='admin'?'<span class="badge-admin" style="font-size:10px;">관리자</span>':''}</td>
+  const onlineIds=getOnlineIds();
+  let h=`<table class="member-table"><thead><tr><th>이름</th><th>티어</th><th>등급</th><th>점수</th>${isAdmin?'<th>역할</th><th>PIN</th><th>숨김</th><th></th>':''}</tr></thead><tbody>`;
+  ids.forEach(id=>{const m=members[id];const sc=mScore(m);const isOnline=onlineIds.has(id);
+    h+=`<tr><td><span class="m-name">${isOnline?'<span style="display:inline-block;width:8px;height:8px;background:#3b82f6;border-radius:50%;margin-right:5px;box-shadow:0 0 6px #3b82f6;"></span>':''}${m.name}</span> ${m.role==='admin'?'<span class="badge-admin" style="font-size:10px;">관리자</span>':''} ${m.hidden?'<span style="font-size:10px;color:#64748b;background:#1e293b;padding:2px 6px;border-radius:4px;">숨김</span>':''}</td>
     <td>${isAdmin?`<select class="m-select" onchange="changeTier('${id}',this.value)">${[1,2,3,4,5,6].map(t=>`<option value="${t}" ${t===(m.tier||4)?'selected':''}>${t}T</option>`).join('')}</select>`:`<span class="tier-badge tier-${m.tier||4}">${m.tier||4}T</span>`}</td>
     <td>${isAdmin?`<select class="m-select" onchange="changeSubTier('${id}',this.value)"><option value="upper" ${m.subTier==='upper'?'selected':''}>상</option><option value="mid" ${(!m.subTier||m.subTier==='mid')?'selected':''}>중</option><option value="lower" ${m.subTier==='lower'?'selected':''}>하</option></select>`:`${SL[m.subTier||'mid']}`}</td>
     <td><span class="m-score">${sc}점</span></td>
-    ${isAdmin?`<td><select class="m-select" onchange="changeRole('${id}',this.value)"><option value="member" ${m.role!=='admin'?'selected':''}>일반</option><option value="admin" ${m.role==='admin'?'selected':''}>관리자</option></select></td><td><button class="btn btn-xs btn-gray" onclick="resetPin('${id}','${m.name}')">초기화</button></td><td><button class="m-delete" onclick="removeMember('${id}','${m.name}')">✕</button></td>`:''}</tr>`;
+    ${isAdmin?`<td><select class="m-select" onchange="changeRole('${id}',this.value)"><option value="member" ${m.role!=='admin'?'selected':''}>일반</option><option value="admin" ${m.role==='admin'?'selected':''}>관리자</option></select></td><td><button class="btn btn-xs btn-gray" onclick="resetPin('${id}','${m.name}')">초기화</button></td><td><button class="btn btn-xs ${m.hidden?'btn-red':'btn-gray'}" onclick="toggleHidden('${id}',${!m.hidden})" style="font-size:11px;padding:4px 8px;">${m.hidden?'해제':'숨김'}</button></td><td><button class="m-delete" onclick="removeMember('${id}','${m.name}')">✕</button></td>`:''}</tr>`;
   });h+=`</tbody></table>`;area.innerHTML=h;
 }
 
 function renderSetup(){
-  renderParticipants();document.getElementById('roundDisplay').textContent=appData.rounds||0;loadRule();
+  renderParticipants();document.getElementById('roundDisplay').textContent=appData.rounds||0;loadRule();loadChickenPts();
   const la=document.getElementById('roundListArea');const rounds=appData.rounds||0;const maps=appData.roundMaps||{};
   if(!rounds){la.innerHTML='<p style="font-size:13px;color:#475569;">라운드 없음</p>';return;}
   const MAPS=['에란겔','사녹','테이고','미라마','비켄디','파라모','카라킨','론도'];
@@ -886,7 +917,7 @@ function renderRanking(){
     cList.innerHTML=sorted.map((tid,i)=>{
       const rank=i+1,total=totals[tid],target=targets[tid],pct=Math.min(Math.round((total/target)*100),999);
       const team=teams[tid];const mids=Object.keys(team.members||{});
-      const rl=appData.tierRule||{};const pt=rl.promoTo||1;const rf=rl.relegFrom||3;
+      const rl=appData.tierRule||{};const pt=rl.promoTo||1;const rb=rl.relegBottom||1;const totalRankTeams=sorted.length;const rf=totalRankTeams-rb+1;
       let bcls='rb-stay',btxt='유지';if(rank<=pt){bcls='rb-up';btxt='▲ 승급';}else if(rank>=rf){bcls='rb-down';btxt='▼ 강등';}
       const isOpen=rank===1?'open':'';
       let playerH=mids.map(mid=>{const mt=team.members[mid];const st=getPlayerStats(tid,mid);const it=mScore(mt);const pp=it>0?Math.round((st.total/it)*100):0;
@@ -955,7 +986,7 @@ function addPlinkoName(){
   inp.value='';renderPlinkoUI();drawMarbleBoard();
 }
 function removePlinkoEntry(i){plinkoEntries.splice(i,1);plinkoEntries.forEach((e,j)=>e.color=PCOLORS[j%PCOLORS.length]);renderPlinkoUI();drawMarbleBoard();}
-function resetPlinko(){plinkoEntries=[];plinkoOrder=[];marbleBalls=[];marbleFinished=[];marbleRunning=false;if(marbleAnim)cancelAnimationFrame(marbleAnim);renderPlinkoUI();drawMarbleBoard();}
+function resetPlinko(){plinkoEntries=[];plinkoOrder=[];marbleBalls=[];marbleFinished=[];marbleRunning=false;if(marbleAnim)cancelAnimationFrame(marbleAnim);renderPlinkoUI();drawMarbleBoard();const td=document.getElementById('plinkoTeamDiv');if(td)td.style.display='none';}
 function shuffleMarbles(){for(let i=plinkoEntries.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[plinkoEntries[i],plinkoEntries[j]]=[plinkoEntries[j],plinkoEntries[i]];}plinkoEntries.forEach((e,j)=>e.color=PCOLORS[j%PCOLORS.length]);renderPlinkoUI();drawMarbleBoard();}
 function renderPlinkoUI(){
   document.getElementById('plinkoNameTags').innerHTML=plinkoEntries.map((e,i)=>`<span class="plinko-tag" style="background:${e.color}">${e.name}<span class="pt-remove" onclick="removePlinkoEntry(${i})">✕</span></span>`).join('');
@@ -975,17 +1006,15 @@ function buildMarbleMap(){
   const n=plinkoEntries.length;if(n<2)return;
   const topY=50,botY=H-40;
   const rows=16;const rowH=(botY-topY)/rows;
-  const cols=Math.min(Math.max(n+2,6),14);const colW=W/(cols+1);
+  const cols=12;const colW=W/(cols+1);
   marblePegs=[];marbleBumpers=[];
-  // 복잡한 맵 : 깔때기 + 지그재그 + 범퍼 조합
+  // 고정 맵 : 핀 갯수 항상 동일
   for(let r=0;r<rows;r++){
     const isOdd=r%2===1;
-    // 위쪽은 넓게, 중간은 지그재그, 아래는 깔때기
     let shift=0;
     if(r>=4&&r<10)shift=(r%3===1?colW*0.5:r%3===2?-colW*0.5:0);
-    if(r>=10){// 깔때기
-      const squeeze=((r-10)/(rows-10))*colW*0.6;
-      const numP=Math.max(3,cols-Math.floor((r-10)*0.8));
+    if(r>=10){
+      const numP=Math.max(4,cols-Math.floor((r-10)*0.7));
       const gap=W/(numP+1);
       for(let c=0;c<numP;c++)marblePegs.push({x:gap+c*gap+shift,y:topY+r*rowH});
     }else{
@@ -993,8 +1022,15 @@ function buildMarbleMap(){
       for(let c=0;c<numP;c++)marblePegs.push({x:sx+c*colW+shift,y:topY+r*rowH});
     }
   }
-  marblePegs=marblePegs.filter(p=>p.x>M_PEG_R+12&&p.x<W-M_PEG_R-12);
-  // 범퍼 (크고 강하게 튕기는 원) - 많이 배치
+  // 사이드 핀 제거하되 안쪽 여유 줄임 (좁은 간격)
+  marblePegs=marblePegs.filter(p=>p.x>M_PEG_R+8&&p.x<W-M_PEG_R-8);
+  // 사이드 경사 가이드 (공이 안쪽으로 자연스럽게 밀리도록)
+  for(let r=0;r<rows;r++){
+    const y=topY+r*rowH;
+    marblePegs.push({x:8,y,side:true});
+    marblePegs.push({x:W-8,y,side:true});
+  }
+  // 범퍼
   const bPositions=[
     [W*0.15,topY+rowH*1.5],[W*0.5,topY+rowH*1.5],[W*0.85,topY+rowH*1.5],
     [W*0.3,topY+rowH*3.5],[W*0.7,topY+rowH*3.5],
@@ -1012,8 +1048,10 @@ function drawMarbleBoard(){
   const n=plinkoEntries.length;
   if(n<2){ctx.fillStyle='#64748b';ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('2명 이상 추가하세요',W/2,H/2);return;}
   buildMarbleMap();
-  // 핀
-  marblePegs.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,M_PEG_R,0,Math.PI*2);const g=ctx.createRadialGradient(p.x-1,p.y-1,0,p.x,p.y,M_PEG_R);g.addColorStop(0,'#94a3b8');g.addColorStop(1,'#475569');ctx.fillStyle=g;ctx.fill();});
+  // 핀 (사이드 가이드는 보이지 않음)
+  marblePegs.forEach(p=>{if(p.side)return;ctx.beginPath();ctx.arc(p.x,p.y,M_PEG_R,0,Math.PI*2);const g=ctx.createRadialGradient(p.x-1,p.y-1,0,p.x,p.y,M_PEG_R);g.addColorStop(0,'#94a3b8');g.addColorStop(1,'#475569');ctx.fillStyle=g;ctx.fill();});
+  // 사이드 벽 라인
+  ctx.strokeStyle='#33415566';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(4,40);ctx.lineTo(4,H-30);ctx.stroke();ctx.beginPath();ctx.moveTo(W-4,40);ctx.lineTo(W-4,H-30);ctx.stroke();
   // 범퍼
   marbleBumpers.forEach(b=>{ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);const g=ctx.createRadialGradient(b.x-2,b.y-2,1,b.x,b.y,b.r);g.addColorStop(0,'#f472b6');g.addColorStop(1,'#be185d');ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='#f9a8d4';ctx.lineWidth=1.5;ctx.stroke();});
   // 골인 라인
@@ -1071,10 +1109,19 @@ function startMarbleRace(){
       b.x+=b.vx;b.y+=b.vy;
       // 핀 충돌
       marblePegs.forEach(p=>{const dx=b.x-p.x,dy=b.y-p.y,dist=Math.sqrt(dx*dx+dy*dy);
-        if(dist<M_BALL_R+M_PEG_R){const nx=dx/dist,ny=dy/dist;const dot=b.vx*nx+b.vy*ny;
-          b.vx-=2*dot*nx;b.vy-=2*dot*ny;b.vx*=M_DAMP;b.vy*=M_DAMP;
-          b.vx+=(Math.random()-0.5)*2.0;
-          const ov=M_BALL_R+M_PEG_R-dist+0.5;b.x+=nx*ov;b.y+=ny*ov;}
+        if(dist<M_BALL_R+M_PEG_R){
+          if(p.side){
+            // 사이드 가이드: 안쪽으로 부드럽게 밀기
+            const inward=p.x<W/2?1.5:-1.5;
+            b.vx+=inward;b.vy*=0.95;
+            const ov=M_BALL_R+M_PEG_R-dist+1;b.x+=(p.x<W/2?ov:-ov);
+          }else{
+            const nx=dx/dist,ny=dy/dist;const dot=b.vx*nx+b.vy*ny;
+            b.vx-=2*dot*nx;b.vy-=2*dot*ny;b.vx*=M_DAMP;b.vy*=M_DAMP;
+            b.vx+=(Math.random()-0.5)*2.0;
+            const ov=M_BALL_R+M_PEG_R-dist+0.5;b.x+=nx*ov;b.y+=ny*ov;
+          }
+        }
       });
       // 범퍼 충돌
       marbleBumpers.forEach(bp=>{const dx=b.x-bp.x,dy=b.y-bp.y,dist=Math.sqrt(dx*dx+dy*dy);
@@ -1100,7 +1147,39 @@ function startMarbleRace(){
   }
   marbleAnim=requestAnimationFrame(step);
 }
-function endMarbleRace(){marbleRunning=false;marbleBalls=[];document.getElementById('plinkoBtn').disabled=false;renderPlinkoUI();drawMarbleBoard();}
+let plinkoTeamMode='seq';
+function endMarbleRace(){marbleRunning=false;marbleBalls=[];document.getElementById('plinkoBtn').disabled=false;renderPlinkoUI();drawMarbleBoard();
+  if(plinkoOrder.length>=2){document.getElementById('plinkoTeamDiv').style.display='block';renderPlinkoTeams();}
+}
+function renderPlinkoTeams(){
+  const n=plinkoOrder.length;if(n<2)return;
+  const sz=parseInt(document.getElementById('plinkoTeamSize')?.value)||4;
+  const numTeams=Math.ceil(n/sz);
+  const teams=Array.from({length:numTeams},()=>[]);
+  // 버튼 활성화 스타일
+  document.querySelectorAll('#plinkoTeamDiv [data-mode]').forEach(b=>{
+    b.className=`btn btn-xs ${b.dataset.mode===plinkoTeamMode?'btn-blue':'btn-gray'}`;b.style.fontSize='12px';
+  });
+  if(plinkoTeamMode==='seq'){
+    plinkoOrder.forEach((p,i)=>{const ti=Math.floor(i/sz);if(ti<numTeams)teams[ti].push(p);});
+  }else{
+    // 지그재그: 1,2,3,4 / 8,7,6,5 / 9,10,11,12...
+    plinkoOrder.forEach((p,i)=>{
+      const round=Math.floor(i/numTeams);const pos=i%numTeams;
+      const ti=round%2===0?pos:numTeams-1-pos;
+      teams[ti].push(p);
+    });
+  }
+  const tc=['#60a5fa','#f87171','#34d399','#fb923c','#a78bfa','#f472b6','#fbbf24','#38bdf8'];
+  let h=`<div style="font-size:11px;color:#64748b;margin-bottom:6px;">${plinkoTeamMode==='seq'?'순서대로 : 1~'+sz+'번→1팀, '+(sz+1)+'~'+(sz*2)+'번→2팀 ...':'지그재그 : 1번→1팀, 2번→2팀 ... 반복 (실력 균등 배분)'}</div>`;
+  teams.forEach((t,i)=>{
+    h+=`<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:#0f172a;border-radius:8px;margin-bottom:4px;border-left:3px solid ${tc[i%tc.length]};">
+      <span style="font-weight:800;font-size:13px;color:${tc[i%tc.length]};min-width:36px;">${i+1}팀</span>
+      <div style="display:flex;flex-wrap:wrap;gap:3px;">${t.map(p=>`<span style="padding:3px 8px;border-radius:5px;font-size:12px;font-weight:600;background:${p.color}22;color:${p.color};border:1px solid ${p.color}44;">${p.name}</span>`).join('')}</div>
+    </div>`;
+  });
+  document.getElementById('plinkoTeamResult').innerHTML=h;
+}
 
 // ===== 멤버 선택 모달 =====
 function openMemberPicker(target){
@@ -1125,19 +1204,19 @@ function applyMemberPick(){
 // ===== 사다리 게임 =====
 let ladderNames=[],ladderResults=[],ladderLines=[],ladderAnim=null,ladderDone=false,ladderBuilt=false;
 function setLadderCount(){const cnt=parseInt(document.getElementById('ladderCount').value)||0;if(cnt<2){ladderNames=[];ladderResults=[];document.getElementById('ladderCanvas').style.display='none';renderLadderUI();return;}
-  ladderNames=[];ladderResults=[];for(let i=0;i<cnt;i++){ladderNames.push('');ladderResults.push('');}ladderBuilt=false;document.getElementById('ladderCanvas').style.display='none';renderLadderUI();}
+  ladderNames=[];ladderResults=[];for(let i=0;i<cnt;i++){ladderNames.push((i+1)+'번');ladderResults.push(String(i+1));}ladderBuilt=false;document.getElementById('ladderCanvas').style.display='none';renderLadderUI();}
 function removeLadderName(i){ladderNames.splice(i,1);ladderResults.splice(i,1);ladderBuilt=false;document.getElementById('ladderCanvas').style.display='none';renderLadderUI();}
 function resetLadder(){ladderNames=[];ladderResults=[];ladderLines=[];ladderDone=false;ladderBuilt=false;if(ladderAnim)cancelAnimationFrame(ladderAnim);document.getElementById('ladderCount').value='0';document.getElementById('ladderCanvas').style.display='none';renderLadderUI();}
 function updateLadderName(i,val){ladderNames[i]=val;drawLadder();}
 function updateLadderResult(i,val){ladderResults[i]=val;drawLadder();}
 function renderLadderUI(){
   const n=ladderNames.length;
-  // 이름 입력 (아래쪽 표시)
-  document.getElementById('ladderNameArea').innerHTML=n>0?`<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;"><span style="font-size:13px;color:#94a3b8;font-weight:700;">이름 (아래) : </span>${ladderNames.map((nm,i)=>`<input type="text" value="${nm}" placeholder="${i+1}번" style="width:70px;font-size:13px;padding:5px 8px;border:1px solid ${PCOLORS[i%PCOLORS.length]};border-radius:6px;background:#0f172a;color:${PCOLORS[i%PCOLORS.length]};" onchange="updateLadderName(${i},this.value)">`).join('')}</div>`:'';
-  // 결과 입력 (위쪽 표시)
-  document.getElementById('ladderResultArea').innerHTML=n>0?`<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;"><span style="font-size:13px;color:#fbbf24;font-weight:700;">결과 (위) : </span>${ladderResults.map((r,i)=>`<input type="text" value="${r}" placeholder="?" style="width:70px;font-size:13px;padding:5px 8px;border:1px solid #fbbf24;border-radius:6px;background:#0f172a;color:#fbbf24;" onchange="updateLadderResult(${i},this.value)">`).join('')}</div>`:'';
+  // 이름 입력 (위쪽 = 출발)
+  document.getElementById('ladderNameArea').innerHTML=n>0?`<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;"><span style="font-size:13px;color:#94a3b8;font-weight:700;">이름 (위) : </span>${ladderNames.map((nm,i)=>`<input type="text" value="${nm}" placeholder="${i+1}번" style="width:70px;font-size:13px;padding:5px 8px;border:1px solid ${PCOLORS[i%PCOLORS.length]};border-radius:6px;background:#0f172a;color:${PCOLORS[i%PCOLORS.length]};" onchange="updateLadderName(${i},this.value)">`).join('')}</div>`:'';
+  // 결과 입력 (아래쪽 = 도착)
+  document.getElementById('ladderResultArea').innerHTML=n>0?`<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;"><span style="font-size:13px;color:#fbbf24;font-weight:700;">결과 (아래) : </span>${ladderResults.map((r,i)=>`<input type="text" value="${r}" placeholder="?" style="width:70px;font-size:13px;padding:5px 8px;border:1px solid #fbbf24;border-radius:6px;background:#0f172a;color:#fbbf24;" onchange="updateLadderResult(${i},this.value)">`).join('')}</div>`:'';
   document.getElementById('ladderResult').classList.add('hidden');
-  document.getElementById('ladderBtn').disabled=ladderNames.length<2||ladderNames.every(n=>!n);
+  document.getElementById('ladderBtn').disabled=ladderNames.length<2;
 }
 function buildLadder(){
   if(ladderBuilt)return;ladderBuilt=true;
@@ -1162,20 +1241,19 @@ function drawLadder(){
   const gap=W/(n+1);const topY=50,botY=H-40;
   for(let i=0;i<n;i++){const x=gap*(i+1);ctx.strokeStyle='#475569';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,topY);ctx.lineTo(x,botY);ctx.stroke();}
   ladderLines.forEach(l=>{const x1=gap*(l.col+1),x2=gap*(l.col+2);ctx.strokeStyle='#64748b';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x1,l.y);ctx.lineTo(x2,l.y);ctx.stroke();});
-  // 결과 (상단) - 클릭 가능 영역
+  // 이름 (상단 = 출발)
   ctx.textAlign='center';ctx.textBaseline='middle';
-  for(let i=0;i<n;i++){const x=gap*(i+1);
-    ctx.fillStyle='#fbbf2433';ctx.beginPath();ctx.roundRect(x-28,topY-42,56,26,6);ctx.fill();
-    ctx.strokeStyle='#fbbf2466';ctx.lineWidth=1;ctx.stroke();
-    ctx.fillStyle='#fbbf24';ctx.font='bold 13px sans-serif';
-    ctx.fillText(ladderResults[i]||'?',x,topY-29);
-  }
-  // 이름 (하단)
-  ctx.textBaseline='middle';
   ladderNames.forEach((name,i)=>{const x=gap*(i+1);
     ctx.fillStyle=PCOLORS[i%PCOLORS.length];ctx.font='bold 14px sans-serif';
-    ctx.fillText(name||('  '+(i+1)+'번  '),x,botY+18);
+    ctx.fillText(name||((i+1)+'번'),x,topY-20);
   });
+  // 결과 (하단 = 도착) - 클릭 가능 영역
+  for(let i=0;i<n;i++){const x=gap*(i+1);
+    ctx.fillStyle='#fbbf2433';ctx.beginPath();ctx.roundRect(x-28,botY+8,56,26,6);ctx.fill();
+    ctx.strokeStyle='#fbbf2466';ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle='#fbbf24';ctx.font='bold 13px sans-serif';
+    ctx.fillText(ladderResults[i]||'?',x,botY+21);
+  }
 }
 function onLadderCanvasClick(e){
   const cv=document.getElementById('ladderCanvas');const rect=cv.getBoundingClientRect();
@@ -1183,19 +1261,19 @@ function onLadderCanvasClick(e){
   const cx=(e.clientX-rect.left)*scaleX,cy=(e.clientY-rect.top)*scaleY;
   const n=ladderNames.length;if(n<2)return;
   const gap=cv.width/(n+1);const topY=50;
-  // 상단 결과 클릭 체크
+  // 상단 이름 클릭 체크
   for(let i=0;i<n;i++){const x=gap*(i+1);
-    if(cx>=x-28&&cx<=x+28&&cy>=topY-42&&cy<=topY-16){
-      const val=prompt(`${i+1}번 결과 입력 :`,ladderResults[i]||'');
-      if(val!==null){ladderResults[i]=val;renderLadderUI();drawLadder();}return;
-    }
-  }
-  // 하단 이름 클릭 체크
-  const botY=cv.height-40;
-  for(let i=0;i<n;i++){const x=gap*(i+1);
-    if(cx>=x-35&&cx<=x+35&&cy>=botY+4&&cy<=botY+32){
+    if(cx>=x-35&&cx<=x+35&&cy>=topY-35&&cy<=topY-5){
       const val=prompt(`${i+1}번 이름 입력 :`,ladderNames[i]||'');
       if(val!==null){ladderNames[i]=val;renderLadderUI();drawLadder();}return;
+    }
+  }
+  // 하단 결과 클릭 체크
+  const botY=cv.height-40;
+  for(let i=0;i<n;i++){const x=gap*(i+1);
+    if(cx>=x-28&&cx<=x+28&&cy>=botY+8&&cy<=botY+34){
+      const val=prompt(`${i+1}번 결과 입력 :`,ladderResults[i]||'');
+      if(val!==null){ladderResults[i]=val;renderLadderUI();drawLadder();}return;
     }
   }
 }
@@ -1210,15 +1288,15 @@ function runLadder(){
   const gap=W/(n+1);const topY=50,botY=H-40;
   const paths=[];
   for(let i=0;i<n;i++){
-    let col=i,y=botY;const path=[{x:gap*(col+1),y}];
-    const sortedLines=ladderLines.slice().sort((a,b)=>b.y-a.y);
+    let col=i,y=topY;const path=[{x:gap*(col+1),y}];
+    const sortedLines=ladderLines.slice().sort((a,b)=>a.y-b.y);
     sortedLines.forEach(l=>{
-      if(l.y<y){
+      if(l.y>y){
         if(l.col===col){path.push({x:gap*(col+1),y:l.y});col++;path.push({x:gap*(col+1),y:l.y});}
         else if(l.col===col-1){path.push({x:gap*(col+1),y:l.y});col--;path.push({x:gap*(col+1),y:l.y});}
       }
     });
-    path.push({x:gap*(col+1),y:topY});
+    path.push({x:gap*(col+1),y:botY});
     paths.push({col:i,endCol:col,path,color:PCOLORS[i%PCOLORS.length]});
   }
   let step=0;const totalSteps=120;
@@ -1241,6 +1319,7 @@ function runLadder(){
     else{
       const res=document.getElementById('ladderResult');res.classList.remove('hidden');
       const resultMap=paths.map(p=>({name:ladderNames[p.col]||((p.col+1)+'번'),result:ladderResults[p.endCol]||'?',color:p.color}));
+      res.scrollIntoView({behavior:'smooth',block:'nearest'});
       res.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">${resultMap.map(r=>`<span style="padding:6px 14px;border-radius:8px;background:${r.color}22;border:1px solid ${r.color};font-weight:700;font-size:14px;">${r.name} → ${r.result}</span>`).join('')}</div>`;
       document.getElementById('ladderBtn').disabled=false;
     }
