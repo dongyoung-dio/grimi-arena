@@ -286,6 +286,27 @@ input:focus,select:focus{border-color:#3b82f6;}
 .profile-field label{font-size:13px;color:#64748b;display:block;margin-bottom:4px;}
 .profile-avatar-big{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 12px;background:#334155;}
 
+/* 가이드 모달 */
+.guide-modal-box{background:#1e293b;border-radius:16px;padding:0;border:1px solid #334155;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column;}
+.guide-header{padding:18px 24px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.guide-header h2{font-size:18px;font-weight:800;margin:0;}
+.guide-tabs{display:flex;gap:4px;padding:10px 24px;border-bottom:1px solid #334155;overflow-x:auto;flex-shrink:0;}
+.guide-tab{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:#0f172a;color:#64748b;border:1px solid #334155;white-space:nowrap;transition:all .15s;}
+.guide-tab:hover{color:#94a3b8;border-color:#60a5fa;}
+.guide-tab.active{background:#3b82f6;color:#fff;border-color:#3b82f6;}
+.guide-body{padding:20px 24px;overflow-y:auto;flex:1;font-size:14px;line-height:1.7;color:#cbd5e1;}
+.guide-body h3{font-size:16px;font-weight:800;color:#e2e8f0;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid #334155;}
+.guide-body h3:first-child{margin-top:0;}
+.guide-body p{margin:6px 0;}
+.guide-body .g-tip{background:rgba(59,130,246,.1);border:1px solid #3b82f640;border-radius:8px;padding:10px 14px;margin:8px 0;font-size:13px;color:#93c5fd;}
+.guide-body .g-warn{background:rgba(239,68,68,.1);border:1px solid #ef444440;border-radius:8px;padding:10px 14px;margin:8px 0;font-size:13px;color:#fca5a5;}
+.guide-body .g-label{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:700;margin-right:4px;}
+.guide-body .g-admin{background:#ef4444;color:#fff;}
+.guide-body .g-all{background:#334155;color:#94a3b8;}
+.guide-body code{background:#0f172a;padding:2px 6px;border-radius:4px;font-size:13px;color:#fbbf24;}
+.guide-btn{background:none;border:1px solid #475569;color:#94a3b8;padding:6px 12px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;}
+.guide-btn:hover{background:#334155;color:#e2e8f0;border-color:#60a5fa;}
+
 @media(max-width:600px){
   .teams-grid{grid-template-columns:1fr;}
   .top-bar{padding:10px 14px;}
@@ -293,6 +314,7 @@ input:focus,select:focus{border-color:#3b82f6;}
   .score-big .current{font-size:36px;}
   .rank-dash-list{flex-direction:column;}
   .rank-dash-item{min-width:auto;}
+  .guide-modal-box{max-width:100%;max-height:90vh;}
 }
 </style>
 </head>
@@ -344,6 +366,15 @@ input:focus,select:focus{border-color:#3b82f6;}
   </div>
 </div>
 
+<!-- 가이드 모달 -->
+<div id="guideModal" class="modal-overlay hidden" onclick="if(event.target===this)closeGuide()">
+  <div class="guide-modal-box">
+    <div class="guide-header"><h2>📖 GRIMI ARENA 가이드</h2><button class="modal-close" onclick="closeGuide()">✕</button></div>
+    <div class="guide-tabs" id="guideTabs"></div>
+    <div class="guide-body" id="guideBody"></div>
+  </div>
+</div>
+
 <!-- 게임 화면 -->
 <div id="gameScreen" class="hidden">
   <div class="top-bar">
@@ -353,6 +384,7 @@ input:focus,select:focus{border-color:#3b82f6;}
       <span class="user-name-display" id="dispName" onclick="openProfile()"></span>
       <span id="roleBadge"></span>
       <span style="font-size:12px;"><span style="display:inline-block;width:7px;height:7px;background:#10b981;border-radius:50%;margin-right:3px;"></span><span id="onlineCount">1</span>명 <span id="guestCountLabel" style="color:#64748b;"></span></span>
+      <button class="guide-btn" onclick="openGuide()">📖 가이드</button>
       <button class="btn btn-xs btn-gray" onclick="logout()">로그아웃</button>
     </div>
   </div>
@@ -1501,6 +1533,141 @@ function endSnailRace(){
     </div>`;
   }).join('')}</div>`;
   document.getElementById('snailCommentary').innerHTML=`🏆 <span style="color:#fbbf24;font-weight:800;">${snailFinishOrder[0].name}</span> 우승!`;
+}
+
+// 가이드
+const GUIDE_DATA={
+  game:{title:'게임 현황',content:`
+<h3>실시간 순위 대시보드</h3>
+<p>화면 상단에 고정되어 스크롤해도 항상 보입니다. 팀별 순위, 점수, 치킨(🍗)/광탈(💀) 횟수, 달성률이 표시됩니다.</p>
+<p>제목 영역을 클릭하면 접거나 펼 수 있습니다.</p>
+
+<h3>팀 카드</h3>
+<p>각 팀별로 카드 형태로 표시됩니다.</p>
+<p><b>라운드 탭</b> : R1, R2... 클릭으로 전환하며 각 맵 이름이 함께 표시됩니다.</p>
+<p><b>점수 입력</b> : 각 멤버별 킬/딜을 숫자로 입력하면 실시간 저장됩니다.</p>
+<p><b>치킨/광탈</b> : 라운드별 드롭다운에서 없음/치킨/광탈을 선택합니다.</p>
+<div class="g-tip">💡 1위 팀은 금색 테두리로 강조됩니다. 100% 달성 시 초록색으로 변합니다.</div>
+
+<h3>점수 계산</h3>
+<p><code>1킬 = 1점</code> · <code>총 딜량 ÷ 100 = 딜 점수</code> (소수점 버림)</p>
+<p>치킨/광탈 점수는 맵 크기에 따라 다릅니다 (팀 배정 탭에서 설정).</p>
+
+<h3>이벤트 종료</h3>
+<p><span class="g-label g-admin">관리자</span> 우측 상단 "이벤트 종료" 버튼으로 결과 저장 + 승급/강등 적용이 가능합니다.</p>
+`},
+  tier:{title:'티어표',content:`
+<h3>티어 구조</h3>
+<p>1T ~ 6T까지 6단계, 각 티어별 상/중/하 등급이 있습니다.</p>
+<p>1T상(60점)이 최상위, 6T하(5점)가 최하위입니다.</p>
+<p>멤버별 목표 점수가 티어에 따라 자동 결정됩니다.</p>
+
+<h3>최근 변동</h3>
+<p>직전 이벤트 결과로 티어가 변동된 멤버가 하단에 표시됩니다.</p>
+<p><span style="color:#10b981;">▲ 승급</span> / <span style="color:#ef4444;">▼ 강등</span> + 이전→현재 티어</p>
+`},
+  setup:{title:'팀 배정',content:`
+<p><span class="g-label g-admin">관리자 전용</span></p>
+
+<h3>참가 멤버 선택</h3>
+<p>이벤트에 참가할 멤버를 선택합니다. 전체 선택/해제 가능.</p>
+
+<h3>팀 구성</h3>
+<p><b>밸런스 랜덤</b> : 1~2티어를 팀에 분산 배치 후 나머지 균등 배분</p>
+<p><b>올 랜덤</b> : 티어 무관 완전 랜덤</p>
+<p>미리보기 → "이 팀으로 확정" 또는 "다시 섞기" 가능</p>
+<p><b>수동 배정</b> : 멤버를 직접 팀에 클릭 배치</p>
+
+<h3>라운드</h3>
+<p>"+ 라운드"로 추가, "- 삭제"로 제거. 라운드별 맵 변경 가능.</p>
+
+<h3>타이머</h3>
+<p>분 단위 설정 후 시작. 종료 시 알람음 + 팝업 알림.</p>
+<div class="g-warn">⚠️ 타이머 종료해도 이벤트가 자동 종료되지 않습니다. 직접 "이벤트 종료"를 눌러야 합니다.</div>
+
+<h3>치킨/광탈 점수</h3>
+<p>큰맵/작은맵 점수를 각각 설정합니다.</p>
+<p>맵 이름 클릭으로 큰맵(🗺️)/작은맵(📍) 전환. 기본 큰맵 : 에란겔, 미라마, 테이고</p>
+
+<h3>승급/강등 규칙</h3>
+<p>상위 N팀 승급, 하위 N팀 강등. 나머지는 유지.</p>
+<p>승급 : 상→(한 티어 올라감)하→중→상→... / 강등 : 반대</p>
+`},
+  ranking:{title:'순위/결과',content:`
+<h3>현재 이벤트 순위</h3>
+<p>팀별 카드를 클릭하면 멤버별 상세가 펼쳐집니다.</p>
+<p>승급/유지/강등 예측 뱃지가 표시됩니다.</p>
+
+<h3>누적 기록</h3>
+<p>전체 이벤트에 걸친 멤버별 기록 테이블입니다.</p>
+<p>회차별 점수, 총점, 평균, 참여율, 전적(승/유/강)이 표시됩니다.</p>
+
+<h3>회차별 상세</h3>
+<p>각 회차 클릭 시 팀 순위와 팀원별 점수를 볼 수 있습니다.</p>
+<p><span class="g-label g-admin">관리자</span> 회차별 삭제 가능</p>
+`},
+  bingo:{title:'빙고',content:`
+<h3>빙고 게임</h3>
+<p>별도 페이지(bingo.html)가 iframe으로 로드됩니다.</p>
+<p>게스트로 접속 시 읽기전용으로 동작합니다.</p>
+<div class="g-tip">💡 빙고가 안 열리면 같은 폴더에 bingo.html 파일이 있는지 확인하세요.</div>
+`},
+  minigame:{title:'미니게임',content:`
+<h3>공통</h3>
+<p>"멤버 선택" 버튼으로 등록된 멤버를 빠르게 추가할 수 있습니다.</p>
+<p>직접 이름 입력도 가능합니다.</p>
+
+<h3>핀볼 (마블 레이싱)</h3>
+<p>멤버별 색깔 공이 핀 사이를 통과하며 하단에 도착합니다.</p>
+<p><b>꼴찌 승리</b> : 마지막 도착이 1등이 됩니다.</p>
+<p><b>위치 셔플</b> : 시작 위치를 랜덤으로 재배치합니다.</p>
+<p><b>팀 나누기</b> : 도착 순서로 팀을 배분합니다.</p>
+<p style="margin-left:12px;">· <b>순서대로</b> : 1~4→1팀, 5~8→2팀</p>
+<p style="margin-left:12px;">· <b>지그재그</b> : 1→1팀, 2→2팀, 3→1팀, 4→2팀 (스네이크)</p>
+
+<h3>사다리 타기</h3>
+<p>인원 선택 → 이름/결과 입력 → "사다리 타기!" 클릭</p>
+<p>인원만 선택하면 이름·결과 자동 입력됩니다.</p>
+<p>캔버스에서 상단 이름 클릭 시 경로 애니메이션 + 결과 표시.</p>
+
+<h3>달팽이 경주</h3>
+<p>멤버별 랜덤 동물 이모지가 배정됩니다.</p>
+<p>3-2-1 카운트다운 후 레이스 시작. 랜덤 이벤트 발생 시 실황 중계가 나옵니다.</p>
+<p>결과는 오른쪽에 메달(🥇🥈🥉) + 시간으로 표시됩니다.</p>
+`},
+  members:{title:'멤버 관리',content:`
+<p><span class="g-label g-admin">관리자 전용</span></p>
+
+<h3>멤버 추가</h3>
+<p>이름 + 티어 + 등급 선택 → "+ 추가"</p>
+<p>초기 PIN은 0000이며, 첫 로그인 시 새 PIN을 설정해야 합니다.</p>
+
+<h3>멤버 테이블</h3>
+<p>티어/등급 변경, 역할(일반/관리자) 변경, PIN 초기화가 가능합니다.</p>
+<p><b>숨김</b> : 로그인 목록에서 안 보이게 합니다 (데이터는 유지).</p>
+<p><b>접속 표시</b> : 현재 접속 중인 멤버는 이름 옆에 파란 점(●)이 표시됩니다.</p>
+<div class="g-warn">⚠️ 멤버 삭제는 영구 삭제입니다. 탈퇴자는 "숨김" 처리를 권장합니다.</div>
+`}
+};
+
+const GUIDE_TAB_MAP={game:'game',tier:'tier',setup:'setup',ranking:'ranking',bingo:'bingo',minigame:'minigame',members:'members'};
+let currentGuideTab='game';
+
+function openGuide(){
+  const activeTab=document.querySelector('.tab.active');
+  const tabKey=activeTab?activeTab.dataset.tab:'game';
+  currentGuideTab=GUIDE_TAB_MAP[tabKey]||'game';
+  renderGuide();
+  document.getElementById('guideModal').classList.remove('hidden');
+}
+function closeGuide(){document.getElementById('guideModal').classList.add('hidden');}
+function switchGuideTab(key){currentGuideTab=key;renderGuide();}
+function renderGuide(){
+  const tabs=document.getElementById('guideTabs');
+  const body=document.getElementById('guideBody');
+  const keys=Object.keys(GUIDE_DATA);
+  tabs.innerHTML=keys.map(k=>`<div class="guide-tab ${k===currentGuideTab?'active':''}" onclick="switchGuideTab('${k}')">${GUIDE_DATA[k].title}</div>`).join('');
+  body.innerHTML=GUIDE_DATA[currentGuideTab].content;
 }
 
 init();
