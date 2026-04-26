@@ -463,9 +463,13 @@ input:focus,select:focus{border-color:#3b82f6;}
           <div class="guest-hide" style="margin-bottom:10px;text-align:center;">
             <button class="btn btn-blue" onclick="startSnailRace()" id="snailBtn" style="font-size:16px;padding:12px 36px;">경주 시작!</button>
           </div>
-          <canvas id="snailCanvas" width="700" height="100" style="border-radius:12px;background:#0f172a;border:1px solid #334155;max-width:100%;display:none;"></canvas>
-          <div id="snailCommentary" style="display:none;padding:8px 14px;background:#1e293b;border:1px solid #334155;border-radius:8px;margin-top:8px;font-size:14px;font-weight:600;min-height:30px;"></div>
-          <div id="snailResult" class="hidden" style="margin-top:12px;"></div>
+          <div style="display:flex;gap:16px;align-items:flex-start;">
+            <div style="flex:1;min-width:0;">
+              <canvas id="snailCanvas" width="500" height="100" style="border-radius:12px;background:#0f172a;border:1px solid #334155;max-width:100%;display:none;"></canvas>
+              <div id="snailCommentary" style="display:none;padding:8px 14px;background:#1e293b;border:1px solid #334155;border-radius:8px;margin-top:8px;font-size:14px;font-weight:600;min-height:30px;"></div>
+            </div>
+            <div id="snailResult" class="hidden" style="min-width:140px;"></div>
+          </div>
         </div>
       </div>
       <div id="mg-ladder" class="hidden">
@@ -486,7 +490,7 @@ input:focus,select:focus{border-color:#3b82f6;}
           <div class="guest-hide" style="margin-bottom:10px;text-align:center;">
             <button class="btn btn-blue" onclick="runLadder()" id="ladderBtn" style="font-size:16px;padding:12px 36px;">사다리 타기!</button>
           </div>
-          <canvas id="ladderCanvas" width="600" height="500" style="border-radius:12px;background:#0f172a;border:1px solid #334155;max-width:100%;cursor:pointer;display:none;" onclick="onLadderCanvasClick(event)"></canvas>
+          <canvas id="ladderCanvas" width="500" height="380" style="border-radius:12px;background:#0f172a;border:1px solid #334155;max-width:100%;cursor:pointer;display:none;" onclick="onLadderCanvasClick(event)"></canvas>
         </div>
       </div>
     </div>
@@ -1209,7 +1213,7 @@ function applyMemberPick(){
   const members=appData.members||{};const names=[...memberPickSelected].map(id=>members[id]?.name).filter(Boolean);
   if(memberPickTarget==='plinko'){plinkoEntries=names.map((n,i)=>({name:n,color:PCOLORS[i%PCOLORS.length]}));plinkoOrder=[];renderPlinkoUI();drawMarbleBoard();}
   else if(memberPickTarget==='ladder'){ladderNames=names.slice();ladderResults=names.map(()=>'');ladderBuilt=false;document.getElementById('ladderCount').value=String(names.length);document.getElementById('ladderCanvas').style.display='none';renderLadderUI();}
-  else if(memberPickTarget==='snail'){snailEntries=names.map((n,i)=>({name:n,color:PCOLORS[i%PCOLORS.length],emoji:SNAIL_CHARS[i%SNAIL_CHARS.length]}));renderSnailUI();}
+  else if(memberPickTarget==='snail'){const shuffled=SNAIL_CHARS.slice();for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}snailEntries=names.map((n,i)=>({name:n,color:PCOLORS[i%PCOLORS.length],emoji:shuffled[i%shuffled.length]}));renderSnailUI();}
   closeMemberPicker();
 }
 
@@ -1355,12 +1359,13 @@ const SNAIL_EVENTS=[
 ];
 let snailEntries=[],snailRacers=[],snailAnim=null,snailRunning=false,snailFinishOrder=[];
 
+function randomSnailEmoji(used){const avail=SNAIL_CHARS.filter(e=>!used.includes(e));return avail.length?avail[Math.floor(Math.random()*avail.length)]:SNAIL_CHARS[Math.floor(Math.random()*SNAIL_CHARS.length)];}
 function addSnailName(){
   const inp=document.getElementById('snailNameInput');const raw=inp.value.trim();if(!raw)return;
-  if(!snailEntries.find(e=>e.name===raw))snailEntries.push({name:raw,color:PCOLORS[snailEntries.length%PCOLORS.length],emoji:SNAIL_CHARS[snailEntries.length%SNAIL_CHARS.length]});
+  if(!snailEntries.find(e=>e.name===raw)){const used=snailEntries.map(e=>e.emoji);snailEntries.push({name:raw,color:PCOLORS[snailEntries.length%PCOLORS.length],emoji:randomSnailEmoji(used)});}
   inp.value='';renderSnailUI();
 }
-function removeSnailEntry(i){snailEntries.splice(i,1);snailEntries.forEach((e,j)=>{e.color=PCOLORS[j%PCOLORS.length];e.emoji=SNAIL_CHARS[j%SNAIL_CHARS.length];});renderSnailUI();}
+function removeSnailEntry(i){snailEntries.splice(i,1);snailEntries.forEach((e,j)=>{e.color=PCOLORS[j%PCOLORS.length];});renderSnailUI();}
 function resetSnailRace(){snailEntries=[];snailRacers=[];snailFinishOrder=[];snailRunning=false;if(snailAnim)cancelAnimationFrame(snailAnim);
   document.getElementById('snailCanvas').style.display='none';document.getElementById('snailCommentary').style.display='none';
   document.getElementById('snailResult').classList.add('hidden');renderSnailUI();}
