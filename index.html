@@ -409,6 +409,7 @@ input:focus,select:focus{border-color:#3b82f6;}
       <div style="display:flex;gap:8px;margin-bottom:16px;">
         <button class="btn btn-sm mini-tab active" data-mg="plinko" onclick="switchMiniGame('plinko')">핀볼</button>
         <button class="btn btn-sm mini-tab" data-mg="ladder" onclick="switchMiniGame('ladder')">사다리</button>
+        <button class="btn btn-sm mini-tab" data-mg="snail" onclick="switchMiniGame('snail')">달팽이 경주</button>
       </div>
       <div id="mg-plinko">
         <div class="card"><h3 style="margin-bottom:14px;font-size:17px;">핀볼</h3>
@@ -447,6 +448,23 @@ input:focus,select:focus{border-color:#3b82f6;}
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div id="mg-snail" class="hidden">
+        <div class="card"><h3 style="margin-bottom:14px;font-size:17px;">🐌 달팽이 경주</h3>
+          <div class="guest-hide" style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+            <button class="btn btn-sm btn-gray" onclick="openMemberPicker('snail')">멤버 선택</button>
+            <input type="text" id="snailNameInput" placeholder="이름 추가" style="width:120px;font-size:14px;padding:7px 12px;" onkeydown="if(event.key==='Enter')addSnailName()">
+            <button class="btn btn-sm btn-blue" onclick="addSnailName()">추가</button>
+            <button class="btn btn-sm btn-red" onclick="resetSnailRace()">초기화</button>
+          </div>
+          <div id="snailNameTags" class="plinko-name-tags guest-hide"></div>
+          <div class="guest-hide" style="margin-bottom:10px;text-align:center;">
+            <button class="btn btn-blue" onclick="startSnailRace()" id="snailBtn" style="font-size:16px;padding:12px 36px;">경주 시작!</button>
+          </div>
+          <canvas id="snailCanvas" width="700" height="100" style="border-radius:12px;background:#0f172a;border:1px solid #334155;max-width:100%;display:none;"></canvas>
+          <div id="snailCommentary" style="display:none;padding:8px 14px;background:#1e293b;border:1px solid #334155;border-radius:8px;margin-top:8px;font-size:14px;font-weight:600;min-height:30px;"></div>
+          <div id="snailResult" class="hidden" style="margin-top:12px;"></div>
         </div>
       </div>
       <div id="mg-ladder" class="hidden">
@@ -572,7 +590,7 @@ function enterApp(id,memberData){
 }
 function logout(){localStorage.removeItem('grimi_kill_user');isGuest=false;location.reload();}
 function switchTab(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));['game','tier','members','setup','ranking','bingo','minigame'].forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});if(tab==='minigame')drawMarbleBoard();if(tab==='bingo'){const f=document.getElementById('bingoFrame');if(!f.getAttribute('src'))f.src='bingo.html'+(isGuest?'?guest=1':'');}}
-function switchMiniGame(mg){document.querySelectorAll('.mini-tab').forEach(t=>t.classList.toggle('active',t.dataset.mg===mg));['plinko','ladder'].forEach(g=>{const el=document.getElementById('mg-'+g);if(el)el.classList.toggle('hidden',g!==mg);});if(mg==='plinko')drawMarbleBoard();}
+function switchMiniGame(mg){document.querySelectorAll('.mini-tab').forEach(t=>t.classList.toggle('active',t.dataset.mg===mg));['plinko','ladder','snail'].forEach(g=>{const el=document.getElementById('mg-'+g);if(el)el.classList.toggle('hidden',g!==mg);});if(mg==='plinko')drawMarbleBoard();}
 
 // 프로필
 function openProfile(){
@@ -1198,6 +1216,7 @@ function applyMemberPick(){
   const members=appData.members||{};const names=[...memberPickSelected].map(id=>members[id]?.name).filter(Boolean);
   if(memberPickTarget==='plinko'){plinkoEntries=names.map((n,i)=>({name:n,color:PCOLORS[i%PCOLORS.length]}));plinkoOrder=[];renderPlinkoUI();drawMarbleBoard();}
   else if(memberPickTarget==='ladder'){ladderNames=names.slice();ladderResults=names.map(()=>'');ladderBuilt=false;document.getElementById('ladderCount').value=String(names.length);document.getElementById('ladderCanvas').style.display='none';renderLadderUI();}
+  else if(memberPickTarget==='snail'){snailEntries=names.map((n,i)=>({name:n,color:PCOLORS[i%PCOLORS.length],emoji:SNAIL_CHARS[i%SNAIL_CHARS.length]}));renderSnailUI();}
   closeMemberPicker();
 }
 
