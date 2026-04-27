@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GRIMI CLAN WAR</title>
-<link rel="icon" type="image/png" href="grimi-logo.png">
+<title>GRIMI CLAN MATCH</title>
+<link rel="icon" type="image/png" href="clanmatch-logo.png">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -27,14 +27,58 @@ body.guest-mode .admin-only{display:none!important;}
 .btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;}
 input,select{padding:8px 12px;border:2px solid #334155;border-radius:8px;background:#0f172a;color:#e2e8f0;font-size:15px;outline:none;transition:border-color .2s;}
 input:focus,select:focus{border-color:#3b82f6;}
-.card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155;}
+.card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155;transition:border-color .2s;}
+.card:hover{border-color:rgba(59,130,246,.15);}
 
 /* 로그인 */
-#loginScreen{max-width:440px;margin:60px auto;text-align:center;padding:20px;}
-#loginScreen h1{font-size:42px;font-weight:900;background:linear-gradient(135deg,#3b82f6,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;letter-spacing:1px;}
-#loginScreen .sub{color:#94a3b8;font-size:15px;margin-bottom:28px;}
-.login-box{background:#1e293b;border-radius:16px;padding:28px;border:1px solid #334155;}
-.login-box h2{font-size:16px;margin-bottom:16px;color:#cbd5e1;}
+#loginScreen{max-width:440px;margin:0 auto;text-align:center;padding:20px;min-height:100vh;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1;}
+.login-bg{position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;overflow:hidden;background:#0f172a;}
+.login-bg::before{content:'';position:absolute;inset:0;background:
+  linear-gradient(rgba(59,130,246,.015) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(59,130,246,.015) 1px,transparent 1px);
+  background-size:80px 80px;}
+.login-bg::after{content:'';position:absolute;inset:0;background:
+  radial-gradient(ellipse at 20% 50%,rgba(59,130,246,.12) 0%,transparent 50%),
+  radial-gradient(ellipse at 80% 30%,rgba(139,92,246,.10) 0%,transparent 45%),
+  radial-gradient(ellipse at 50% 90%,rgba(99,102,241,.08) 0%,transparent 40%);}
+.orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.4;animation:orbFloat 12s ease-in-out infinite;}
+@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(30px,-20px) scale(1.05)}50%{transform:translate(-20px,30px) scale(.95)}75%{transform:translate(20px,20px) scale(1.02)}}
+.scan-line{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,.15),transparent);animation:scanDown 8s linear infinite;opacity:.5;}
+@keyframes scanDown{0%{top:-2%}100%{top:102%}}
+.corner{position:absolute;width:80px;height:80px;border:2px solid rgba(59,130,246,.1);}
+.corner-tl{top:20px;left:20px;border-right:none;border-bottom:none;border-radius:4px 0 0 0;}
+.corner-tr{top:20px;right:20px;border-left:none;border-bottom:none;border-radius:0 4px 0 0;}
+.corner-bl{bottom:20px;left:20px;border-right:none;border-top:none;border-radius:0 0 0 4px;}
+.corner-br{bottom:20px;right:20px;border-left:none;border-top:none;border-radius:0 0 4px 0;}
+.float-icon{position:absolute;font-size:20px;opacity:.08;animation:floatIcon 20s ease-in-out infinite;}
+@keyframes floatIcon{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-20px) rotate(10deg)}}
+.particle{position:absolute;width:2px;height:2px;background:#60a5fa;border-radius:50%;opacity:0;animation:particleUp linear infinite;}
+.particle.spark{width:1px;height:8px;border-radius:1px;background:linear-gradient(to top,transparent,#60a5fa);animation-name:sparkUp;}
+@keyframes particleUp{0%{opacity:0;transform:translateY(0) scale(1)}10%{opacity:.6}90%{opacity:.2}100%{opacity:0;transform:translateY(-100vh) scale(0)}}
+@keyframes sparkUp{0%{opacity:0;transform:translateY(0) rotate(0deg)}10%{opacity:.5}90%{opacity:.1}100%{opacity:0;transform:translateY(-80vh) rotate(15deg)}}
+.grid-line-h,.grid-line-v{position:absolute;opacity:0;}
+.grid-line-h{height:1px;width:100%;background:linear-gradient(90deg,transparent,transparent 30%,rgba(96,165,250,.4) 50%,transparent 70%,transparent);background-size:200% 100%;animation:gridLineH linear infinite;}
+.grid-line-v{width:1px;height:100%;background:linear-gradient(180deg,transparent,transparent 30%,rgba(139,92,246,.4) 50%,transparent 70%,transparent);background-size:100% 200%;animation:gridLineV linear infinite;}
+@keyframes gridLineH{0%{opacity:0;background-position:200% 0}10%{opacity:1}90%{opacity:1}100%{opacity:0;background-position:-200% 0}}
+@keyframes gridLineV{0%{opacity:0;background-position:0 200%}10%{opacity:1}90%{opacity:1}100%{opacity:0;background-position:0 -200%}}
+.twinkle{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0;animation:twinkleAnim ease-in-out infinite;}
+@keyframes twinkleAnim{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:.7;transform:scale(1.3)}}
+.meteor{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:0;animation:meteorShoot linear infinite;}
+.meteor::after{content:'';position:absolute;top:0;right:0;width:40px;height:1px;background:linear-gradient(to left,rgba(96,165,250,.6),transparent);transform:rotate(0deg);transform-origin:right center;}
+@keyframes meteorShoot{0%{opacity:0;transform:translate(0,0)}5%{opacity:.8}30%{opacity:.3}35%{opacity:0;transform:translate(-300px,200px)}100%{opacity:0}}
+.ring-pulse{position:absolute;border-radius:50%;border:1px solid rgba(96,165,250,.2);opacity:0;animation:ringExpand ease-out infinite;}
+@keyframes ringExpand{0%{opacity:.4;transform:scale(0)}60%{opacity:.1}100%{opacity:0;transform:scale(1)}}
+.login-icon{font-size:52px;margin-bottom:10px;filter:drop-shadow(0 0 24px rgba(59,130,246,.4));animation:iconPulse 3s ease-in-out infinite;}
+@keyframes iconPulse{0%,100%{filter:drop-shadow(0 0 24px rgba(59,130,246,.4));transform:scale(1)}50%{filter:drop-shadow(0 0 40px rgba(139,92,246,.6));transform:scale(1.05)}}
+#loginScreen h1{font-size:56px;font-weight:900;letter-spacing:8px;margin-bottom:4px;position:relative;display:inline-block;text-shadow:0 0 40px rgba(96,165,250,.2);}
+#loginScreen h1 .title-main{background:linear-gradient(135deg,#60a5fa,#818cf8,#c084fc,#60a5fa);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradientShift 4s ease infinite;-webkit-text-stroke:0.5px rgba(96,165,250,.3);}
+#loginScreen h1 .title-glow{position:absolute;inset:0;background:linear-gradient(135deg,#60a5fa,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:blur(16px);opacity:.6;z-index:-1;animation:gradientShift 4s ease infinite;}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+#loginScreen .sub{color:#64748b;font-size:13px;margin-bottom:32px;letter-spacing:3px;text-transform:uppercase;}
+#loginScreen .sub-line{display:block;width:60px;height:2px;background:linear-gradient(90deg,transparent,#3b82f6,transparent);margin:10px auto 0;animation:lineGlow 2s ease-in-out infinite;}
+@keyframes lineGlow{0%,100%{opacity:.3;width:60px}50%{opacity:.8;width:100px}}
+.login-box{background:rgba(30,41,59,.8);backdrop-filter:blur(16px);border-radius:20px;padding:32px;border:1px solid rgba(96,165,250,.12);box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.03) inset,0 0 80px rgba(59,130,246,.04);}
+.login-box h2{font-size:15px;margin-bottom:18px;color:#94a3b8;font-weight:600;letter-spacing:0.5px;}
 /* 커스텀 드롭다운 */
 .custom-select-wrap{position:relative;margin-bottom:16px;}
 .custom-select-btn{width:100%;padding:14px 18px;background:#0f172a;border:2px solid #334155;border-radius:12px;color:#e2e8f0;font-size:16px;font-weight:700;text-align:left;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all .2s;}
@@ -51,32 +95,54 @@ input:focus,select:focus{border-color:#3b82f6;}
 .custom-select-item.selected{background:rgba(59,130,246,.15);color:#60a5fa;}
 .custom-select-item .cs-dot{width:8px;height:8px;border-radius:50%;background:#3b82f6;}
 .pin-inputs{display:flex;gap:8px;justify-content:center;margin-bottom:12px;}
-.pin-digit{width:50px;height:58px;text-align:center;font-size:26px;font-weight:800;border:2px solid #334155;border-radius:10px;background:#0f172a;color:#fbbf24;outline:none;}
-.pin-digit:focus{border-color:#3b82f6;}
+.pin-digit{width:52px;height:60px;text-align:center;font-size:26px;font-weight:800;border:2px solid #334155;border-radius:12px;background:rgba(15,23,42,.8);color:#fbbf24;outline:none;transition:all .2s;}
+.pin-digit:focus{border-color:#60a5fa;box-shadow:0 0 12px rgba(96,165,250,.15);}
 .pin-error{color:#ef4444;font-size:13px;margin-bottom:8px;min-height:18px;}
-.login-divider{border-top:1px solid #334155;margin:20px 0;position:relative;}
-.login-divider span{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#1e293b;padding:0 12px;color:#64748b;font-size:13px;}
+.login-divider{border-top:1px solid rgba(51,65,85,.6);margin:24px 0;position:relative;}
+.login-divider span{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:rgba(30,41,59,.85);padding:0 14px;color:#475569;font-size:12px;text-transform:uppercase;letter-spacing:1px;}
 .pin-section{display:none;}
 .pin-section.show{display:block;}
 
+/* 앱 배경 */
+#appScreen{position:relative;}
+#appScreen::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
+  radial-gradient(ellipse at 15% 10%,rgba(59,130,246,.10) 0%,transparent 50%),
+  radial-gradient(ellipse at 85% 90%,rgba(139,92,246,.08) 0%,transparent 50%),
+  radial-gradient(ellipse at 50% 50%,rgba(99,102,241,.05) 0%,transparent 60%);
+  pointer-events:none;z-index:0;}
+#appScreen::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+  background:linear-gradient(rgba(59,130,246,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,.02) 1px,transparent 1px);
+  background-size:120px 120px;pointer-events:none;z-index:0;}
+.app-orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;animation:appOrbFloat 20s ease-in-out infinite;}
+@keyframes appOrbFloat{0%,100%{transform:translate(0,0)}33%{transform:translate(40px,-30px)}66%{transform:translate(-30px,40px)}}
+.app-scan{position:fixed;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,.08),transparent);animation:scanDown 12s linear infinite;pointer-events:none;z-index:0;}
+#appScreen>*{position:relative;z-index:1;}
+
 /* 상단바 */
-.top-bar{background:#1e293b;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #334155;flex-wrap:wrap;gap:8px;}
-.top-bar h1{font-size:22px;font-weight:900;letter-spacing:1px;background:linear-gradient(135deg,#3b82f6,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer;}
+.top-bar{position:relative;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+  background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(30,41,59,.9));
+  border-bottom:1px solid rgba(59,130,246,.15);
+  box-shadow:0 4px 20px rgba(0,0,0,.3),0 1px 0 rgba(59,130,246,.08) inset;}
+.top-bar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,.3),rgba(139,92,246,.2),transparent);}
+.top-bar h1{font-size:26px;font-weight:900;letter-spacing:5px;cursor:pointer;position:relative;-webkit-text-stroke:1.5px rgba(96,165,250,.4);
+  background:linear-gradient(135deg,#60a5fa,#818cf8,#60a5fa);background-size:200% 200%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradientShift 4s ease infinite;text-shadow:0 0 20px rgba(96,165,250,.15);}
+.top-bar h1::before{content:'🛡️';margin-right:8px;font-size:22px;-webkit-text-fill-color:initial;filter:drop-shadow(0 0 8px rgba(59,130,246,.4));vertical-align:middle;}
 .top-info{display:flex;align-items:center;gap:10px;font-size:14px;color:#94a3b8;}
-.badge-admin{background:#ef4444;color:#fff;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:700;}
+.badge-admin{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:700;box-shadow:0 0 10px rgba(239,68,68,.2);}
 .badge-guest{background:#334155;color:#94a3b8;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:700;}
-.online-dot{display:inline-block;width:7px;height:7px;background:#10b981;border-radius:50%;margin-right:3px;}
+.online-dot{display:inline-block;width:7px;height:7px;background:#10b981;border-radius:50%;margin-right:3px;box-shadow:0 0 6px rgba(16,185,129,.4);}
 .online-info{font-size:12px;color:#94a3b8;}
-.tabs{display:flex;background:#1e293b;border-bottom:1px solid #334155;overflow-x:auto;position:sticky;top:0;z-index:20;}
+.tabs{display:flex;background:rgba(30,41,59,.8);border-bottom:1px solid #334155;overflow-x:auto;position:sticky;top:0;z-index:20;backdrop-filter:blur(8px);}
 .tab{padding:14px 20px;font-size:15px;font-weight:600;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
-.tab:hover{color:#94a3b8;}
-.tab.active{color:#60a5fa;border-bottom-color:#3b82f6;}
+.tab:hover{color:#94a3b8;background:rgba(59,130,246,.03);}
+.tab.active{color:#60a5fa;border-bottom-color:#3b82f6;background:rgba(59,130,246,.05);}
 .main{padding:20px;max-width:1400px;margin:0 auto;}
 
 /* TOP 3 포디움 */
 .podium{display:flex;justify-content:center;gap:12px;margin-bottom:20px;}
 .podium-card{background:#1e293b;border-radius:14px;padding:14px 20px;border:2px solid #334155;text-align:center;min-width:140px;flex:0 1 200px;transition:all .2s;}
-.podium-card.p1{border-color:#fbbf24;box-shadow:0 0 24px rgba(251,191,36,.12);order:2;}
+.podium-card.p1{border-color:#fbbf24;box-shadow:0 0 24px rgba(251,191,36,.15),0 0 48px rgba(251,191,36,.05);order:2;}
 .podium-card.p2{border-color:#c0c0c0;order:1;}
 .podium-card.p3{border-color:#cd7f32;order:3;}
 .podium-medal{font-size:28px;margin-bottom:2px;}
@@ -90,7 +156,7 @@ input:focus,select:focus{border-color:#3b82f6;}
 .board-title{font-size:18px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
 .board-title .live-dot{width:8px;height:8px;background:#10b981;border-radius:50%;animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.score-table-wrap{overflow-x:auto;border-radius:10px;border:1px solid #334155;}
+.score-table-wrap{overflow-x:auto;border-radius:10px;border:1px solid #334155;box-shadow:0 4px 16px rgba(0,0,0,.2);}
 .score-table{width:100%;border-collapse:collapse;font-size:15px;min-width:600px;}
 .score-table th{background:#334155;padding:12px 10px;text-align:center;font-weight:700;font-size:13px;color:#94a3b8;white-space:nowrap;position:sticky;top:0;z-index:1;}
 .score-table td{padding:12px 10px;text-align:center;border-bottom:1px solid #0f172a;white-space:nowrap;font-size:15px;}
@@ -202,10 +268,30 @@ input:focus,select:focus{border-color:#3b82f6;}
 <body>
 
 <!-- 로그인 -->
+<div class="login-bg" id="loginBg">
+  <div class="orb" style="width:300px;height:300px;background:rgba(59,130,246,.15);top:5%;left:-5%;animation-duration:14s;"></div>
+  <div class="orb" style="width:200px;height:200px;background:rgba(139,92,246,.13);top:15%;right:10%;animation-duration:18s;animation-delay:-4s;"></div>
+  <div class="orb" style="width:260px;height:260px;background:rgba(99,102,241,.12);bottom:15%;left:10%;animation-duration:16s;animation-delay:-8s;"></div>
+  <div class="orb" style="width:180px;height:180px;background:rgba(59,130,246,.10);bottom:5%;right:-3%;animation-duration:20s;animation-delay:-2s;"></div>
+  <div class="orb" style="width:150px;height:150px;background:rgba(168,85,247,.10);top:45%;left:50%;animation-duration:15s;animation-delay:-6s;"></div>
+  <div class="orb" style="width:220px;height:220px;background:rgba(56,189,248,.08);top:70%;left:30%;animation-duration:17s;animation-delay:-10s;"></div>
+  <div class="scan-line"></div>
+  <div class="scan-line" style="animation-delay:-4s;opacity:.3;"></div>
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div>
+  <div class="corner corner-br"></div>
+  <div class="float-icon" style="top:12%;left:15%;animation-delay:-2s;">🎯</div>
+  <div class="float-icon" style="top:25%;right:12%;animation-delay:-7s;font-size:16px;">💀</div>
+  <div class="float-icon" style="bottom:20%;left:8%;animation-delay:-12s;font-size:24px;">🏆</div>
+  <div class="float-icon" style="top:60%;right:8%;animation-delay:-5s;">🔥</div>
+  <div class="float-icon" style="bottom:35%;right:25%;animation-delay:-15s;font-size:18px;">⚡</div>
+  <div class="float-icon" style="top:8%;left:45%;animation-delay:-9s;font-size:14px;">💥</div>
+  <div class="float-icon" style="bottom:10%;left:40%;animation-delay:-3s;font-size:22px;">🎖️</div>
+</div>
 <div id="loginScreen">
-  <img src="grimi-logo.png" alt="GRIMI" style="width:100px;height:100px;border-radius:50%;margin-bottom:12px;object-fit:cover;" onerror="this.style.display='none'">
-  <h1>CLAN WAR</h1>
-  <p class="sub">클랜 교류전 스코어보드</p>
+  <h1><span class="title-main">CLAN MATCH</span><span class="title-glow">CLAN MATCH</span></h1>
+  <p class="sub">BATTLE SCOREBOARD<span class="sub-line"></span></p>
   <div class="login-box">
     <h2>관리자 로그인</h2>
     <div class="custom-select-wrap" id="adminSelectWrap">
@@ -226,14 +312,20 @@ input:focus,select:focus{border-color:#3b82f6;}
       <div class="pin-error" id="pinError"></div>
     </div>
     <div class="login-divider"><span>또는</span></div>
-    <button class="btn btn-gray" onclick="enterAsGuest()" style="width:100%;">조회 모드로 입장</button>
+    <button class="btn btn-gray" onclick="enterAsGuest()" style="width:100%;border:1px solid #475569;padding:14px;">👁 조회 모드로 입장</button>
   </div>
 </div>
 
+<!-- 앱 배경 효과 -->
+<div id="appBgEffects" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0;">
+  <div class="app-orb" style="width:300px;height:300px;background:rgba(59,130,246,.06);top:10%;left:-5%;"></div>
+  <div class="app-orb" style="width:250px;height:250px;background:rgba(139,92,246,.05);bottom:10%;right:-5%;animation-delay:-8s;"></div>
+  <div class="app-scan"></div>
+</div>
 <!-- 메인 -->
 <div id="appScreen" class="hidden">
   <div class="top-bar">
-    <h1 onclick="switchTab('board')">CLAN WAR</h1>
+    <h1 onclick="switchTab('board')">CLAN MATCH</h1>
     <div class="top-info">
       <span id="titleDisplay" style="font-weight:700;color:#cbd5e1;"></span>
       <span id="roleBadge"></span>
@@ -458,7 +550,9 @@ function tryLogin(){
 function enterAsGuest(){isAdmin=false;currentAdminName='';enterApp();}
 function enterApp(){
   document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('loginBg').classList.add('hidden');
   document.getElementById('appScreen').classList.remove('hidden');
+  document.getElementById('appBgEffects').classList.remove('hidden');
   if(!isAdmin) document.body.classList.add('guest-mode');
   else document.body.classList.remove('guest-mode');
   document.getElementById('roleBadge').innerHTML=isAdmin?`<span class="badge-admin">${currentAdminName}</span>`:'<span class="badge-guest">조회 모드</span>';
@@ -468,7 +562,9 @@ function enterApp(){
 function logout(){
   leavePresence();
   document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginBg').classList.remove('hidden');
   document.getElementById('appScreen').classList.add('hidden');
+  document.getElementById('appBgEffects').classList.add('hidden');
   document.body.classList.remove('guest-mode');
   isAdmin=false;currentAdminName='';selectedAdminId=null;
   document.getElementById('pinSection').classList.remove('show');
@@ -719,7 +815,9 @@ function renderClanList(){
 }
 function updateTeamClanSelect(){
   const sel=document.getElementById('newTeamClan'),clans=appData.clans||{};
+  const prev=sel.value;
   sel.innerHTML='<option value="">클랜 선택</option>'+Object.keys(clans).sort().map(id=>`<option value="${id}">${id} (${clans[id].name})</option>`).join('');
+  if(prev&&clans[prev]) sel.value=prev;
 }
 
 // Teams
@@ -888,10 +986,10 @@ function captureElement(elId,filename){
   const wrap=document.createElement('div');
   wrap.style.cssText='padding:20px;background:#0f172a;border-radius:12px;display:inline-block;min-width:'+el.offsetWidth+'px;';
   // Add title header
-  const title=appData.config?.title||'CLAN WAR';
+  const title=appData.config?.title||'CLAN MATCH';
   const header=document.createElement('div');
   header.style.cssText='text-align:center;margin-bottom:12px;font-family:-apple-system,Pretendard,sans-serif;';
-  header.innerHTML=`<div style="font-size:20px;font-weight:900;color:#60a5fa;letter-spacing:1px;">GRIMI CLAN WAR</div><div style="font-size:14px;color:#94a3b8;margin-top:2px;">${title}</div>`;
+  header.innerHTML=`<div style="font-size:20px;font-weight:900;color:#60a5fa;letter-spacing:1px;">GRIMI CLAN MATCH</div><div style="font-size:14px;color:#94a3b8;margin-top:2px;">${title}</div>`;
   wrap.appendChild(header);
   const clone=el.cloneNode(true);
   // Remove capture buttons from clone
@@ -922,6 +1020,72 @@ function showConfirm(title,msg,cb){
 function closeConfirm(){document.getElementById('confirmModal').classList.add('hidden');confirmCb=null;const btn=document.getElementById('confirmBtn');btn.textContent='확인';btn.className='btn btn-sm btn-red';}
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000);}
 
+// Particles
+(function(){
+  const bg=document.getElementById('loginBg');
+  const colors=['#60a5fa','#818cf8','#a78bfa','#38bdf8','#c084fc'];
+  // 그리드 위 빛 이동 라인
+  for(let i=0;i<6;i++){
+    const h=document.createElement('div');h.className='grid-line-h';
+    h.style.top=Math.round((Math.random()*0.8+0.1)*100/8)*8+'%';
+    h.style.animationDuration=(3+Math.random()*3)+'s';
+    h.style.animationDelay=(i*2.5+Math.random()*2)+'s';
+    bg.appendChild(h);
+  }
+  for(let i=0;i<4;i++){
+    const v=document.createElement('div');v.className='grid-line-v';
+    v.style.left=Math.round((Math.random()*0.8+0.1)*100/8)*8+'%';
+    v.style.animationDuration=(3+Math.random()*3)+'s';
+    v.style.animationDelay=(i*3+Math.random()*3)+'s';
+    bg.appendChild(v);
+  }
+  // 올라가는 파티클 + 스파크
+  for(let i=0;i<90;i++){
+    const p=document.createElement('div');
+    p.className=Math.random()>.6?'particle spark':'particle';
+    p.style.left=Math.random()*100+'%';
+    p.style.bottom=-10+'px';
+    p.style.animationDuration=(3+Math.random()*7)+'s';
+    p.style.animationDelay=(Math.random()*5)+'s';
+    const size=1+Math.random()*2.5;
+    p.style.width=size+'px';p.style.height=size+'px';
+    p.style.background=colors[Math.floor(Math.random()*colors.length)];
+    bg.appendChild(p);
+  }
+  // 반짝이는 별
+  for(let i=0;i<25;i++){
+    const s=document.createElement('div');s.className='twinkle';
+    s.style.left=Math.random()*100+'%';
+    s.style.top=Math.random()*100+'%';
+    s.style.animationDuration=(2+Math.random()*4)+'s';
+    s.style.animationDelay=(Math.random()*6)+'s';
+    const sz=1+Math.random()*2;
+    s.style.width=sz+'px';s.style.height=sz+'px';
+    s.style.background=colors[Math.floor(Math.random()*colors.length)];
+    bg.appendChild(s);
+  }
+  // 유성
+  for(let i=0;i<4;i++){
+    const m=document.createElement('div');m.className='meteor';
+    m.style.top=Math.random()*40+'%';
+    m.style.right=-50+'px';
+    m.style.animationDuration=(6+Math.random()*8)+'s';
+    m.style.animationDelay=(i*4+Math.random()*4)+'s';
+    bg.appendChild(m);
+  }
+  // 퍼지는 링
+  for(let i=0;i<5;i++){
+    const r=document.createElement('div');r.className='ring-pulse';
+    r.style.left=Math.random()*80+10+'%';
+    r.style.top=Math.random()*80+10+'%';
+    const sz=80+Math.random()*120;
+    r.style.width=sz+'px';r.style.height=sz+'px';
+    r.style.animationDuration=(4+Math.random()*4)+'s';
+    r.style.animationDelay=(Math.random()*8)+'s';
+    r.style.borderColor=colors[Math.floor(Math.random()*colors.length)].replace(')',',0.15)').replace('rgb','rgba');
+    bg.appendChild(r);
+  }
+})();
 init();
 </script>
 </body>
