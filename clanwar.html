@@ -150,7 +150,8 @@ input:focus,select:focus{border-color:#3b82f6;}
 .item-delete:hover{background:#ef4444;color:#fff;}
 .color-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;}
 .clan-logo{width:24px;height:24px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid #475569;}
-.clan-logo-sm{width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;border:1px solid #475569;}
+.clan-logo-sm{width:34px;height:34px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;border:1px solid #475569;}
+.clan-avatar{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;color:#fff;font-size:15px;font-weight:800;vertical-align:middle;margin-right:6px;flex-shrink:0;}
 .clan-logo-lg{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #475569;margin-bottom:6px;}
 .logo-upload-btn{padding:6px 12px;background:#334155;border:1px dashed #475569;border-radius:8px;color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-block;}
 .logo-upload-btn:hover{background:#475569;color:#e2e8f0;border-color:#60a5fa;}
@@ -506,8 +507,10 @@ function getClanName(id){return appData.clans?.[id]?.name||id;}
 function getClanLogo(id){return appData.clans?.[id]?.logo||'';}
 function clanTagHtml(id){
   const logo=getClanLogo(id);
-  const tag=`<span class="clan-tag" style="background:${getClanColor(id)};margin-right:6px;">${id}</span>`;
-  return logo?`<img src="${logo}" class="clan-logo-sm" alt="${id}">${tag}`:tag;
+  const color=getClanColor(id);
+  const tag=`<span class="clan-tag" style="background:${color};margin-right:6px;">${id}</span>`;
+  if(logo) return `<img src="${logo}" class="clan-logo-sm" alt="${id}">${tag}`;
+  return `<span class="clan-avatar" style="background:${color};">${id.charAt(0)}</span>${tag}`;
 }
 let pendingLogoBase64='';
 function previewLogo(input){
@@ -681,6 +684,7 @@ function addClan(){
   const color=document.getElementById('newClanColor').value;
   const teamCount=Number(document.getElementById('newClanTeamCount').value)||2;
   if(!id){toast('클랜 약칭을 입력하세요');return;}
+  if(appData.clans?.[id]){toast('이미 존재하는 약칭입니다');return;}
   const data={name:name||id,color};
   if(pendingLogoBase64) data.logo=pendingLogoBase64;
   ref.child('clans/'+id).set(data);
@@ -693,13 +697,33 @@ function addClan(){
   toast(id+' 클랜 + '+teamCount+'팀 추가');
 }
 function updateClanLogo(cid,input){const file=input.files[0];if(!file)return;resizeImage(file,128,b64=>{ref.child('clans/'+cid+'/logo').set(b64);toast(cid+' 마크 업데이트');});}
+function updateClanName(cid,name){ref.child('clans/'+cid+'/name').set(name.trim()||cid);toast('클랜명 변경');}
+function updateClanColor(cid,color){ref.child('clans/'+cid+'/color').set(color);toast('색상 변경');}
+function renameClanId(oldId,newId){
+  newId=newId.trim().toUpperCase();
+  if(!newId||newId===oldId) return;
+  if(appData.clans?.[newId]){toast('이미 존재하는 약칭입니다');return;}
+  const clanData=appData.clans[oldId];
+  const updates={};
+  updates['clans/'+oldId]=null;
+  updates['clans/'+newId]=clanData;
+  // 팀의 clan 참조도 변경
+  Object.entries(appData.teams||{}).forEach(([tid,t])=>{
+    if(t.clan===oldId){
+      updates['teams/'+tid+'/clan']=newId;
+      // 팀명도 GRM-1 → NEW-1 로 변경
+      if(t.name.startsWith(oldId+'-')) updates['teams/'+tid+'/name']=t.name.replace(oldId,newId);
+    }
+  });
+  ref.update(updates);toast(oldId+' → '+newId+' 변경');
+}
 function removeClan(id){showConfirm('클랜 삭제',`${id} 클랜 삭제?`,()=>{ref.child('clans/'+id).remove();toast('삭제됨');});}
 function renderClanList(){
   const clans=appData.clans||{},area=document.getElementById('clanListArea'),ids=Object.keys(clans).sort();
   if(!ids.length){area.innerHTML='<p style="color:#64748b;font-size:13px;">등록된 클랜이 없습니다.</p>';return;}
   area.innerHTML=ids.map(id=>{const c=clans[id];
-    const logo=c.logo?`<img src="${c.logo}" class="clan-logo">`:`<span class="color-dot" style="background:${c.color}"></span>`;
-    return `<div class="item-row">${logo}<span class="item-name">${id} <span style="color:#94a3b8;font-size:13px;">(${c.name})</span></span><label class="logo-upload-btn" style="font-size:11px;padding:4px 8px;">${c.logo?'마크 변경':'마크 추가'}<input type="file" accept="image/*" style="display:none;" onchange="updateClanLogo('${id}',this)"></label><button class="item-delete" onclick="removeClan('${id}')">✕</button></div>`;
+    const logo=c.logo?`<img src="${c.logo}" class="clan-logo-sm">`:`<span class="clan-avatar" style="background:${c.color};">${id.charAt(0)}</span>`;
+    return `<div class="item-row" style="flex-wrap:wrap;gap:6px;">${logo}<input type="text" value="${id}" style="width:70px;padding:4px 8px;font-size:13px;font-weight:700;" onchange="renameClanId('${id}',this.value)"><input type="text" value="${c.name}" style="width:100px;padding:4px 8px;font-size:13px;" onchange="updateClanName('${id}',this.value)"><input type="color" value="${c.color}" style="width:30px;height:28px;padding:1px;border-radius:6px;cursor:pointer;" onchange="updateClanColor('${id}',this.value)"><label class="logo-upload-btn" style="font-size:11px;padding:4px 8px;">${c.logo?'마크 변경':'마크 추가'}<input type="file" accept="image/*" style="display:none;" onchange="updateClanLogo('${id}',this)"></label><button class="item-delete" onclick="removeClan('${id}')">✕</button></div>`;
   }).join('');
 }
 function updateTeamClanSelect(){
@@ -730,7 +754,7 @@ function renderTeamList(){
   const ids=Object.keys(teams).sort((a,b)=>(teams[a].name||'').localeCompare(teams[b].name||''));
   if(!ids.length){area.innerHTML='<p style="color:#64748b;font-size:13px;">등록된 팀이 없습니다.</p>';return;}
   area.innerHTML=ids.map(id=>{const t=teams[id];
-    const logo=getClanLogo(t.clan)?`<img src="${getClanLogo(t.clan)}" class="clan-logo-sm">`:'';
+    const logo=getClanLogo(t.clan)?`<img src="${getClanLogo(t.clan)}" class="clan-logo-sm">`:`<span class="clan-avatar" style="background:${getClanColor(t.clan)};">${t.clan.charAt(0)}</span>`;
     return `<div class="item-row">${logo}<span class="clan-tag" style="background:${getClanColor(t.clan)};font-size:11px;">${t.clan}</span><span class="item-name">${t.name}</span><button class="item-delete" onclick="removeTeam('${id}')">✕</button></div>`;
   }).join('');
 }
