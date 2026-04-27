@@ -7,6 +7,7 @@
 <link rel="icon" type="image/png" href="grimi-logo.png">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:-apple-system,'Pretendard','Noto Sans KR',sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh;font-size:15px;}
@@ -66,8 +67,6 @@ input:focus,select:focus{border-color:#3b82f6;}
 .badge-guest{background:#334155;color:#94a3b8;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:700;}
 .online-dot{display:inline-block;width:7px;height:7px;background:#10b981;border-radius:50%;margin-right:3px;}
 .online-info{font-size:12px;color:#94a3b8;}
-.event-status{text-align:center;padding:10px;font-size:15px;font-weight:600;}
-.event-live{background:#10b981;color:#fff;}.event-idle{background:#334155;color:#64748b;}
 .tabs{display:flex;background:#1e293b;border-bottom:1px solid #334155;overflow-x:auto;position:sticky;top:0;z-index:20;}
 .tab{padding:14px 20px;font-size:15px;font-weight:600;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
 .tab:hover{color:#94a3b8;}
@@ -110,15 +109,15 @@ input:focus,select:focus{border-color:#3b82f6;}
 .placement-num{font-size:11px;color:#94a3b8;display:block;margin-top:1px;}
 
 /* 라운드별 순위 */
-.round-rank-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-top:20px;}
-.round-rank-card{background:#1e293b;border-radius:12px;border:1px solid #334155;overflow:hidden;}
+.round-rank-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-top:20px;}
+.round-rank-card{background:#1e293b;border-radius:12px;border:1px solid #334155;overflow:hidden;min-width:0;}
 .round-rank-head{padding:12px 16px;background:#334155;font-weight:800;font-size:14px;display:flex;align-items:center;gap:8px;}
 .round-rank-head .rr-round{color:#60a5fa;}
 .round-rank-head .rr-map{color:#94a3b8;font-weight:600;font-size:13px;}
 .rr-table{width:100%;border-collapse:collapse;font-size:14px;}
 .rr-table td{padding:8px 12px;border-bottom:1px solid #0f172a;}
 .rr-table .rr-rank{font-weight:900;width:32px;text-align:center;font-size:16px;}
-.rr-table .rr-team{font-weight:700;text-align:left;}
+.rr-table .rr-team{font-weight:700;text-align:left;word-break:break-all;}
 .rr-table .rr-kill{color:#fbbf24;font-weight:700;text-align:center;width:50px;}
 .rr-table .rr-pts{color:#60a5fa;font-weight:700;text-align:center;width:50px;}
 .rr-table .rr-total{font-weight:900;color:#fbbf24;text-align:center;width:55px;font-size:15px;}
@@ -161,6 +160,20 @@ input:focus,select:focus{border-color:#3b82f6;}
 .pts-item label{color:#94a3b8;white-space:nowrap;min-width:30px;}
 .pts-item input{width:44px;padding:4px;font-size:13px;text-align:center;border:1px solid #334155;border-radius:4px;background:#1e293b;color:#fbbf24;font-weight:700;}
 
+/* 캡처 */
+.capture-btn{background:#334155;border:1px solid #475569;color:#94a3b8;padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:4px;}
+.capture-btn:hover{background:#475569;color:#e2e8f0;border-color:#60a5fa;}
+.capture-btn svg{width:14px;height:14px;}
+.capture-wrap{padding:16px;background:#0f172a;border-radius:12px;}
+
+/* 히스토리 */
+.history-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.history-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#0f172a;border:1px solid #334155;border-radius:10px;cursor:pointer;transition:all .15s;}
+.history-item:hover{border-color:#3b82f6;background:#1e293b;}
+.history-item .hi-title{font-weight:700;font-size:15px;}
+.history-item .hi-date{font-size:13px;color:#64748b;}
+.history-item .hi-teams{font-size:12px;color:#94a3b8;}
+
 /* 토스트 */
 .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#10b981;color:#fff;padding:12px 24px;border-radius:10px;font-weight:700;font-size:14px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;}
 .toast.show{opacity:1;}
@@ -181,6 +194,7 @@ input:focus,select:focus{border-color:#3b82f6;}
   .podium-score{font-size:18px;}
   .score-table{min-width:500px;}
   .pts-grid{grid-template-columns:repeat(auto-fill,minmax(90px,1fr));}
+  .round-rank-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -226,7 +240,7 @@ input:focus,select:focus{border-color:#3b82f6;}
       <button class="btn btn-xs btn-gray" onclick="logout()">로그아웃</button>
     </div>
   </div>
-  <div id="statusBar" class="event-status event-idle">대회 대기 중</div>
+  <div id="onlineListArea" style="padding:6px 20px;background:#1e293b;border-bottom:1px solid #334155;"></div>
   <div class="tabs">
     <div class="tab active" data-tab="board" onclick="switchTab('board')">순위 보드</div>
     <div class="tab admin-only" data-tab="input" onclick="switchTab('input')">점수 입력</div>
@@ -237,11 +251,16 @@ input:focus,select:focus{border-color:#3b82f6;}
     <div id="tab-board">
       <div id="podiumArea" class="podium"></div>
       <div class="board-section">
-        <div class="board-title"><span class="live-dot"></span> 실시간 팀 순위</div>
-        <div id="teamBoardArea"><div class="card" style="text-align:center;color:#64748b;padding:40px;">아직 등록된 팀이 없습니다.</div></div>
+        <div class="board-title" style="justify-content:space-between;">
+          <span style="display:flex;align-items:center;gap:8px;"><span class="live-dot"></span> 실시간 팀 순위</span>
+          <button class="capture-btn" onclick="captureElement('captureTotal','전체순위')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>전체 캡처</button>
+        </div>
+        <div id="captureTotal">
+          <div id="teamBoardArea"><div class="card" style="text-align:center;color:#64748b;padding:40px;">아직 등록된 팀이 없습니다.</div></div>
+        </div>
       </div>
       <div id="roundRankArea"></div>
-      <div id="onlineListArea" style="margin-top:8px;"></div>
+      <div id="historyArea" style="margin-top:28px;"></div>
     </div>
     <!-- 점수 입력 -->
     <div id="tab-input" class="hidden">
@@ -256,8 +275,7 @@ input:focus,select:focus{border-color:#3b82f6;}
       <div class="setup-card"><h3>대회 정보</h3>
         <div class="setup-row"><label>대회명</label><input type="text" id="eventTitle" placeholder="예: 제1회 클랜 교류전" style="flex:1;max-width:300px;" onchange="saveConfig()"></div>
         <div class="setup-row" style="gap:12px;">
-          <button class="btn btn-sm btn-green" onclick="setEventStatus('live')">대회 시작</button>
-          <button class="btn btn-sm btn-amber" onclick="setEventStatus('idle')">대기 상태</button>
+          <button class="btn btn-sm btn-blue" onclick="archiveTournament()">대회 종료 & 기록 저장</button>
           <button class="btn btn-sm btn-red" onclick="resetAll()">전체 초기화</button>
         </div>
       </div>
@@ -335,7 +353,7 @@ let activeInputRound=null,selectedAdminId=null;
 function init(){
   ref.on('value',snap=>{
     appData=snap.val()||{};
-    ['config','admins','clans','teams','rounds','scores'].forEach(k=>{if(!appData[k])appData[k]={};});
+    ['config','admins','clans','teams','rounds','scores','history'].forEach(k=>{if(!appData[k])appData[k]={};});
     if(!appData.rankPts) appData.rankPts=DEFAULT_RANK_PTS;
     if(!appData.presence) appData.presence={};
     renderLoginAdmins();
@@ -466,14 +484,11 @@ function switchTab(t){
 
 // ===== Render All =====
 function renderAll(){
-  const status=appData.config?.status||'idle';
-  const bar=document.getElementById('statusBar');
-  bar.className='event-status '+(status==='live'?'event-live':'event-idle');
-  bar.textContent=status==='live'?(appData.config?.title||'대회 진행 중'):'대회 대기 중';
   document.getElementById('titleDisplay').textContent=appData.config?.title||'';
   renderPodium();
   renderTeamBoard();
   renderRoundRanks();
+  renderHistory();
   updateOnlineDisplay();
   if(isAdmin){renderSetup();renderScoreInput();}
 }
@@ -581,9 +596,9 @@ function renderRoundRanks(){
       const cls=rank===1?'rr-gold':rank===2?'rr-silver':rank===3?'rr-bronze':'';
       rows+=`<tr class="${cls}"><td class="rr-rank">${rank}</td><td class="rr-team">${clanTagHtml(t.clan)}${t.name}</td><td class="rr-kill">${t.kills}</td><td class="rr-pts">+${t.placePts}</td><td class="rr-total">${t.roundTotal}</td></tr>`;
     });
-    cards+=`<div class="round-rank-card"><div class="round-rank-head"><span style="color:#fbbf24;">R${i+1}</span>${r?.map||'맵 미정'}</div><table class="rr-table"><thead><tr><th>#</th><th style="text-align:left;">팀</th><th>킬</th><th>순위점</th><th>합계</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    cards+=`<div class="round-rank-card" id="captureRound_${rid}"><div class="round-rank-head"><span style="color:#fbbf24;">R${i+1}</span>${r?.map||'맵 미정'}<span style="flex:1;"></span><button class="capture-btn" onclick="event.stopPropagation();captureElement('captureRound_${rid}','R${i+1}_${r?.map||''}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>캡처</button></div><table class="rr-table"><thead><tr><th>#</th><th style="text-align:left;">팀</th><th>킬</th><th>순위점</th><th>합계</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   });
-  area.innerHTML=cards?`<h3 style="color:#94a3b8;font-size:15px;margin:24px 0 10px;font-weight:700;">라운드별 순위</h3><div class="round-rank-grid">${cards}</div>`:'';
+  area.innerHTML=cards?`<div style="display:flex;align-items:center;justify-content:space-between;margin:24px 0 10px;"><h3 style="color:#94a3b8;font-size:15px;font-weight:700;">라운드별 순위</h3><button class="capture-btn" onclick="captureElement('captureRounds','라운드별순위')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>전체 라운드 캡처</button></div><div class="round-rank-grid" id="captureRounds">${cards}</div>`:'';
 }
 
 // ===== Score Input =====
@@ -623,8 +638,7 @@ function renderSetup(){
   renderAdminList();renderClanList();renderTeamList();renderRoundList();renderRankPtsGrid();updateTeamClanSelect();
 }
 function saveConfig(){ref.child('config/title').set(document.getElementById('eventTitle').value||'');toast('저장됨');}
-function setEventStatus(s){ref.child('config/status').set(s);toast(s==='live'?'대회 시작!':'대기 상태로 변경');}
-function resetAll(){showConfirm('전체 초기화','모든 점수와 라운드가 삭제됩니다.',()=>{ref.child('scores').remove();ref.child('rounds').remove();ref.child('config/status').set('idle');toast('초기화 완료');});}
+function resetAll(){showConfirm('전체 초기화','모든 점수와 라운드가 삭제됩니다.',()=>{ref.child('scores').remove();ref.child('rounds').remove();toast('초기화 완료');});}
 
 // Admins
 function addAdmin(){
@@ -730,15 +744,137 @@ function saveRankPts(){
   ref.child('rankPts').set(pts);toast('점수표 저장됨');
 }
 
+// ===== History =====
+function archiveTournament(){
+  const title=appData.config?.title;
+  if(!title){toast('대회명을 먼저 입력하세요');return;}
+  const {scores}=getTeamScores();
+  if(!scores.length){toast('점수 데이터가 없습니다');return;}
+  showConfirm('대회 기록 저장',`"${title}" 대회 결과를 저장하고 초기화합니다.`,()=>{
+    const archive={
+      title,
+      date:new Date().toISOString(),
+      clans:appData.clans||{},
+      teams:appData.teams||{},
+      rounds:appData.rounds||{},
+      scores:appData.scores||{},
+      rankPts:appData.rankPts||DEFAULT_RANK_PTS
+    };
+    const hKey=ref.child('history').push().key;
+    ref.child('history/'+hKey).set(archive).then(()=>{
+      // Also capture image
+      captureElement('captureTotal',title.replace(/\s/g,'_'));
+      // Reset scores and rounds
+      ref.child('scores').remove();
+      ref.child('rounds').remove();
+      toast('기록 저장 완료!');
+    });
+  });
+}
+function renderHistory(){
+  const history=appData.history||{};
+  const area=document.getElementById('historyArea');
+  const ids=Object.keys(history).sort((a,b)=>{
+    const da=history[a].date||'',db=history[b].date||'';
+    return db.localeCompare(da);
+  });
+  if(!ids.length){area.innerHTML='';return;}
+  let items='';
+  ids.forEach(id=>{
+    const h=history[id];
+    const d=h.date?new Date(h.date):null;
+    const dateStr=d?`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`:'';
+    const teamCount=Object.keys(h.teams||{}).length;
+    const clanCount=Object.keys(h.clans||{}).length;
+    items+=`<div class="history-item" onclick="viewHistory('${id}')"><div><div class="hi-title">${h.title||'무제'}</div><div class="hi-date">${dateStr}</div></div><div style="text-align:right;"><div class="hi-teams">${clanCount}클랜 ${teamCount}팀</div><span style="color:#3b82f6;font-size:13px;font-weight:600;">조회 →</span></div></div>`;
+  });
+  area.innerHTML=`<div style="border-top:1px solid #334155;padding-top:20px;"><h3 style="color:#94a3b8;font-size:15px;font-weight:700;margin-bottom:4px;">과거 대회 기록</h3><div class="history-list">${items}</div></div>`;
+}
+function viewHistory(hid){
+  const h=appData.history?.[hid];
+  if(!h) return;
+  // Build a temporary modal showing the archived results
+  const teams=h.teams||{},rounds=h.rounds||{},scores=h.scores||{},rankPts=h.rankPts||DEFAULT_RANK_PTS;
+  const roundIds=Object.keys(rounds).sort((a,b)=>(rounds[a].order||0)-(rounds[b].order||0));
+  const getRp=p=>Number((rankPts)[p])||0;
+  const result=[];
+  Object.keys(teams).forEach(tid=>{
+    const t=teams[tid];let totalKills=0,totalPlacePts=0;
+    roundIds.forEach(rid=>{
+      const s=scores[tid]?.[rid];
+      const kills=s?Number(s.kills)||0:0;
+      const placement=s?Number(s.placement)||0:0;
+      const placePts=placement>0?getRp(placement):0;
+      totalKills+=kills;totalPlacePts+=placePts;
+    });
+    result.push({name:t.name,clan:t.clan,totalKills,totalPlacePts,total:totalKills+totalPlacePts});
+  });
+  result.sort((a,b)=>b.total-a.total||(b.totalKills-a.totalKills));
+  const clans=h.clans||{};
+  const clanTag=(cid)=>{
+    const c=clans[cid];
+    const logo=c?.logo?`<img src="${c.logo}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:3px;border:1px solid #475569;">`:'';
+    return `${logo}<span class="clan-tag" style="background:${c?.color||'#64748b'};margin-right:6px;">${cid}</span>`;
+  };
+  const d=h.date?new Date(h.date):null;
+  const dateStr=d?`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`:'';
+  let rows='';
+  result.forEach((s,i)=>{
+    const rank=i+1;
+    const rc=rank<=3?'rank-'+rank:'rank-else';
+    const rowc=rank===1?'row-gold':rank===2?'row-silver':rank===3?'row-bronze':'';
+    rows+=`<tr class="${rowc}"><td class="col-rank ${rc}">${rank}</td><td class="col-team">${clanTag(s.clan)}${s.name}</td><td class="col-kill">${s.totalKills}</td><td class="col-place">${s.totalPlacePts}</td><td class="col-total">${s.total}</td></tr>`;
+  });
+  const modal=document.getElementById('confirmModal');
+  document.getElementById('confirmTitle').innerHTML=`${h.title||'무제'} <span style="font-size:13px;color:#64748b;font-weight:400;">${dateStr}</span>`;
+  document.getElementById('confirmMsg').innerHTML=`<div id="captureHistory_${hid}" style="overflow-x:auto;"><table class="score-table" style="min-width:400px;"><thead><tr><th>#</th><th style="text-align:left;">팀</th><th>총킬</th><th>순위점</th><th>합계</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  document.getElementById('confirmBtn').textContent='캡처';
+  document.getElementById('confirmBtn').className='btn btn-sm btn-blue';
+  document.getElementById('confirmBtn').onclick=()=>{captureElement('captureHistory_'+hid,h.title||'history');};
+  modal.classList.remove('hidden');
+}
+
+// ===== Capture =====
+function captureElement(elId,filename){
+  const el=document.getElementById(elId);
+  if(!el){toast('캡처 대상 없음');return;}
+  toast('캡처 중...');
+  // Wrap in a temporary container for better background
+  const wrap=document.createElement('div');
+  wrap.style.cssText='padding:20px;background:#0f172a;border-radius:12px;display:inline-block;min-width:'+el.offsetWidth+'px;';
+  // Add title header
+  const title=appData.config?.title||'CLAN WAR';
+  const header=document.createElement('div');
+  header.style.cssText='text-align:center;margin-bottom:12px;font-family:-apple-system,Pretendard,sans-serif;';
+  header.innerHTML=`<div style="font-size:20px;font-weight:900;color:#60a5fa;letter-spacing:1px;">GRIMI CLAN WAR</div><div style="font-size:14px;color:#94a3b8;margin-top:2px;">${title}</div>`;
+  wrap.appendChild(header);
+  const clone=el.cloneNode(true);
+  // Remove capture buttons from clone
+  clone.querySelectorAll('.capture-btn').forEach(b=>b.remove());
+  wrap.appendChild(clone);
+  document.body.appendChild(wrap);
+  html2canvas(wrap,{backgroundColor:'#0f172a',scale:2,useCORS:true}).then(canvas=>{
+    document.body.removeChild(wrap);
+    const link=document.createElement('a');
+    link.download=`clanwar_${filename}_${new Date().toISOString().slice(0,10)}.png`;
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    toast('캡처 완료!');
+  }).catch(err=>{
+    document.body.removeChild(wrap);
+    console.error(err);toast('캡처 실패');
+  });
+}
+
 // ===== Confirm / Toast =====
 let confirmCb=null;
 function showConfirm(title,msg,cb){
   document.getElementById('confirmTitle').textContent=title;
   document.getElementById('confirmMsg').textContent=msg;confirmCb=cb;
-  document.getElementById('confirmBtn').onclick=()=>{closeConfirm();if(confirmCb)confirmCb();};
+  document.getElementById('confirmBtn').onclick=()=>{const cb=confirmCb;closeConfirm();if(cb)cb();};
   document.getElementById('confirmModal').classList.remove('hidden');
 }
-function closeConfirm(){document.getElementById('confirmModal').classList.add('hidden');confirmCb=null;}
+function closeConfirm(){document.getElementById('confirmModal').classList.add('hidden');confirmCb=null;const btn=document.getElementById('confirmBtn');btn.textContent='확인';btn.className='btn btn-sm btn-red';}
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000);}
 
 init();
