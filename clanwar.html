@@ -150,7 +150,7 @@ input:focus,select:focus{border-color:#3b82f6;}
 .item-delete:hover{background:#ef4444;color:#fff;}
 .color-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;}
 .clan-logo{width:24px;height:24px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid #475569;}
-.clan-logo-sm{width:20px;height:20px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px;border:1px solid #475569;}
+.clan-logo-sm{width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;border:1px solid #475569;}
 .clan-logo-lg{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #475569;margin-bottom:6px;}
 .logo-upload-btn{padding:6px 12px;background:#334155;border:1px dashed #475569;border-radius:8px;color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-block;}
 .logo-upload-btn:hover{background:#475569;color:#e2e8f0;border-color:#60a5fa;}
@@ -644,7 +644,7 @@ function renderSetup(){
   renderAdminList();renderClanList();renderTeamList();renderRoundList();renderRankPtsGrid();updateTeamClanSelect();
 }
 function saveConfig(){ref.child('config/title').set(document.getElementById('eventTitle').value||'');toast('저장됨');}
-function resetAll(){showConfirm('전체 초기화','모든 점수와 라운드가 삭제됩니다.',()=>{ref.child('scores').remove();ref.child('rounds').remove();toast('초기화 완료');});}
+function resetAll(){showConfirm('전체 초기화','모든 점수, 라운드, 팀이 삭제됩니다.',()=>{ref.child('scores').remove();ref.child('rounds').remove();ref.child('teams').remove();toast('초기화 완료');});}
 
 // Admins
 function addAdmin(){
