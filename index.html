@@ -186,6 +186,14 @@ input:focus,select:focus{border-color:#3b82f6;}
 .manual-member .mm-remove:hover{color:#ef4444;}
 .pool-chip{display:inline-flex;align-items:center;gap:4px;padding:7px 14px;border-radius:8px;background:#334155;font-size:14px;font-weight:600;cursor:pointer;margin:3px;}
 .pool-chip:hover{background:#475569;}
+.manual-add-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#1e293b;border:1px dashed #475569;color:#64748b;font-size:18px;cursor:pointer;margin:3px;transition:all .15s;}
+.manual-add-btn:hover{background:#334155;color:#e2e8f0;border-color:#60a5fa;}
+.manual-picker{position:relative;display:inline-block;}
+.manual-picker-drop{position:absolute;top:36px;left:0;z-index:50;background:#1e293b;border:1px solid #475569;border-radius:10px;padding:6px;min-width:200px;max-height:240px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.5);}
+.manual-picker-search{width:100%;padding:6px 10px;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:13px;margin-bottom:6px;box-sizing:border-box;}
+.manual-picker-item{padding:6px 10px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;}
+.manual-picker-item:hover{background:#334155;}
+.manual-picker-empty{padding:8px 10px;color:#64748b;font-size:13px;text-align:center;}
 
 /* 티어표 */
 .tier-table{width:100%;border-collapse:collapse;font-size:15px;}
@@ -730,20 +738,31 @@ function confirmTeams(){
   pendingTeams=null;document.getElementById('teamPreviewArea').classList.add('hidden');
 }
 function cancelPreview(){pendingTeams=null;document.getElementById('teamPreviewArea').classList.add('hidden');}
-function toggleManualMode(){manualMode=!manualMode;document.getElementById('manualArea').classList.toggle('hidden',!manualMode);if(manualMode){manualAssign={};renderManualAssign();}}
+function toggleManualMode(){manualMode=!manualMode;document.getElementById('manualArea').classList.toggle('hidden',!manualMode);if(manualMode){manualAssign={};manualPickerOpen=null;renderManualAssign();}}
+document.addEventListener('click',function(e){if(manualPickerOpen&&!e.target.closest('.manual-picker')&&!e.target.closest('.manual-add-btn')){manualPickerOpen=null;renderManualAssign();}});
+let manualPickerOpen=null;
 function renderManualAssign(){
   const members=appData.members||{};const ids=Object.keys(members).filter(id=>selectedParticipants.has(id));
   const sz=parseInt(document.getElementById('teamSize')?.value)||4;const nt=Math.ceil(ids.length/sz)||1;
   const area=document.getElementById('manualArea');let h='';
-  for(let t=1;t<=nt;t++){const tid='team_'+t;const asg=ids.filter(id=>manualAssign[id]===tid);
-    h+=`<div class="manual-team"><div class="manual-team-head" style="color:${teamColor(tid)}">${t}팀 (${asg.length})</div><div>${asg.map(id=>`<span class="manual-member">${members[id].name}<span class="mm-remove" onclick="delete manualAssign['${id}'];renderManualAssign()">✕</span></span>`).join('')}${asg.length===0?'<span style="color:#475569;font-size:13px;">비어있음</span>':''}</div></div>`;
-  }
   const ua=ids.filter(id=>!manualAssign[id]);
-  h+=`<div style="margin-top:10px;"><span style="font-size:13px;color:#64748b;">미배정 (${ua.length}명)</span><div style="margin-top:4px;">${ua.map(id=>`<span class="pool-chip" onclick="assignManual('${id}',${nt})">${members[id].name} <span class="tier-badge tier-sm tier-${members[id].tier||4}">${members[id].tier||4}${SL[members[id].subTier||'mid']}</span></span>`).join('')}</div></div>`;
+  for(let t=1;t<=nt;t++){const tid='team_'+t;const asg=ids.filter(id=>manualAssign[id]===tid);
+    h+=`<div class="manual-team"><div class="manual-team-head" style="color:${teamColor(tid)}">${t}팀 (${asg.length})</div><div>${asg.map(id=>`<span class="manual-member">${members[id].name}<span class="mm-remove" onclick="delete manualAssign['${id}'];renderManualAssign()">✕</span></span>`).join('')}<span class="manual-picker"><button class="manual-add-btn" onclick="toggleManualPicker('${tid}',event)">+</button>${manualPickerOpen===tid?buildManualPicker(tid,ua,members):''}</span></div></div>`;
+  }
+  h+=`<div style="margin-top:10px;"><span style="font-size:13px;color:#64748b;">미배정 (${ua.length}명)</span><div style="margin-top:4px;">${ua.map(id=>`<span class="pool-chip">${members[id].name} <span class="tier-badge tier-sm tier-${members[id].tier||4}">${members[id].tier||4}${SL[members[id].subTier||'mid']}</span></span>`).join('')}</div></div>`;
   h+=`<div style="margin-top:12px;"><button class="btn btn-sm btn-green" onclick="applyManualTeams(${nt})">수동 팀 적용</button></div>`;
   area.innerHTML=h;
+  if(manualPickerOpen){const si=document.getElementById('manualPickerSearch');if(si)si.focus();}
 }
-function assignManual(mid,nt){const pick=prompt('몇 팀? (1~'+nt+')',1);if(!pick)return;const n=parseInt(pick);if(n>=1&&n<=nt)manualAssign[mid]='team_'+n;renderManualAssign();}
+function buildManualPicker(tid,ua,members){
+  if(!ua.length)return`<div class="manual-picker-drop"><div class="manual-picker-empty">미배정 멤버 없음</div></div>`;
+  let h=`<div class="manual-picker-drop"><input type="text" class="manual-picker-search" id="manualPickerSearch" placeholder="이름 검색..." oninput="filterManualPicker(this.value)">`;
+  h+=`<div id="manualPickerList">${ua.map(id=>`<div class="manual-picker-item" data-name="${members[id].name.toLowerCase()}" onclick="pickManual('${id}','${tid}')">${members[id].name} <span class="tier-badge tier-sm tier-${members[id].tier||4}">${members[id].tier||4}${SL[members[id].subTier||'mid']}</span></div>`).join('')}</div></div>`;
+  return h;
+}
+function toggleManualPicker(tid,e){e&&e.stopPropagation();manualPickerOpen=manualPickerOpen===tid?null:tid;renderManualAssign();}
+function filterManualPicker(val){const v=val.trim().toLowerCase();document.querySelectorAll('#manualPickerList .manual-picker-item').forEach(el=>{el.style.display=el.dataset.name.includes(v)?'':'none';});const visible=[...document.querySelectorAll('#manualPickerList .manual-picker-item')].filter(el=>el.style.display!=='none');const empty=document.querySelector('#manualPickerList .manual-picker-empty');if(!visible.length&&!empty){document.getElementById('manualPickerList').insertAdjacentHTML('beforeend','<div class="manual-picker-empty">검색 결과 없음</div>');}else if(visible.length&&empty)empty.remove();}
+function pickManual(mid,tid){manualAssign[mid]=tid;manualPickerOpen=tid;renderManualAssign();}
 function applyManualTeams(nt){
   if(!isAdmin)return;const members=appData.members||{};const ids=Object.keys(members).filter(id=>selectedParticipants.has(id));
   const ua=ids.filter(id=>!manualAssign[id]);if(ua.length>0&&!confirm(ua.length+'명 미배정. 제외됩니다.'))return;
@@ -1607,7 +1626,7 @@ const GUIDE_DATA={
 <p><b>밸런스 랜덤</b> : 1~2티어를 팀에 분산 배치 후 나머지 균등 배분</p>
 <p><b>올 랜덤</b> : 티어 무관 완전 랜덤</p>
 <p>미리보기 → "이 팀으로 확정" 또는 "다시 섞기" 가능</p>
-<p><b>수동 배정</b> : 멤버를 직접 팀에 클릭 배치</p>
+<p><b>수동 배정</b> : 각 팀의 + 버튼으로 미배정 멤버를 검색/선택하여 배치</p>
 
 <h3>라운드</h3>
 <p>"+ 라운드"로 추가, "- 삭제"로 제거. 라운드별 맵 변경 가능.</p>
