@@ -623,7 +623,7 @@ function enterAsGuest(){isGuest=true;isAdmin=false;currentUser={id:'guest',name:
   document.getElementById('loginScreen').classList.add('hidden');document.getElementById('pinScreen').classList.add('hidden');document.getElementById('gameScreen').classList.remove('hidden');
   document.getElementById('dispName').textContent='게스트';document.getElementById('userAvatarTop').textContent='👤';
   document.getElementById('roleBadge').innerHTML='<span class="badge-member">구경</span>';
-  document.querySelectorAll('.tab[data-tab="members"],.tab[data-tab="setup"]').forEach(el=>el.style.display='none');
+  document.querySelectorAll('.tab[data-tab="members"],.tab[data-tab="setup"],.tab[data-tab="tier"]').forEach(el=>el.style.display='none');
   const presRef=dataRef.child('presence');const myRef=presRef.push();myRef.set({name:'게스트',type:'guest'});myRef.onDisconnect().remove();
   presRef.on('value',s=>{presenceData=s.exists()?s.val():{};updateOnlineDisplay();});
   dataRef.on('value',snap=>{appData=snap.val()||{};renderAll();});
@@ -1612,6 +1612,7 @@ const GUIDE_DATA={
 `},
   tier:{title:'티어표',content:`
 <h3>티어 구조</h3>
+<p class="g-tip">게스트에게는 티어표 탭이 보이지 않습니다.</p>
 <p>1T ~ 6T까지 6단계, 각 티어별 상/중/하 등급이 있습니다.</p>
 <p>1T상(60점)이 최상위, 6T하(5점)가 최하위입니다.</p>
 <p>멤버별 목표 점수가 티어에 따라 자동 결정됩니다.</p>
