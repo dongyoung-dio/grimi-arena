@@ -738,13 +738,17 @@ function confirmTeams(){
   pendingTeams=null;document.getElementById('teamPreviewArea').classList.add('hidden');
 }
 function cancelPreview(){pendingTeams=null;document.getElementById('teamPreviewArea').classList.add('hidden');}
-function toggleManualMode(){manualMode=!manualMode;document.getElementById('manualArea').classList.toggle('hidden',!manualMode);if(manualMode){manualAssign={};manualPickerOpen=null;renderManualAssign();}}
+let manualTeamCount=4;
+function toggleManualMode(){manualMode=!manualMode;document.getElementById('manualArea').classList.toggle('hidden',!manualMode);if(manualMode){manualAssign={};manualPickerOpen=null;manualTeamCount=4;renderManualAssign();}}
 document.addEventListener('click',function(e){if(manualPickerOpen&&!e.target.closest('.manual-picker')&&!e.target.closest('.manual-add-btn')){manualPickerOpen=null;renderManualAssign();}});
 let manualPickerOpen=null;
+function addManualTeam(){manualTeamCount++;renderManualAssign();}
+function removeManualTeam(){if(manualTeamCount<=2)return;const tid='team_'+manualTeamCount;Object.keys(manualAssign).forEach(id=>{if(manualAssign[id]===tid)delete manualAssign[id];});manualTeamCount--;renderManualAssign();}
 function renderManualAssign(){
   const members=appData.members||{};const ids=Object.keys(members).filter(id=>selectedParticipants.has(id));
-  const sz=parseInt(document.getElementById('teamSize')?.value)||4;const nt=Math.ceil(ids.length/sz)||1;
+  const nt=manualTeamCount;
   const area=document.getElementById('manualArea');let h='';
+  h+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span style="font-size:14px;font-weight:700;color:#94a3b8;">${nt}팀</span><button class="btn btn-xs btn-gray" onclick="addManualTeam()" style="padding:4px 10px;font-size:13px;">+ 팀 추가</button><button class="btn btn-xs btn-gray" onclick="removeManualTeam()" style="padding:4px 10px;font-size:13px;">- 팀 삭제</button></div>`;
   const ua=ids.filter(id=>!manualAssign[id]);
   for(let t=1;t<=nt;t++){const tid='team_'+t;const asg=ids.filter(id=>manualAssign[id]===tid);
     h+=`<div class="manual-team"><div class="manual-team-head" style="color:${teamColor(tid)}">${t}팀 (${asg.length})</div><div>${asg.map(id=>`<span class="manual-member">${members[id].name}<span class="mm-remove" onclick="delete manualAssign['${id}'];renderManualAssign()">✕</span></span>`).join('')}<span class="manual-picker"><button class="manual-add-btn" onclick="toggleManualPicker('${tid}',event)">+</button>${manualPickerOpen===tid?buildManualPicker(tid,ua,members):''}</span></div></div>`;
