@@ -34,18 +34,18 @@ input:focus,select:focus{border-color:#3b82f6;}
 #loginScreen{max-width:440px;margin:0 auto;text-align:center;padding:20px;min-height:100vh;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1;}
 .login-bg{position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;overflow:hidden;background:#0f172a;}
 .login-bg::before{content:'';position:absolute;inset:0;background:
-  linear-gradient(rgba(59,130,246,.015) 1px,transparent 1px),
-  linear-gradient(90deg,rgba(59,130,246,.015) 1px,transparent 1px);
+  linear-gradient(rgba(59,130,246,.012) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(59,130,246,.012) 1px,transparent 1px);
   background-size:80px 80px;}
 .login-bg::after{content:'';position:absolute;inset:0;background:
-  radial-gradient(ellipse at 20% 50%,rgba(59,130,246,.12) 0%,transparent 50%),
-  radial-gradient(ellipse at 80% 30%,rgba(139,92,246,.10) 0%,transparent 45%),
-  radial-gradient(ellipse at 50% 90%,rgba(99,102,241,.08) 0%,transparent 40%);}
-.orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.4;animation:orbFloat 12s ease-in-out infinite;}
+  radial-gradient(ellipse at 20% 50%,rgba(59,130,246,.096) 0%,transparent 50%),
+  radial-gradient(ellipse at 80% 30%,rgba(139,92,246,.08) 0%,transparent 45%),
+  radial-gradient(ellipse at 50% 90%,rgba(99,102,241,.064) 0%,transparent 40%);}
+.orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.32;animation:orbFloat 12s ease-in-out infinite;}
 @keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(30px,-20px) scale(1.05)}50%{transform:translate(-20px,30px) scale(.95)}75%{transform:translate(20px,20px) scale(1.02)}}
-.scan-line{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,.15),transparent);animation:scanDown 8s linear infinite;opacity:.5;}
+.scan-line{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,.12),transparent);animation:scanDown 8s linear infinite;opacity:.4;}
 @keyframes scanDown{0%{top:-2%}100%{top:102%}}
-.corner{position:absolute;width:80px;height:80px;border:2px solid rgba(59,130,246,.1);}
+.corner{position:absolute;width:80px;height:80px;border:2px solid rgba(59,130,246,.08);}
 .corner-tl{top:20px;left:20px;border-right:none;border-bottom:none;border-radius:4px 0 0 0;}
 .corner-tr{top:20px;right:20px;border-left:none;border-bottom:none;border-radius:0 4px 0 0;}
 .corner-bl{bottom:20px;left:20px;border-right:none;border-top:none;border-radius:0 0 0 4px;}
@@ -54,20 +54,20 @@ input:focus,select:focus{border-color:#3b82f6;}
 @keyframes floatIcon{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-20px) rotate(10deg)}}
 .particle{position:absolute;width:2px;height:2px;background:#60a5fa;border-radius:50%;opacity:0;animation:particleUp linear infinite;}
 .particle.spark{width:1px;height:8px;border-radius:1px;background:linear-gradient(to top,transparent,#60a5fa);animation-name:sparkUp;}
-@keyframes particleUp{0%{opacity:0;transform:translateY(0) scale(1)}10%{opacity:.6}90%{opacity:.2}100%{opacity:0;transform:translateY(-100vh) scale(0)}}
-@keyframes sparkUp{0%{opacity:0;transform:translateY(0) rotate(0deg)}10%{opacity:.5}90%{opacity:.1}100%{opacity:0;transform:translateY(-80vh) rotate(15deg)}}
+@keyframes particleUp{0%{opacity:0;transform:translateY(0) scale(1)}10%{opacity:.48}90%{opacity:.16}100%{opacity:0;transform:translateY(-100vh) scale(0)}}
+@keyframes sparkUp{0%{opacity:0;transform:translateY(0) rotate(0deg)}10%{opacity:.4}90%{opacity:.08}100%{opacity:0;transform:translateY(-80vh) rotate(15deg)}}
 .grid-line-h,.grid-line-v{position:absolute;opacity:0;}
-.grid-line-h{height:1px;width:100%;background:linear-gradient(90deg,transparent,transparent 30%,rgba(96,165,250,.4) 50%,transparent 70%,transparent);background-size:200% 100%;animation:gridLineH linear infinite;}
-.grid-line-v{width:1px;height:100%;background:linear-gradient(180deg,transparent,transparent 30%,rgba(139,92,246,.4) 50%,transparent 70%,transparent);background-size:100% 200%;animation:gridLineV linear infinite;}
+.grid-line-h{height:1px;width:100%;background:linear-gradient(90deg,transparent,transparent 30%,rgba(96,165,250,.32) 50%,transparent 70%,transparent);background-size:200% 100%;animation:gridLineH linear infinite;}
+.grid-line-v{width:1px;height:100%;background:linear-gradient(180deg,transparent,transparent 30%,rgba(139,92,246,.32) 50%,transparent 70%,transparent);background-size:100% 200%;animation:gridLineV linear infinite;}
 @keyframes gridLineH{0%{opacity:0;background-position:200% 0}10%{opacity:1}90%{opacity:1}100%{opacity:0;background-position:-200% 0}}
 @keyframes gridLineV{0%{opacity:0;background-position:0 200%}10%{opacity:1}90%{opacity:1}100%{opacity:0;background-position:0 -200%}}
 .twinkle{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0;animation:twinkleAnim ease-in-out infinite;}
-@keyframes twinkleAnim{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:.7;transform:scale(1.3)}}
+@keyframes twinkleAnim{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:.56;transform:scale(1.3)}}
 .meteor{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:0;animation:meteorShoot linear infinite;}
-.meteor::after{content:'';position:absolute;top:0;right:0;width:40px;height:1px;background:linear-gradient(to left,rgba(96,165,250,.6),transparent);transform:rotate(0deg);transform-origin:right center;}
-@keyframes meteorShoot{0%{opacity:0;transform:translate(0,0)}5%{opacity:.8}30%{opacity:.3}35%{opacity:0;transform:translate(-300px,200px)}100%{opacity:0}}
+.meteor::after{content:'';position:absolute;top:0;right:0;width:40px;height:1px;background:linear-gradient(to left,rgba(96,165,250,.48),transparent);transform:rotate(0deg);transform-origin:right center;}
+@keyframes meteorShoot{0%{opacity:0;transform:translate(0,0)}5%{opacity:.64}30%{opacity:.24}35%{opacity:0;transform:translate(-300px,200px)}100%{opacity:0}}
 .ring-pulse{position:absolute;border-radius:50%;border:1px solid rgba(96,165,250,.2);opacity:0;animation:ringExpand ease-out infinite;}
-@keyframes ringExpand{0%{opacity:.4;transform:scale(0)}60%{opacity:.1}100%{opacity:0;transform:scale(1)}}
+@keyframes ringExpand{0%{opacity:.32;transform:scale(0)}60%{opacity:.1}100%{opacity:0;transform:scale(1)}}
 .login-icon{font-size:52px;margin-bottom:10px;filter:drop-shadow(0 0 24px rgba(59,130,246,.4));animation:iconPulse 3s ease-in-out infinite;}
 @keyframes iconPulse{0%,100%{filter:drop-shadow(0 0 24px rgba(59,130,246,.4));transform:scale(1)}50%{filter:drop-shadow(0 0 40px rgba(139,92,246,.6));transform:scale(1.05)}}
 #loginScreen h1{font-size:56px;font-weight:900;letter-spacing:8px;margin-bottom:4px;position:relative;display:inline-block;text-shadow:0 0 40px rgba(96,165,250,.2);}
@@ -281,13 +281,6 @@ input:focus,select:focus{border-color:#3b82f6;}
   <div class="corner corner-tr"></div>
   <div class="corner corner-bl"></div>
   <div class="corner corner-br"></div>
-  <div class="float-icon" style="top:12%;left:15%;animation-delay:-2s;">🎯</div>
-  <div class="float-icon" style="top:25%;right:12%;animation-delay:-7s;font-size:16px;">💀</div>
-  <div class="float-icon" style="bottom:20%;left:8%;animation-delay:-12s;font-size:24px;">🏆</div>
-  <div class="float-icon" style="top:60%;right:8%;animation-delay:-5s;">🔥</div>
-  <div class="float-icon" style="bottom:35%;right:25%;animation-delay:-15s;font-size:18px;">⚡</div>
-  <div class="float-icon" style="top:8%;left:45%;animation-delay:-9s;font-size:14px;">💥</div>
-  <div class="float-icon" style="bottom:10%;left:40%;animation-delay:-3s;font-size:22px;">🎖️</div>
 </div>
 <div id="loginScreen">
   <h1><span class="title-main">CLAN MATCH</span><span class="title-glow">CLAN MATCH</span></h1>
