@@ -111,6 +111,13 @@ input:focus,select:focus{border-color:#3b82f6;}
 .item-delete{background:none;border:none;color:#475569;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;}
 .item-delete:hover{background:#ef4444;color:#fff;}
 .color-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;}
+.clan-logo{width:24px;height:24px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid #475569;}
+.clan-logo-sm{width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px;border:1px solid #475569;}
+.clan-logo-lg{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #475569;margin-bottom:6px;}
+.logo-upload{display:flex;align-items:center;gap:6px;}
+.logo-upload-btn{padding:6px 12px;background:#334155;border:1px dashed #475569;border-radius:8px;color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.logo-upload-btn:hover{background:#475569;color:#e2e8f0;border-color:#60a5fa;}
+.logo-preview{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #475569;}
 .pts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px;}
 .pts-item{display:flex;align-items:center;gap:6px;padding:6px 10px;background:#0f172a;border-radius:6px;border:1px solid #334155;font-size:13px;}
 .pts-item label{color:#94a3b8;white-space:nowrap;min-width:30px;}
@@ -208,6 +215,10 @@ input:focus,select:focus{border-color:#3b82f6;}
           <input type="text" id="newClanId" placeholder="약칭 (예: GRM)" style="width:100px;">
           <input type="text" id="newClanName" placeholder="클랜명 (예: 그리미)" style="width:140px;">
           <input type="color" id="newClanColor" value="#3b82f6" style="width:40px;height:36px;padding:2px;border-radius:6px;cursor:pointer;">
+          <div class="logo-upload">
+            <label class="logo-upload-btn" id="logoUploadLabel">마크 업로드<input type="file" id="newClanLogo" accept="image/*" style="display:none;" onchange="previewLogo(this)"></label>
+            <img id="logoPreview" class="logo-preview" style="display:none;">
+          </div>
           <button class="btn btn-sm btn-blue" onclick="addClan()">추가</button>
         </div>
         <div id="clanListArea" class="item-list"></div>
@@ -390,6 +401,48 @@ function getTeamScores(){
 }
 function getClanColor(clanId){return appData.clans?.[clanId]?.color||'#64748b';}
 function getClanName(clanId){return appData.clans?.[clanId]?.name||clanId;}
+function getClanLogo(clanId){return appData.clans?.[clanId]?.logo||'';}
+function clanLogoHtml(clanId,size){
+  const logo=getClanLogo(clanId);
+  const cls=size==='lg'?'clan-logo-lg':size==='sm'?'clan-logo-sm':'clan-logo';
+  if(logo) return `<img src="${logo}" class="${cls}" alt="${clanId}">`;
+  return '';
+}
+function clanTagHtml(clanId){
+  const logo=getClanLogo(clanId);
+  if(logo) return `<img src="${logo}" class="clan-logo-sm" alt="${clanId}"><span class="clan-tag" style="background:${getClanColor(clanId)};margin-right:6px;">${clanId}</span>`;
+  return `<span class="clan-tag" style="background:${getClanColor(clanId)};margin-right:6px;">${clanId}</span>`;
+}
+// Image resize to base64
+let pendingLogoBase64='';
+function previewLogo(input){
+  const file=input.files[0];
+  if(!file) return;
+  resizeImage(file,128,function(b64){
+    pendingLogoBase64=b64;
+    const prev=document.getElementById('logoPreview');
+    prev.src=b64;prev.style.display='block';
+    document.getElementById('logoUploadLabel').textContent='변경';
+  });
+}
+function resizeImage(file,maxSize,callback){
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const img=new Image();
+    img.onload=function(){
+      const canvas=document.createElement('canvas');
+      let w=img.width,h=img.height;
+      if(w>h){if(w>maxSize){h=h*(maxSize/w);w=maxSize;}}
+      else{if(h>maxSize){w=w*(maxSize/h);h=maxSize;}}
+      canvas.width=w;canvas.height=h;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,w,h);
+      callback(canvas.toDataURL('image/webp',0.8));
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 
 // ===== Team Board =====
 function renderTeamBoard(){
@@ -412,7 +465,7 @@ function renderTeamBoard(){
       const rd=s.roundData[rid];
       roundCells+=`<td class="col-kill">${rd.kills||'-'}</td><td class="col-place">${rd.placePts?'+'+rd.placePts:'-'}</td>`;
     });
-    rows+=`<tr class="${rowc}"><td class="col-rank ${rc}">${rank}</td><td class="col-team"><span class="clan-tag" style="background:${getClanColor(s.clan)};margin-right:6px;">${s.clan}</span>${s.name}</td>${roundCells}<td class="col-kill">${s.totalKills}</td><td class="col-place">${s.totalPlacePts}</td><td class="col-total">${s.total}</td></tr>`;
+    rows+=`<tr class="${rowc}"><td class="col-rank ${rc}">${rank}</td><td class="col-team">${clanTagHtml(s.clan)}${s.name}</td>${roundCells}<td class="col-kill">${s.totalKills}</td><td class="col-place">${s.totalPlacePts}</td><td class="col-total">${s.total}</td></tr>`;
   });
   area.innerHTML=`<div class="score-table-wrap"><table class="score-table"><thead><tr><th>순위</th><th style="text-align:left;">팀</th>${roundHeaders}<th>총 킬</th><th>총 순위점</th><th>합계</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
@@ -435,7 +488,8 @@ function renderClanBoard(){
     const c=clanMap[cid];
     const rank=i+1;
     const rc=rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'rank-else';
-    return `<div class="clan-card ${rank===1?'top-clan':''}"><div class="clan-rank ${rc}">${rank===1?'🏆':rank===2?'🥈':rank===3?'🥉':'#'+rank}</div><div class="clan-name" style="color:${getClanColor(cid)}">${getClanName(cid)}</div><div class="clan-score">${c.total}</div><div class="clan-detail">킬 ${c.kills} · 순위점 ${c.placePts} · ${c.teams}팀</div></div>`;
+    const logoHtml=getClanLogo(cid)?`<img src="${getClanLogo(cid)}" class="clan-logo-lg" alt="${cid}">`:'';
+    return `<div class="clan-card ${rank===1?'top-clan':''}">${logoHtml}<div class="clan-rank ${rc}">${rank===1?'🏆':rank===2?'🥈':rank===3?'🥉':'#'+rank}</div><div class="clan-name" style="color:${getClanColor(cid)}">${getClanName(cid)}</div><div class="clan-score">${c.total}</div><div class="clan-detail">킬 ${c.kills} · 순위점 ${c.placePts} · ${c.teams}팀</div></div>`;
   }).join('');
 }
 
@@ -465,7 +519,7 @@ function renderScoreInput(){
     const placePts=placement>0?getRankPts(placement):0;
     let opts='<option value="0">-</option>';
     for(let p=1;p<=totalTeams;p++) opts+=`<option value="${p}" ${placement===p?'selected':''}>${p}등</option>`;
-    rows+=`<tr><td class="team-name-cell"><span class="clan-tag" style="background:${getClanColor(t.clan)};margin-right:6px;font-size:11px;">${t.clan}</span>${t.name}</td><td><select onchange="saveScore('${tid}','${activeInputRound}','placement',this.value)">${opts}</select></td><td class="auto-pts">${placement>0?'+'+placePts:'-'}</td><td><input type="number" min="0" max="99" value="${kills}" onchange="saveScore('${tid}','${activeInputRound}','kills',this.value)" style="width:60px;"></td><td style="font-weight:800;color:#fbbf24;">${kills+placePts}</td></tr>`;
+    rows+=`<tr><td class="team-name-cell">${clanTagHtml(t.clan)}${t.name}</td><td><select onchange="saveScore('${tid}','${activeInputRound}','placement',this.value)">${opts}</select></td><td class="auto-pts">${placement>0?'+'+placePts:'-'}</td><td><input type="number" min="0" max="99" value="${kills}" onchange="saveScore('${tid}','${activeInputRound}','kills',this.value)" style="width:60px;"></td><td style="font-weight:800;color:#fbbf24;">${kills+placePts}</td></tr>`;
   });
   inputArea.innerHTML=`<div style="overflow-x:auto;"><table class="input-table"><thead><tr><th style="text-align:left;">팀</th><th>순위</th><th>순위점</th><th>킬</th><th>합계</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
@@ -506,10 +560,24 @@ function addClan(){
   const name=document.getElementById('newClanName').value.trim();
   const color=document.getElementById('newClanColor').value;
   if(!id){toast('클랜 약칭을 입력하세요');return;}
-  ref.child('clans/'+id).set({name:name||id,color});
+  const data={name:name||id,color};
+  if(pendingLogoBase64) data.logo=pendingLogoBase64;
+  ref.child('clans/'+id).set(data);
   document.getElementById('newClanId').value='';
   document.getElementById('newClanName').value='';
+  document.getElementById('newClanLogo').value='';
+  document.getElementById('logoPreview').style.display='none';
+  document.getElementById('logoUploadLabel').textContent='마크 업로드';
+  pendingLogoBase64='';
   toast(id+' 클랜 추가');
+}
+function updateClanLogo(clanId,input){
+  const file=input.files[0];
+  if(!file) return;
+  resizeImage(file,128,function(b64){
+    ref.child('clans/'+clanId+'/logo').set(b64);
+    toast(clanId+' 마크 업데이트');
+  });
 }
 function removeClan(id){
   showConfirm('클랜 삭제',`${id} 클랜을 삭제할까요? (소속 팀은 유지됩니다)`,()=>{ref.child('clans/'+id).remove();toast('삭제됨');});
@@ -521,7 +589,8 @@ function renderClanList(){
   if(!ids.length){area.innerHTML='<p style="color:#64748b;font-size:13px;">등록된 클랜이 없습니다.</p>';return;}
   area.innerHTML=ids.map(id=>{
     const c=clans[id];
-    return `<div class="item-row"><span class="color-dot" style="background:${c.color}"></span><span class="item-name">${id} <span style="color:#94a3b8;font-size:13px;">(${c.name})</span></span><button class="item-delete" onclick="removeClan('${id}')">✕</button></div>`;
+    const logoImg=c.logo?`<img src="${c.logo}" class="clan-logo" alt="${id}">`:`<span class="color-dot" style="background:${c.color}"></span>`;
+    return `<div class="item-row">${logoImg}<span class="item-name">${id} <span style="color:#94a3b8;font-size:13px;">(${c.name})</span></span><label class="logo-upload-btn" style="font-size:11px;padding:4px 8px;">${c.logo?'마크 변경':'마크 추가'}<input type="file" accept="image/*" style="display:none;" onchange="updateClanLogo('${id}',this)"></label><button class="item-delete" onclick="removeClan('${id}')">✕</button></div>`;
   }).join('');
 }
 function updateTeamClanSelect(){
@@ -556,7 +625,8 @@ function renderTeamList(){
   if(!ids.length){area.innerHTML='<p style="color:#64748b;font-size:13px;">등록된 팀이 없습니다.</p>';return;}
   area.innerHTML=ids.map(id=>{
     const t=teams[id];
-    return `<div class="item-row"><span class="clan-tag" style="background:${getClanColor(t.clan)};font-size:11px;">${t.clan}</span><span class="item-name">${t.name}</span><button class="item-delete" onclick="removeTeam('${id}')">✕</button></div>`;
+    const tLogo=getClanLogo(t.clan)?`<img src="${getClanLogo(t.clan)}" class="clan-logo-sm">`:'';
+    return `<div class="item-row">${tLogo}<span class="clan-tag" style="background:${getClanColor(t.clan)};font-size:11px;">${t.clan}</span><span class="item-name">${t.name}</span><button class="item-delete" onclick="removeTeam('${id}')">✕</button></div>`;
   }).join('');
 }
 
