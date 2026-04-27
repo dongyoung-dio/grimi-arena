@@ -407,7 +407,7 @@ input:focus,select:focus{border-color:#3b82f6;}
       <div id="noTeamsMsg" class="card" style="text-align:center;color:#64748b;padding:40px;font-size:16px;">아직 팀이 배정되지 않았습니다.<br>관리자가 "팀 배정" 탭에서 설정해주세요.</div>
     </div>
     <div id="tab-tier" class="hidden"><div class="card"><h3 style="margin-bottom:6px;font-size:17px;">티어별 목표 점수</h3><p style="font-size:14px;color:#64748b;margin-bottom:16px;">1킬 = 1점 · 총 딜 100당 = 1점</p><div id="tierTableArea"></div></div></div>
-    <div id="tab-members" class="hidden"><div class="card"><h3 style="margin-bottom:14px;font-size:17px;">멤버 관리 <span id="memberCount" style="font-size:14px;color:#64748b;font-weight:400;"></span></h3><div id="adminAddArea"></div><div id="memberTableArea"></div></div></div>
+    <div id="tab-members" class="hidden"><div class="card"><h3 style="margin-bottom:14px;font-size:17px;">멤버 관리 <span id="memberCount" style="font-size:14px;color:#64748b;font-weight:400;"></span></h3><div id="adminAddArea"></div><div style="margin-bottom:10px;display:flex;align-items:center;gap:8px;"><input type="text" id="memberSearchInput" placeholder="멤버 검색..." oninput="renderMembers()" style="flex:1;max-width:260px;padding:8px 12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:14px;"><span id="memberSearchCount" style="font-size:13px;color:#64748b;"></span></div><div id="adminBulkArea"></div><div id="memberTableArea"></div></div></div>
     <div id="tab-setup" class="hidden">
       <div class="card setup-section"><h3>참가 멤버 선택</h3><div class="participant-bar"><button class="btn btn-xs btn-gray" onclick="toggleAllParticipants(true)">전체 선택</button><button class="btn btn-xs btn-gray" onclick="toggleAllParticipants(false)">전체 해제</button><span style="font-size:14px;color:#94a3b8;"><strong id="selectedCount" style="color:#fbbf24;">0</strong>명 선택</span></div><div class="participant-grid" id="participantGrid"></div></div>
       <div class="card setup-section"><h3>팀 구성</h3><div class="setup-row"><label>팀당 최대</label><select id="teamSize"><option value="2">2명</option><option value="3">3명</option><option value="4" selected>4명</option></select><button class="btn btn-sm btn-blue" onclick="previewTeams('balance')">밸런스 랜덤</button><button class="btn btn-sm btn-gray" onclick="previewTeams('full')">올 랜덤</button></div><p class="setup-info">선택 <strong id="availableCount">0</strong>명 → <strong id="teamCountCalc">0</strong>팀</p><div id="teamPreviewArea" class="hidden" style="margin-top:14px;"></div><div style="margin-top:10px;"><button class="btn btn-sm btn-gray" onclick="toggleManualMode()">수동 배정 모드</button></div><div id="manualArea" class="manual-area hidden"></div></div>
@@ -659,7 +659,7 @@ function changeMyPin(){
 }
 
 // 멤버 CRUD
-function addMember(){if(!isAdmin)return;const name=document.getElementById('addMemberName').value.trim();const tier=parseInt(document.getElementById('addMemberTier').value);const subTier=document.getElementById('addMemberSubTier').value;if(!name)return;const id=name.replace(/[.#$/\[\]]/g,'_');dataRef.child('members/'+id).set({name,tier,subTier,role:'member',pin:'0000'});document.getElementById('addMemberName').value='';}
+function addMember(){if(!isAdmin)return;const name=document.getElementById('addMemberName').value.trim();const tier=parseInt(document.getElementById('addMemberTier').value);const subTier=document.getElementById('addMemberSubTier').value;if(!name)return;const members=appData.members||{};const dup=Object.values(members).some(m=>m.name===name);if(dup){alert('이미 같은 이름의 멤버가 있습니다.');return;}const id=name.replace(/[.#$/\[\]]/g,'_');dataRef.child('members/'+id).set({name,tier,subTier,role:'member',pin:'0000'});document.getElementById('addMemberName').value='';}
 function removeMember(id,name){if(!isAdmin||!confirm(name+' 삭제?'))return;dataRef.child('members/'+id).remove();}
 function changeTier(id,tier){if(!isAdmin)return;dataRef.child('members/'+id+'/tier').set(parseInt(tier));}
 function changeSubTier(id,sub){if(!isAdmin)return;dataRef.child('members/'+id+'/subTier').set(sub);}
@@ -947,23 +947,37 @@ function renderTierTable(){
   area.innerHTML=h;
 }
 
+let bulkSelected=new Set();
 function renderMembers(){
   const members=appData.members||{};const ids=Object.keys(members);
   document.getElementById('memberCount').textContent=`(${ids.length}명)`;
   const addArea=document.getElementById('adminAddArea');
   if(isAdmin){addArea.innerHTML=`<div class="add-member-bar"><input type="text" id="addMemberName" placeholder="새 멤버 이름" onkeydown="if(event.key==='Enter')addMember()"><select id="addMemberTier" style="width:65px;">${[1,2,3,4,5,6].map(t=>`<option value="${t}" ${t===4?'selected':''}>${t}T</option>`).join('')}</select><select id="addMemberSubTier" style="width:80px;"><option value="upper">상</option><option value="mid" selected>중</option><option value="lower">하</option></select><button class="btn btn-blue" onclick="addMember()" style="padding:18px 48px;font-size:20px;font-weight:800;border-radius:12px;min-width:120px;">+ 추가</button></div>`;}else addArea.innerHTML='';
+  const searchVal=(document.getElementById('memberSearchInput')?.value||'').trim().toLowerCase();
+  const filtered=ids.filter(id=>{if(!searchVal)return true;return members[id].name.toLowerCase().includes(searchVal);});
+  const searchCount=document.getElementById('memberSearchCount');
+  if(searchVal)searchCount.textContent=`${filtered.length}/${ids.length}명`;else searchCount.textContent='';
+  // 일괄 적용 영역
+  const bulkArea=document.getElementById('adminBulkArea');
+  if(isAdmin){
+    const selCount=bulkSelected.size;
+    bulkArea.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;padding:8px 12px;background:#0f172a;border:1px solid #334155;border-radius:10px;"><label style="font-size:13px;color:#94a3b8;font-weight:600;">일괄 적용</label><select id="bulkTier" style="width:65px;padding:6px;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:13px;"><option value="">티어</option>${[1,2,3,4,5,6].map(t=>`<option value="${t}">${t}T</option>`).join('')}</select><select id="bulkSubTier" style="width:65px;padding:6px;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:13px;"><option value="">등급</option><option value="upper">상</option><option value="mid">중</option><option value="lower">하</option></select><button class="btn btn-xs btn-blue" onclick="applyBulkTier()" style="padding:6px 14px;font-size:13px;">적용</button><span style="font-size:12px;color:#64748b;margin-left:4px;">${selCount}명 선택</span><button class="btn btn-xs btn-gray" onclick="bulkSelectAll(true)" style="font-size:11px;padding:4px 8px;">전체선택</button><button class="btn btn-xs btn-gray" onclick="bulkSelectAll(false)" style="font-size:11px;padding:4px 8px;">전체해제</button></div>`;
+  }else bulkArea.innerHTML='';
   const area=document.getElementById('memberTableArea');
-  if(!ids.length){area.innerHTML='<p style="color:#64748b;text-align:center;padding:20px;">멤버 없음</p>';return;}
+  if(!filtered.length){area.innerHTML=`<p style="color:#64748b;text-align:center;padding:20px;">${searchVal?'검색 결과 없음':'멤버 없음'}</p>`;return;}
   const onlineIds=getOnlineIds();
-  let h=`<table class="member-table"><thead><tr><th>이름</th><th>티어</th><th>등급</th><th>점수</th>${isAdmin?'<th>역할</th><th>PIN</th><th>숨김</th><th></th>':''}</tr></thead><tbody>`;
-  ids.forEach(id=>{const m=members[id];const sc=mScore(m);const isOnline=onlineIds.has(id);
-    h+=`<tr><td><span class="m-name">${isOnline?'<span style="display:inline-block;width:8px;height:8px;background:#3b82f6;border-radius:50%;margin-right:5px;box-shadow:0 0 6px #3b82f6;"></span>':''}${m.name}</span> ${m.role==='admin'?'<span class="badge-admin" style="font-size:10px;">관리자</span>':''} ${m.hidden?'<span style="font-size:10px;color:#64748b;background:#1e293b;padding:2px 6px;border-radius:4px;">숨김</span>':''}</td>
+  let h=`<table class="member-table"><thead><tr>${isAdmin?'<th style="width:32px;"><input type="checkbox" onchange="bulkSelectAll(this.checked)" style="cursor:pointer;"></th>':''}<th>이름</th><th>티어</th><th>등급</th><th>점수</th>${isAdmin?'<th>역할</th><th>PIN</th><th>숨김</th><th></th>':''}</tr></thead><tbody>`;
+  filtered.forEach(id=>{const m=members[id];const sc=mScore(m);const isOnline=onlineIds.has(id);const checked=bulkSelected.has(id);
+    h+=`<tr><td>${isAdmin?`<input type="checkbox" ${checked?'checked':''} onchange="toggleBulkSelect('${id}',this.checked)" style="cursor:pointer;">`:''}</td><td><span class="m-name">${isOnline?'<span style="display:inline-block;width:8px;height:8px;background:#3b82f6;border-radius:50%;margin-right:5px;box-shadow:0 0 6px #3b82f6;"></span>':''}${m.name}</span> ${m.role==='admin'?'<span class="badge-admin" style="font-size:10px;">관리자</span>':''} ${m.hidden?'<span style="font-size:10px;color:#64748b;background:#1e293b;padding:2px 6px;border-radius:4px;">숨김</span>':''}</td>
     <td>${isAdmin?`<select class="m-select" onchange="changeTier('${id}',this.value)">${[1,2,3,4,5,6].map(t=>`<option value="${t}" ${t===(m.tier||4)?'selected':''}>${t}T</option>`).join('')}</select>`:`<span class="tier-badge tier-${m.tier||4}">${m.tier||4}T</span>`}</td>
     <td>${isAdmin?`<select class="m-select" onchange="changeSubTier('${id}',this.value)"><option value="upper" ${m.subTier==='upper'?'selected':''}>상</option><option value="mid" ${(!m.subTier||m.subTier==='mid')?'selected':''}>중</option><option value="lower" ${m.subTier==='lower'?'selected':''}>하</option></select>`:`${SL[m.subTier||'mid']}`}</td>
     <td><span class="m-score">${sc}점</span></td>
     ${isAdmin?`<td><select class="m-select" onchange="changeRole('${id}',this.value)"><option value="member" ${m.role!=='admin'?'selected':''}>일반</option><option value="admin" ${m.role==='admin'?'selected':''}>관리자</option></select></td><td><button class="btn btn-xs btn-gray" onclick="resetPin('${id}','${m.name}')">초기화</button></td><td><button class="btn btn-xs ${m.hidden?'btn-red':'btn-gray'}" onclick="toggleHidden('${id}',${!m.hidden})" style="font-size:11px;padding:4px 8px;">${m.hidden?'해제':'숨김'}</button></td><td><button class="m-delete" onclick="removeMember('${id}','${m.name}')">✕</button></td>`:''}</tr>`;
   });h+=`</tbody></table>`;area.innerHTML=h;
 }
+function toggleBulkSelect(id,checked){if(checked)bulkSelected.add(id);else bulkSelected.delete(id);renderMembers();}
+function bulkSelectAll(checked){const members=appData.members||{};const searchVal=(document.getElementById('memberSearchInput')?.value||'').trim().toLowerCase();const ids=Object.keys(members).filter(id=>!searchVal||members[id].name.toLowerCase().includes(searchVal));if(checked)ids.forEach(id=>bulkSelected.add(id));else bulkSelected.clear();renderMembers();}
+function applyBulkTier(){if(!isAdmin||!bulkSelected.size)return;const tier=document.getElementById('bulkTier').value;const sub=document.getElementById('bulkSubTier').value;if(!tier&&!sub){alert('티어 또는 등급을 선택해주세요.');return;}const names=[...bulkSelected].map(id=>(appData.members||{})[id]?.name).filter(Boolean);if(!confirm(`${names.length}명에게 ${tier?tier+'T ':''}${sub?({'upper':'상','mid':'중','lower':'하'}[sub])+' ':''}일괄 적용하시겠습니까?\n\n${names.join(', ')}`))return;const updates={};bulkSelected.forEach(id=>{if(tier)updates[`members/${id}/tier`]=parseInt(tier);if(sub)updates[`members/${id}/subTier`]=sub;});dataRef.update(updates);bulkSelected.clear();}
 
 function renderSetup(){
   renderParticipants();document.getElementById('roundDisplay').textContent=appData.rounds||0;loadRule();loadChickenPts();
