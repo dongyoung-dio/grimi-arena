@@ -243,6 +243,7 @@ input:focus,select:focus{border-color:#3b82f6;}
   <div id="onlineListArea" style="padding:6px 20px;background:#1e293b;border-bottom:1px solid #334155;"></div>
   <div class="tabs">
     <div class="tab active" data-tab="board" onclick="switchTab('board')">순위 보드</div>
+    <div class="tab" data-tab="history" onclick="switchTab('history')">대회 기록</div>
     <div class="tab admin-only" data-tab="input" onclick="switchTab('input')">점수 입력</div>
     <div class="tab admin-only" data-tab="setup" onclick="switchTab('setup')">대회 설정</div>
   </div>
@@ -260,7 +261,10 @@ input:focus,select:focus{border-color:#3b82f6;}
         </div>
       </div>
       <div id="roundRankArea"></div>
-      <div id="historyArea" style="margin-top:28px;"></div>
+    </div>
+    <!-- 대회 기록 -->
+    <div id="tab-history" class="hidden">
+      <div id="historyArea"></div>
     </div>
     <!-- 점수 입력 -->
     <div id="tab-input" class="hidden">
@@ -478,8 +482,9 @@ function logout(){
 // ===== Tabs =====
 function switchTab(t){
   document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===t));
-  ['board','input','setup'].forEach(id=>{const el=document.getElementById('tab-'+id);if(el) el.classList.toggle('hidden',id!==t);});
+  ['board','history','input','setup'].forEach(id=>{const el=document.getElementById('tab-'+id);if(el) el.classList.toggle('hidden',id!==t);});
   if(t==='input') renderScoreInput();
+  if(t==='history') renderHistory();
 }
 
 // ===== Render All =====
@@ -488,7 +493,6 @@ function renderAll(){
   renderPodium();
   renderTeamBoard();
   renderRoundRanks();
-  renderHistory();
   updateOnlineDisplay();
   if(isAdmin){renderSetup();renderScoreInput();}
 }
@@ -778,7 +782,7 @@ function renderHistory(){
     const da=history[a].date||'',db=history[b].date||'';
     return db.localeCompare(da);
   });
-  if(!ids.length){area.innerHTML='';return;}
+  if(!ids.length){area.innerHTML='<div class="card" style="text-align:center;color:#64748b;padding:40px;">저장된 대회 기록이 없습니다.</div>';return;}
   let items='';
   ids.forEach(id=>{
     const h=history[id];
@@ -788,7 +792,7 @@ function renderHistory(){
     const clanCount=Object.keys(h.clans||{}).length;
     items+=`<div class="history-item" onclick="viewHistory('${id}')"><div><div class="hi-title">${h.title||'무제'}</div><div class="hi-date">${dateStr}</div></div><div style="text-align:right;"><div class="hi-teams">${clanCount}클랜 ${teamCount}팀</div><span style="color:#3b82f6;font-size:13px;font-weight:600;">조회 →</span></div></div>`;
   });
-  area.innerHTML=`<div style="border-top:1px solid #334155;padding-top:20px;"><h3 style="color:#94a3b8;font-size:15px;font-weight:700;margin-bottom:4px;">과거 대회 기록</h3><div class="history-list">${items}</div></div>`;
+  area.innerHTML=`<h3 style="font-size:18px;font-weight:800;margin-bottom:14px;">대회 기록</h3><div class="history-list">${items}</div>`;
 }
 function viewHistory(hid){
   const h=appData.history?.[hid];
