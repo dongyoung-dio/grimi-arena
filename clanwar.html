@@ -305,14 +305,11 @@ input:focus,select:focus{border-color:#3b82f6;}
           <input type="color" id="newClanColor" value="#3b82f6" style="width:40px;height:36px;padding:2px;border-radius:6px;cursor:pointer;">
           <label class="logo-upload-btn" id="logoUploadLabel"><span id="logoUploadText">마크 업로드</span><input type="file" id="newClanLogo" accept="image/*" style="display:none;" onchange="previewLogo(this)"></label>
           <img id="logoPreview" class="logo-preview" style="display:none;">
-          <label style="font-size:13px;color:#94a3b8;">팀 수</label>
-          <input type="number" id="newClanTeamCount" min="1" max="10" value="2" style="width:60px;text-align:center;" onfocus="this.select()">
           <button class="btn btn-sm btn-blue" onclick="addClan()">추가</button>
         </div>
         <div id="clanListArea" class="item-list"></div>
       </div>
-      <div class="setup-card"><h3>팀 관리</h3>
-        <p style="font-size:13px;color:#64748b;margin-bottom:10px;">클랜 추가 시 자동 생성됩니다. 개별 추가/삭제도 가능합니다.</p>
+      <div class="setup-card"><h3 style="justify-content:space-between;">팀 관리 <button class="btn btn-xs btn-red" onclick="removeAllTeams()">전체 삭제</button></h3>
         <div class="setup-row">
           <select id="newTeamClan" style="width:120px;"><option value="">클랜 선택</option></select>
           <button class="btn btn-sm btn-blue" onclick="addTeam()">+ 팀 추가</button>
@@ -688,13 +685,8 @@ function addClan(){
   const data={name:name||id,color};
   if(pendingLogoBase64) data.logo=pendingLogoBase64;
   ref.child('clans/'+id).set(data);
-  // 자동 팀 생성: GRM-1, GRM-2, ...
-  for(let i=1;i<=teamCount;i++){
-    const tName=id+'-'+i;
-    ref.child('teams/'+ref.child('teams').push().key).set({name:tName,clan:id});
-  }
-  resetClanForm();document.getElementById('newClanTeamCount').value='2';
-  toast(id+' 클랜 + '+teamCount+'팀 추가');
+  resetClanForm();
+  toast(id+' 클랜 추가');
 }
 function updateClanLogo(cid,input){const file=input.files[0];if(!file)return;resizeImage(file,128,b64=>{ref.child('clans/'+cid+'/logo').set(b64);toast(cid+' 마크 업데이트');});}
 function updateClanName(cid,name){ref.child('clans/'+cid+'/name').set(name.trim()||cid);toast('클랜명 변경');}
@@ -749,6 +741,7 @@ function addTeam(){
   toast(name+' 팀 추가');
 }
 function removeTeam(id){const t=appData.teams?.[id];showConfirm('팀 삭제',`${t?.name||''} 삭제?`,()=>{ref.child('teams/'+id).remove();ref.child('scores/'+id).remove();toast('삭제됨');});}
+function removeAllTeams(){const cnt=Object.keys(appData.teams||{}).length;if(!cnt){toast('삭제할 팀이 없습니다');return;}showConfirm('전체 팀 삭제',`${cnt}개 팀을 모두 삭제합니다.`,()=>{ref.child('teams').remove();ref.child('scores').remove();toast('전체 팀 삭제 완료');});}
 function renderTeamList(){
   const teams=appData.teams||{},area=document.getElementById('teamListArea');
   const ids=Object.keys(teams).sort((a,b)=>(teams[a].name||'').localeCompare(teams[b].name||''));
