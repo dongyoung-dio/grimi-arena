@@ -679,7 +679,6 @@ function addClan(){
   const id=document.getElementById('newClanId').value.trim().toUpperCase();
   const name=document.getElementById('newClanName').value.trim();
   const color=document.getElementById('newClanColor').value;
-  const teamCount=Number(document.getElementById('newClanTeamCount').value)||2;
   if(!id){toast('클랜 약칭을 입력하세요');return;}
   if(appData.clans?.[id]){toast('이미 존재하는 약칭입니다');return;}
   const data={name:name||id,color};
