@@ -1246,7 +1246,7 @@ function renderRanking(){
 
   // 누적 기록 테이블
   let h=`<div class="hist-table-wrap"><table class="hist-table"><thead><tr><th style="text-align:left;">멤버</th><th>티어</th>`;
-  eventKeys.slice().reverse().forEach(ek=>{const ev=history[ek];const num=ek.replace('event_','');h+=`<th>${num}회<br><span style="color:#475569;font-weight:400;font-size:11px;">${ev.date||''}</span></th>`;});
+  eventKeys.slice().reverse().forEach(ek=>{const ev=history[ek];h+=`<th>${ev.date||'?'}</th>`;});
   h+=`<th>총점</th><th>평균</th><th>평균딜</th><th>참여</th><th>승급</th></tr></thead><tbody>`;
   const pids=Object.keys(playerTotals).sort((a,b)=>playerTotals[b].scores.reduce((s,x)=>s+x.score,0)-playerTotals[a].scores.reduce((s,x)=>s+x.score,0));
   pids.forEach(mid=>{const p=playerTotals[mid];const m=members[mid];const total=p.scores.reduce((s,x)=>s+x.score,0);const avg=(total/p.participated).toFixed(1);const avgDmg=Math.round(p.totalDamage/p.participated);const pp=Math.round((p.participated/totalEvents)*100);
@@ -1257,12 +1257,12 @@ function renderRanking(){
   });h+=`</tbody></table></div>`;
 
   // 회차별 아코디언
-  h+=`<div style="margin-top:20px;"><p style="font-size:14px;font-weight:700;color:#64748b;margin-bottom:10px;">회차별 상세</p>`;
-  eventKeys.forEach((ek,ei)=>{const ev=history[ek];const num=ek.replace('event_','');
+  h+=`<div style="margin-top:20px;"><p style="font-size:14px;font-weight:700;color:#64748b;margin-bottom:10px;">이벤트 상세</p>`;
+  eventKeys.forEach((ek,ei)=>{const ev=history[ek];
     const tks=Object.keys(ev.teams||{}).sort((a,b)=>(ev.teams[a].rank||99)-(ev.teams[b].rank||99));
     const winner=tks.length>0?ev.teams[tks[0]]:null;
     const wName=winner?winner.name:'';const wTotal=winner?winner.total:0;const wTarget=winner?winner.target:0;
-    h+=`<div class="accordion-head ${ei===0?'open':''}" onclick="toggleAccordion(this)"><div class="ac-title"><span>${num}회차</span><span style="color:#475569;font-size:13px;">${ev.date||''} · ${ev.rounds||0}R</span>${isAdmin?`<button class="hist-delete" onclick="event.stopPropagation();recalcEvent('${ek}')" style="background:#1e40af;">재계산</button><button class="hist-delete" onclick="event.stopPropagation();deleteHistory('${ek}')">삭제</button>`:''}</div><div class="ac-right"><span class="ac-detail">우승 : ${wName}</span><span class="ac-score">${wTotal}/${wTarget}</span><span class="ac-chevron">▼</span></div></div>`;
+    h+=`<div class="accordion-head ${ei===0?'open':''}" onclick="toggleAccordion(this)"><div class="ac-title"><span>${ev.date||'?'}</span>${isAdmin?`<button class="hist-delete" onclick="event.stopPropagation();recalcEvent('${ek}')" style="background:#1e40af;">재계산</button><button class="hist-delete" onclick="event.stopPropagation();deleteHistory('${ek}')">삭제</button>`:''}</div><div class="ac-right"><span class="ac-detail">우승 : ${wName}</span><span class="ac-score">${wTotal}/${wTarget}</span><span class="ac-chevron">▼</span></div></div>`;
     h+=`<div class="accordion-body ${ei===0?'open':''}">`;
     tks.forEach(tid=>{const t=ev.teams[tid];const rank=t.rank;
       const ps=ev.playerScores||{};
