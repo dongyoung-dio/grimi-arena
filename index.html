@@ -952,8 +952,8 @@ function renderGame(){
   document.getElementById('noTeamsMsg').classList.toggle('hidden',tids.length>0);
   const c=document.getElementById('gameTeams');
   if(!tids.length){dash.classList.add('hidden');c.innerHTML='';return;}
-  const totals={},targets={};tids.forEach(tid=>{totals[tid]=getTeamTotal(tid);targets[tid]=getTeamTarget(tid);});
-  const sorted=tids.slice().sort((a,b)=>totals[b]-totals[a]);const rankMap={};sorted.forEach((tid,i)=>rankMap[tid]=i+1);
+  const totals={},targets={},pcts={};tids.forEach(tid=>{totals[tid]=getTeamTotal(tid);targets[tid]=getTeamTarget(tid);pcts[tid]=(totals[tid]/targets[tid])*100;});
+  const sorted=tids.slice().sort((a,b)=>pcts[b]-pcts[a]);const rankMap={};sorted.forEach((tid,i)=>rankMap[tid]=i+1);
   dash.classList.remove('hidden');
   const cols=sorted.length<=4?sorted.length:sorted.length<=6?3:sorted.length<=9?3:4;
   const dashOpen=dash.dataset.open!=='false';
