@@ -479,8 +479,8 @@ input:focus,select:focus{border-color:#3b82f6;}
   <div id="eventStatusBar" class="event-status event-idle">이벤트 대기 중</div>
   <div id="timerBar" class="timer-bar hidden"><span class="timer-display" id="timerDisplay">00:00:00</span></div>
   <div class="tabs">
-    <div class="tab active" data-tab="game" onclick="switchTab('game')">게임 현황</div>
-    <div class="tab" data-tab="tier" onclick="switchTab('tier')">티어표</div>
+    <div class="tab active" data-tab="tier" onclick="switchTab('tier')">티어표</div>
+    <div class="tab" data-tab="game" onclick="switchTab('game')">게임 현황</div>
     <div class="tab" data-tab="setup" onclick="switchTab('setup')">팀 배정</div>
     <div class="tab" data-tab="ranking" onclick="switchTab('ranking')">순위/결과</div>
     <div class="tab" data-tab="bingo" onclick="switchTab('bingo')">빙고</div>
@@ -488,13 +488,13 @@ input:focus,select:focus{border-color:#3b82f6;}
     <div class="tab" data-tab="members" onclick="switchTab('members')">멤버 관리</div>
   </div>
   <div class="main">
-    <div id="tab-game">
+    <div id="tab-game" class="hidden">
       <div id="gameEndEventArea" class="guest-hide" style="margin-bottom:12px;text-align:right;"></div>
       <div id="rankDashboard" class="rank-dashboard hidden"></div>
       <div id="gameTeams" class="teams-grid"></div>
       <div id="noTeamsMsg" class="card" style="text-align:center;color:#64748b;padding:40px;font-size:16px;">아직 팀이 배정되지 않았습니다.<br>관리자가 "팀 배정" 탭에서 설정해주세요.</div>
     </div>
-    <div id="tab-tier" class="hidden"><div class="card"><h3 style="margin-bottom:6px;font-size:17px;">티어별 목표 점수</h3><p style="font-size:14px;color:#64748b;margin-bottom:16px;">1킬 = 1점 · 총 딜 100당 = 1점</p><div id="tierTableArea"></div></div></div>
+    <div id="tab-tier"><div class="card"><h3 style="margin-bottom:6px;font-size:17px;">티어별 목표 점수</h3><p style="font-size:14px;color:#64748b;margin-bottom:16px;">1킬 = 1점 · 총 딜 100당 = 1점</p><div id="tierTableArea"></div></div></div>
     <div id="tab-members" class="hidden"><div class="card"><h3 style="margin-bottom:14px;font-size:17px;">멤버 관리 <span id="memberCount" style="font-size:14px;color:#64748b;font-weight:400;"></span></h3><div id="adminAddArea"></div><div style="margin-bottom:10px;display:flex;align-items:center;gap:8px;"><input type="text" id="memberSearchInput" placeholder="멤버 검색..." oninput="renderMembers()" style="flex:1;max-width:260px;padding:8px 12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:14px;"><span id="memberSearchCount" style="font-size:13px;color:#64748b;"></span></div><div id="adminBulkArea"></div><div id="memberTableArea"></div></div></div>
     <div id="tab-setup" class="hidden">
       <div class="card setup-section"><h3>참가 멤버 선택</h3><div class="participant-bar"><button class="btn btn-xs btn-gray" onclick="toggleAllParticipants(true)">전체 선택</button><button class="btn btn-xs btn-gray" onclick="toggleAllParticipants(false)">전체 해제</button><span style="font-size:14px;color:#94a3b8;"><strong id="selectedCount" style="color:#fbbf24;">0</strong>명 선택</span></div><div class="participant-grid" id="participantGrid"></div></div>
@@ -725,6 +725,7 @@ function enterAsGuest(){isGuest=true;isAdmin=false;currentUser={id:'guest',name:
   document.getElementById('dispName').textContent='게스트';document.getElementById('userAvatarTop').textContent='👤';
   document.getElementById('roleBadge').innerHTML='<span class="badge-member">구경</span>';
   document.querySelectorAll('.tab[data-tab="members"],.tab[data-tab="setup"],.tab[data-tab="tier"]').forEach(el=>el.style.display='none');
+  switchTab('game');
   const presRef=dataRef.child('presence');const myRef=presRef.push();myRef.set({name:'게스트',type:'guest'});myRef.onDisconnect().remove();
   presRef.on('value',s=>{presenceData=s.exists()?s.val():{};updateOnlineDisplay();});
   dataRef.on('value',snap=>{appData=snap.val()||{};renderAll();});
