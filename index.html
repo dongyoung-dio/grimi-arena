@@ -884,8 +884,8 @@ function endEvent(){
   const result={date:dateStr,rounds,teams:{},playerScores:{},tierSnapshot:{}};
   // 현재 티어 스냅샷 저장
   Object.keys(members).forEach(mid=>{result.tierSnapshot[mid]={name:members[mid].name,tier:members[mid].tier||4,subTier:members[mid].subTier||'mid'};});
-  const totals={};tids.forEach(tid=>{totals[tid]=getTeamTotal(tid);});
-  const sorted=tids.slice().sort((a,b)=>totals[b]-totals[a]);
+  const totals={},targets2={},pcts2={};tids.forEach(tid=>{totals[tid]=getTeamTotal(tid);targets2[tid]=getTeamTarget(tid);pcts2[tid]=(totals[tid]/targets2[tid])*100;});
+  const sorted=tids.slice().sort((a,b)=>pcts2[b]-pcts2[a]);
   sorted.forEach((tid,i)=>{
     const team=teams[tid];result.teams[tid]={name:team.name,rank:i+1,total:totals[tid],target:getTeamTarget(tid),members:team.members};
     Object.keys(team.members||{}).forEach(mid=>{const st=getPlayerStats(tid,mid);result.playerScores[mid]={name:team.members[mid].name,score:st.total,damage:st.damage,kills:st.kills,target:mScore(team.members[mid]),team:team.name,rank:i+1};});
@@ -910,6 +910,50 @@ function saveRule(){if(!isAdmin)return;const promoTo=parseInt(document.getElemen
 function loadRule(){const rule=appData.tierRule||{};const promoTo=rule.promoTo||1;const relegBottom=rule.relegBottom||(rule.relegFrom?null:1);const pEl=document.getElementById('rulePromoTo');const rEl=document.getElementById('ruleRelegBottom');if(pEl&&pEl!==document.activeElement)pEl.value=promoTo;if(rEl&&relegBottom!==null&&rEl!==document.activeElement)rEl.value=relegBottom;const preview=document.getElementById('rulePreviewText');if(preview)preview.textContent=`승급 상위 ${promoTo}팀, 강등 하위 ${(relegBottom||1)===1?'꼴등만':relegBottom+'팀'} → 나머지는 유지`;}
 function resetEvent(){if(!isAdmin||!confirm('초기화? 결과 저장 안됨'))return;dataRef.update({teams:null,scores:null,rounds:0,roundMaps:null,eventStatus:'idle',timer:null});if(timerInterval)clearInterval(timerInterval);selectedRounds={};}
 function deleteHistory(ek){if(!isAdmin||!confirm(ek.replace('event_','')+'회차 삭제?'))return;dataRef.child('history/'+ek).remove();}
+function recalcEvent(ek){
+  if(!isAdmin)return;
+  const ev=(appData.history||{})[ek];if(!ev||!ev.teams||!ev.tierSnapshot)return alert('해당 회차 데이터 없음');
+  const rule=appData.tierRule||{};const promoTo=rule.promoTo||1;const relegBottom=rule.relegBottom||1;
+  const tids=Object.keys(ev.teams);
+  const totalTeams=tids.length;const relegFrom=totalTeams-relegBottom+1;
+  // % 기준 재정렬
+  const pctMap={};tids.forEach(tid=>{const t=ev.teams[tid];pctMap[tid]=(t.total/(t.target||1))*100;});
+  const sorted=tids.slice().sort((a,b)=>pctMap[b]-pctMap[a]);
+  // 히스토리 팀 순위 업데이트
+  const histUpdates={};
+  sorted.forEach((tid,i)=>{histUpdates['history/'+ek+'/teams/'+tid+'/rank']=i+1;});
+  // playerScores 순위도 업데이트
+  sorted.forEach((tid,i)=>{
+    const team=ev.teams[tid];
+    Object.keys(team.members||{}).forEach(mid=>{
+      if(ev.playerScores&&ev.playerScores[mid]){histUpdates['history/'+ek+'/playerScores/'+mid+'/rank']=i+1;}
+    });
+  });
+  // tierSnapshot 기준으로 승급/강등 재계산
+  const snap=ev.tierSnapshot;const members=appData.members||{};
+  const tierChanges={};const memberUpdates={};
+  sorted.forEach((tid,i)=>{
+    const rank=i+1;
+    Object.keys(ev.teams[tid].members||{}).forEach(mid=>{
+      const s=snap[mid];if(!s)return;
+      let tier=s.tier||4,sub=s.subTier||'mid';
+      const beforeTier=tier,beforeSub=sub;
+      if(rank<=promoTo){if(sub==='lower')sub='mid';else if(sub==='mid')sub='upper';else if(sub==='upper'&&tier>1){tier--;sub='lower';}}
+      else if(rank>=relegFrom){if(sub==='upper')sub='mid';else if(sub==='mid')sub='lower';else if(sub==='lower'&&tier<6){tier++;sub='upper';}}
+      if(members[mid]){memberUpdates['members/'+mid+'/tier']=tier;memberUpdates['members/'+mid+'/subTier']=sub;}
+      if(tier!==beforeTier||sub!==beforeSub){
+        const dir=(tier<beforeTier||(tier===beforeTier&&['lower','mid','upper'].indexOf(sub)>['lower','mid','upper'].indexOf(beforeSub)))?'up':'down';
+        tierChanges[mid]={name:s.name,from:{tier:beforeTier,subTier:beforeSub},to:{tier,subTier:sub},dir};
+      }
+    });
+  });
+  histUpdates['history/'+ek+'/tierChanges']=tierChanges;
+  const allUpdates=Object.assign({},histUpdates,memberUpdates);
+  const sortedNames=sorted.map((tid,i)=>`${i+1}위: ${ev.teams[tid].name} (${Math.round(pctMap[tid])}%)`).join('\n');
+  if(!confirm(`${ek.replace('event_','')}회차 순위를 달성률(%) 기준으로 재계산합니다.\n\n${sortedNames}\n\n현재 멤버 티어도 함께 수정됩니다. 진행?`))return;
+  dataRef.update(allUpdates);
+  alert('재계산 완료! 티어가 수정되었습니다.');
+}
 
 // 타이머
 function startTimer(){if(!isAdmin)return;dataRef.child('timer').set({endTime:Date.now()+(parseInt(document.getElementById('timerMinutes').value)||120)*60000,active:true});}
@@ -1113,7 +1157,7 @@ function renderRanking(){
   const cList=document.getElementById('currentRankingList');
   if(tids.length){
     const totals={},targets={};tids.forEach(tid=>{totals[tid]=getTeamTotal(tid);targets[tid]=getTeamTarget(tid);});
-    const sorted=tids.slice().sort((a,b)=>totals[b]-totals[a]);
+    const sorted=tids.slice().sort((a,b)=>{const pA=(totals[a]/targets[a])*100,pB=(totals[b]/targets[b])*100;return pB-pA;});
     cList.innerHTML=sorted.map((tid,i)=>{
       const rank=i+1,total=totals[tid],target=targets[tid],pct=Math.min(Math.round((total/target)*100),999);
       const team=teams[tid];const mids=Object.keys(team.members||{});
@@ -1159,7 +1203,7 @@ function renderRanking(){
     const tks=Object.keys(ev.teams||{}).sort((a,b)=>(ev.teams[a].rank||99)-(ev.teams[b].rank||99));
     const winner=tks.length>0?ev.teams[tks[0]]:null;
     const wName=winner?winner.name:'';const wTotal=winner?winner.total:0;const wTarget=winner?winner.target:0;
-    h+=`<div class="accordion-head ${ei===0?'open':''}" onclick="toggleAccordion(this)"><div class="ac-title"><span>${num}회차</span><span style="color:#475569;font-size:13px;">${ev.date||''} · ${ev.rounds||0}R</span>${isAdmin?`<button class="hist-delete" onclick="event.stopPropagation();deleteHistory('${ek}')">삭제</button>`:''}</div><div class="ac-right"><span class="ac-detail">우승 : ${wName}</span><span class="ac-score">${wTotal}/${wTarget}</span><span class="ac-chevron">▼</span></div></div>`;
+    h+=`<div class="accordion-head ${ei===0?'open':''}" onclick="toggleAccordion(this)"><div class="ac-title"><span>${num}회차</span><span style="color:#475569;font-size:13px;">${ev.date||''} · ${ev.rounds||0}R</span>${isAdmin?`<button class="hist-delete" onclick="event.stopPropagation();recalcEvent('${ek}')" style="background:#1e40af;">재계산</button><button class="hist-delete" onclick="event.stopPropagation();deleteHistory('${ek}')">삭제</button>`:''}</div><div class="ac-right"><span class="ac-detail">우승 : ${wName}</span><span class="ac-score">${wTotal}/${wTarget}</span><span class="ac-chevron">▼</span></div></div>`;
     h+=`<div class="accordion-body ${ei===0?'open':''}">`;
     tks.forEach(tid=>{const t=ev.teams[tid];const rank=t.rank;
       const ps=ev.playerScores||{};
