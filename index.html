@@ -25,8 +25,46 @@ input,select{padding:8px 12px;border:2px solid #334155;border-radius:8px;backgro
 input:focus,select:focus{border-color:#3b82f6;}
 .card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155;}
 
+/* ===== 배경 효과 ===== */
+/* 로비 배경 래퍼 */
+#loginBg{position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;z-index:0;pointer-events:none;}
+#loginBg::before{content:'';position:absolute;inset:0;background:linear-gradient(rgba(59,130,246,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,.018) 1px,transparent 1px);background-size:80px 80px;}
+#loginBg::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 15% 50%,rgba(59,130,246,.12) 0%,transparent 50%),radial-gradient(ellipse at 85% 25%,rgba(139,92,246,.10) 0%,transparent 45%),radial-gradient(ellipse at 45% 90%,rgba(99,102,241,.08) 0%,transparent 40%);}
+.lobby-orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.35;animation:lobbyOrbFloat 12s ease-in-out infinite;}
+@keyframes lobbyOrbFloat{0%,100%{transform:translate(0,0) scale(1)}20%{transform:translate(25px,-30px) scale(1.06)}40%{transform:translate(-15px,20px) scale(.94)}60%{transform:translate(30px,15px) scale(1.03)}80%{transform:translate(-25px,-10px) scale(.97)}}
+.lobby-particle{position:absolute;width:2px;height:2px;border-radius:50%;opacity:0;animation:lobbyParticleUp linear infinite;}
+.lobby-particle.spark{width:1px;height:6px;border-radius:1px;background:linear-gradient(to top,transparent,#818cf8);animation-name:lobbySparkUp;}
+@keyframes lobbyParticleUp{0%{opacity:0;transform:translateY(0) scale(1)}8%{opacity:.5}50%{opacity:.3}100%{opacity:0;transform:translateY(-100vh) scale(.3)}}
+@keyframes lobbySparkUp{0%{opacity:0;transform:translateY(0) rotate(-5deg)}8%{opacity:.4}100%{opacity:0;transform:translateY(-85vh) rotate(10deg)}}
+.lobby-twinkle{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0;animation:lobbyTwinkle ease-in-out infinite;}
+@keyframes lobbyTwinkle{0%,100%{opacity:0;transform:scale(.4) rotate(0deg)}50%{opacity:.7;transform:scale(1.4) rotate(180deg)}}
+.lobby-meteor{position:absolute;width:2px;height:2px;background:#e0e7ff;border-radius:50%;opacity:0;animation:lobbyMeteor linear infinite;}
+.lobby-meteor::after{content:'';position:absolute;top:0;right:0;width:40px;height:1px;background:linear-gradient(to left,rgba(129,140,248,.6),transparent);transform-origin:right center;}
+@keyframes lobbyMeteor{0%{opacity:0;transform:translate(0,0) rotate(-35deg)}4%{opacity:.7}25%{opacity:.2}30%{opacity:0;transform:translate(-350px,230px) rotate(-35deg)}100%{opacity:0}}
+.lobby-ring{position:absolute;border-radius:50%;border:1px solid rgba(96,165,250,.15);opacity:0;animation:lobbyRing ease-out infinite;}
+@keyframes lobbyRing{0%{opacity:.35;transform:scale(0) rotate(0deg)}50%{opacity:.1;transform:scale(.6) rotate(90deg)}100%{opacity:0;transform:scale(1) rotate(180deg)}}
+.lobby-scan{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(96,165,250,.12),rgba(139,92,246,.12),transparent);animation:lobbyScan 8s linear infinite;opacity:.5;}
+@keyframes lobbyScan{0%{top:-2%}100%{top:102%}}
+.grid-line-h,.grid-line-v{position:absolute;opacity:0;}
+.grid-line-h{height:1px;width:100%;background:linear-gradient(90deg,transparent,transparent 25%,rgba(96,165,250,.35) 50%,transparent 75%,transparent);background-size:200% 100%;animation:gridH linear infinite;}
+.grid-line-v{width:1px;height:100%;background:linear-gradient(180deg,transparent,transparent 25%,rgba(139,92,246,.35) 50%,transparent 75%,transparent);background-size:100% 200%;animation:gridV linear infinite;}
+@keyframes gridH{0%{opacity:0;background-position:200% 0}10%{opacity:1}90%{opacity:1}100%{opacity:0;background-position:-200% 0}}
+@keyframes gridV{0%{opacity:0;background-position:0 200%}10%{opacity:1}90%{opacity:1}100%{opacity:0;background-position:0 -200%}}
+.lobby-corner{position:absolute;width:40px;height:40px;border-color:rgba(96,165,250,.1);border-style:solid;border-width:0;}
+.lobby-corner.tl{top:20px;left:20px;border-top-width:2px;border-left-width:2px;border-top-left-radius:4px;}
+.lobby-corner.tr{top:20px;right:20px;border-top-width:2px;border-right-width:2px;border-top-right-radius:4px;}
+.lobby-corner.bl{bottom:20px;left:20px;border-bottom-width:2px;border-left-width:2px;border-bottom-left-radius:4px;}
+.lobby-corner.br{bottom:20px;right:20px;border-bottom-width:2px;border-right-width:2px;border-bottom-right-radius:4px;}
+/* 앱 내부 배경 */
+#appBgEffects{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0;}
+#appBgEffects::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 10% 15%,rgba(59,130,246,.10) 0%,transparent 50%),radial-gradient(ellipse at 90% 85%,rgba(139,92,246,.08) 0%,transparent 50%),radial-gradient(ellipse at 50% 50%,rgba(99,102,241,.05) 0%,transparent 60%);}
+#appBgEffects::after{content:'';position:absolute;inset:0;background:linear-gradient(rgba(59,130,246,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,.02) 1px,transparent 1px);background-size:120px 120px;}
+.app-orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;animation:appOrbDrift 20s ease-in-out infinite;}
+@keyframes appOrbDrift{0%,100%{transform:translate(0,0)}30%{transform:translate(35px,-25px)}60%{transform:translate(-25px,35px)}}
+.app-scan{position:fixed;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,.06),transparent);animation:lobbyScan 12s linear infinite;pointer-events:none;z-index:0;}
+
 /* 로그인 */
-#loginScreen{max-width:500px;margin:50px auto;text-align:center;padding:20px;}
+#loginScreen{max-width:500px;margin:50px auto;text-align:center;padding:20px;position:relative;z-index:1;}
 #loginScreen h1{font-size:38px;font-weight:800;background:linear-gradient(135deg,#ef4444,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;}
 #loginScreen .sub{color:#94a3b8;font-size:15px;margin-bottom:28px;}
 .login-box{background:#1e293b;border-radius:16px;padding:28px;border:1px solid #334155;}
@@ -44,7 +82,7 @@ input:focus,select:focus{border-color:#3b82f6;}
 .login-hint{color:#475569;font-size:13px;margin-top:10px;}
 
 /* PIN */
-#pinScreen{max-width:400px;margin:60px auto;text-align:center;padding:20px;}
+#pinScreen{max-width:400px;margin:60px auto;text-align:center;padding:20px;position:relative;z-index:1;}
 #pinScreen h1{font-size:38px;font-weight:800;background:linear-gradient(135deg,#ef4444,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;}
 #pinScreen .sub{color:#94a3b8;font-size:15px;margin-bottom:28px;}
 .pin-box{background:#1e293b;border-radius:16px;padding:28px;border:1px solid #334155;}
@@ -328,6 +366,25 @@ input:focus,select:focus{border-color:#3b82f6;}
 </head>
 <body>
 
+<!-- 로비 배경 효과 -->
+<div id="loginBg">
+  <canvas id="starfieldCanvas" style="position:absolute;top:0;left:0;width:100%;height:100%;"></canvas>
+  <div class="lobby-orb" style="width:280px;height:280px;background:rgba(59,130,246,.14);top:8%;left:-3%;animation-duration:13s;"></div>
+  <div class="lobby-orb" style="width:200px;height:200px;background:rgba(139,92,246,.12);top:20%;right:8%;animation-duration:17s;animation-delay:-3s;"></div>
+  <div class="lobby-orb" style="width:240px;height:240px;background:rgba(99,102,241,.11);bottom:12%;left:12%;animation-duration:15s;animation-delay:-7s;"></div>
+  <div class="lobby-orb" style="width:160px;height:160px;background:rgba(16,185,129,.08);bottom:8%;right:-2%;animation-duration:19s;animation-delay:-11s;"></div>
+  <div class="lobby-scan"></div>
+  <div class="lobby-scan" style="animation-delay:-4s;opacity:.3;"></div>
+  <div class="lobby-corner tl"></div><div class="lobby-corner tr"></div><div class="lobby-corner bl"></div><div class="lobby-corner br"></div>
+</div>
+
+<!-- 앱 배경 효과 -->
+<div id="appBgEffects" class="hidden">
+  <div class="app-orb" style="width:280px;height:280px;background:rgba(59,130,246,.06);top:8%;left:-4%;"></div>
+  <div class="app-orb" style="width:230px;height:230px;background:rgba(139,92,246,.05);bottom:8%;right:-4%;animation-delay:-7s;"></div>
+  <div class="app-scan"></div>
+</div>
+
 <!-- 로그인 -->
 <div id="loginScreen">
   <img src="grimi-logo.png" alt="GRIMI" style="width:120px;height:120px;border-radius:50%;margin-bottom:12px;object-fit:cover;" onerror="this.style.display='none'">
@@ -384,7 +441,7 @@ input:focus,select:focus{border-color:#3b82f6;}
 </div>
 
 <!-- 게임 화면 -->
-<div id="gameScreen" class="hidden">
+<div id="gameScreen" class="hidden" style="position:relative;z-index:1;">
   <div class="top-bar">
     <h1>GRIMI ARENA</h1>
     <div class="top-info">
@@ -621,6 +678,7 @@ function backToLogin(){document.getElementById('pinScreen').classList.add('hidde
 
 function enterAsGuest(){isGuest=true;isAdmin=false;currentUser={id:'guest',name:'게스트',role:'guest'};document.body.classList.add('guest-mode');
   document.getElementById('loginScreen').classList.add('hidden');document.getElementById('pinScreen').classList.add('hidden');document.getElementById('gameScreen').classList.remove('hidden');
+  document.getElementById('loginBg').classList.add('hidden');stopStarfield();document.getElementById('appBgEffects').classList.remove('hidden');
   document.getElementById('dispName').textContent='게스트';document.getElementById('userAvatarTop').textContent='👤';
   document.getElementById('roleBadge').innerHTML='<span class="badge-member">구경</span>';
   document.querySelectorAll('.tab[data-tab="members"],.tab[data-tab="setup"],.tab[data-tab="tier"]').forEach(el=>el.style.display='none');
@@ -632,6 +690,7 @@ function enterApp(id,memberData){
   isGuest=false;currentUser={id,...memberData};isAdmin=memberData.role==='admin';
   localStorage.setItem('grimi_kill_user',JSON.stringify({id}));
   document.getElementById('loginScreen').classList.add('hidden');document.getElementById('pinScreen').classList.add('hidden');document.getElementById('gameScreen').classList.remove('hidden');
+  document.getElementById('loginBg').classList.add('hidden');stopStarfield();document.getElementById('appBgEffects').classList.remove('hidden');
   document.getElementById('dispName').textContent=memberData.name;
   document.getElementById('userAvatarTop').textContent=memberData.avatar||memberData.name.charAt(0);
   document.getElementById('roleBadge').innerHTML=isAdmin?'<span class="badge-admin">관리자</span>':'<span class="badge-member">일반</span>';
@@ -1740,6 +1799,107 @@ function renderGuide(){
 }
 
 init();
+
+// ===== 로비 배경 동적 효과 =====
+(function(){
+  const bg=document.getElementById('loginBg');if(!bg)return;
+  const colors=['#60a5fa','#818cf8','#a78bfa','#38bdf8','#c084fc','#10b981'];
+  // 파티클 12개 + 스파크 3개
+  for(let i=0;i<15;i++){
+    const p=document.createElement('div');
+    p.className=i>=12?'lobby-particle spark':'lobby-particle';
+    p.style.left=Math.random()*100+'%';
+    p.style.bottom='-6px';
+    p.style.animationDuration=(5+Math.random()*7)+'s';
+    p.style.animationDelay=(Math.random()*10)+'s';
+    const sz=1+Math.random()*1.5;
+    p.style.width=sz+'px';p.style.height=sz+'px';
+    p.style.background=colors[Math.floor(Math.random()*colors.length)];
+    bg.appendChild(p);
+  }
+  // 트윈클 10개
+  for(let i=0;i<10;i++){
+    const s=document.createElement('div');
+    s.className='lobby-twinkle';
+    s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';
+    s.style.animationDuration=(3+Math.random()*4)+'s';
+    s.style.animationDelay=(Math.random()*8)+'s';
+    const sz=1+Math.random()*1.5;
+    s.style.width=sz+'px';s.style.height=sz+'px';
+    s.style.background=colors[Math.floor(Math.random()*colors.length)];
+    bg.appendChild(s);
+  }
+  // 유성 2개
+  for(let i=0;i<2;i++){
+    const m=document.createElement('div');
+    m.className='lobby-meteor';
+    m.style.top=Math.random()*30+'%';m.style.right='-50px';
+    m.style.animationDuration=(8+Math.random()*7)+'s';
+    m.style.animationDelay=(i*7+Math.random()*5)+'s';
+    bg.appendChild(m);
+  }
+  // 링 펄스 2개
+  for(let i=0;i<2;i++){
+    const r=document.createElement('div');
+    r.className='lobby-ring';
+    r.style.left=(20+Math.random()*60)+'%';r.style.top=(20+Math.random()*60)+'%';
+    const sz=80+Math.random()*80;
+    r.style.width=sz+'px';r.style.height=sz+'px';
+    r.style.animationDuration=(6+Math.random()*4)+'s';
+    r.style.animationDelay=(Math.random()*10)+'s';
+    bg.appendChild(r);
+  }
+  // 그리드 트래블링 라인 — 수평 3, 수직 2
+  for(let i=0;i<3;i++){
+    const h=document.createElement('div');h.className='grid-line-h';
+    h.style.top=Math.round((15+Math.random()*70)/8)*8+'%';
+    h.style.animationDuration=(4+Math.random()*3)+'s';
+    h.style.animationDelay=(i*3+Math.random()*3)+'s';
+    bg.appendChild(h);
+  }
+  for(let i=0;i<2;i++){
+    const v=document.createElement('div');v.className='grid-line-v';
+    v.style.left=Math.round((15+Math.random()*70)/8)*8+'%';
+    v.style.animationDuration=(4+Math.random()*3)+'s';
+    v.style.animationDelay=(i*4+Math.random()*3)+'s';
+    bg.appendChild(v);
+  }
+})();
+
+// ===== Starfield Warp =====
+let starfieldAnim=null;
+(function(){
+  const cv=document.getElementById('starfieldCanvas');if(!cv)return;
+  const ctx=cv.getContext('2d');
+  function resize(){cv.width=window.innerWidth*2;cv.height=window.innerHeight*2;ctx.scale(2,2);}
+  resize();window.addEventListener('resize',resize);
+  const W=()=>cv.width/2,H=()=>cv.height/2;
+  const stars=[];
+  for(let i=0;i<150;i++)stars.push({x:(Math.random()-.5)*2000,y:(Math.random()-.5)*2000,z:Math.random()*1000,pz:0});
+  function draw(){
+    const w=W(),h=H(),cx=w/2,cy=h/2;
+    ctx.fillStyle='rgba(15,23,42,.12)';ctx.fillRect(0,0,w,h);
+    for(const s of stars){
+      s.pz=s.z;s.z-=1.2;
+      if(s.z<1){s.z=1000;s.x=(Math.random()-.5)*2000;s.y=(Math.random()-.5)*2000;s.pz=s.z;}
+      const sx=cx+s.x/s.z*w*.35;const sy=cy+s.y/s.z*h*.35;
+      const px=cx+s.x/s.pz*w*.35;const py=cy+s.y/s.pz*h*.35;
+      const life=1-s.z/1000;
+      const r=Math.max(0,life*2.2);
+      const a=Math.max(0,life*.7);
+      // 꼬리 — 파랑/보라 톤
+      const hue=life>.5?'96,165,250':'129,140,248';
+      ctx.strokeStyle=`rgba(${hue},${a*.6})`;ctx.lineWidth=r*.6;
+      ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(sx,sy);ctx.stroke();
+      // 별 머리
+      ctx.fillStyle=`rgba(224,231,255,${a})`;
+      ctx.beginPath();ctx.arc(sx,sy,r*.4,0,Math.PI*2);ctx.fill();
+    }
+    starfieldAnim=requestAnimationFrame(draw);
+  }
+  draw();
+})();
+function stopStarfield(){if(starfieldAnim){cancelAnimationFrame(starfieldAnim);starfieldAnim=null;}}
 </script>
 </body>
 </html>
