@@ -934,7 +934,7 @@ function updateChicken(tid,r,val){dataRef.child('scores/'+tid+'/_team/r'+r+'/chi
 function getTeamTarget(tid){const team=(appData.teams||{})[tid];if(!team||!team.members)return 1;let t=0;Object.keys(team.members).forEach(mid=>{t+=mScore(team.members[mid]);});return t||1;}
 function getTeamChicken(tid){const rounds=appData.rounds||0,sc=appData.scores||{},ts=sc[tid]||{},tm=ts['_team']||{};let c=0;for(let r=1;r<=rounds;r++){const rd=tm['r'+r]||{};c+=(rd.chicken||0);}return c;}
 function getTeamChickenCount(tid){const rounds=appData.rounds||0,sc=appData.scores||{},ts=sc[tid]||{},tm=ts['_team']||{};let wins=0,elims=0;for(let r=1;r<=rounds;r++){const rd=tm['r'+r]||{};const v=rd.chicken||0;if(v>0)wins++;else if(v<0)elims++;}return{wins,elims};}
-function getTeamTotal(tid){const rounds=appData.rounds||0,sc=appData.scores||{},ts=sc[tid]||{};let k=0,d=0;Object.keys(ts).forEach(mid=>{if(mid==='_team')return;for(let r=1;r<=rounds;r++){const rd=ts[mid]['r'+r]||{};k+=(rd.kill||0);d+=(rd.damage||0);}});return k+Math.floor(d/100)+getTeamChicken(tid);}
+function getTeamTotal(tid){const sc=appData.scores||{},ts=sc[tid]||{};let total=0;Object.keys(ts).forEach(mid=>{if(mid==='_team')return;total+=getPlayerStats(tid,mid).total;});return total+getTeamChicken(tid);}
 function getPlayerStats(tid,mid){const rounds=appData.rounds||0,ms=((appData.scores||{})[tid]||{})[mid]||{};let k=0,d=0;for(let r=1;r<=rounds;r++){const rd=ms['r'+r]||{};k+=(rd.kill||0);d+=(rd.damage||0);}return{kills:k,damage:d,dmgPts:Math.floor(d/100),total:k+Math.floor(d/100)};}
 function getPlayerTotal(tid,mid){return getPlayerStats(tid,mid).total;}
 function selectRound(tid,r){selectedRounds[tid]=r;renderGame();}
