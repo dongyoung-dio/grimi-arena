@@ -944,6 +944,7 @@ function renderAll(){renderEventStatus();updateTimer();renderGame();renderTierTa
 function renderEventStatus(){const bar=document.getElementById('eventStatusBar');const r=appData.rounds||0;const d=new Date();const ds=(d.getMonth()+1)+'/'+d.getDate();if((appData.eventStatus||'idle')==='live'||Object.keys(appData.teams||{}).length>0){bar.className='event-status event-live';bar.textContent='이벤트 진행 중 · '+ds+' ('+r+'라운드)';}else{bar.className='event-status event-idle';bar.textContent='이벤트 대기 중';}}
 
 function renderGame(){
+  const scrollY=window.scrollY;
   const teams=appData.teams||{},tids=Object.keys(teams),rounds=appData.rounds||0,scores=appData.scores||{},maps=appData.roundMaps||{};
   const dash=document.getElementById('rankDashboard');
   const endArea=document.getElementById('gameEndEventArea');
@@ -1022,6 +1023,7 @@ function renderGame(){
     h+=`</div>`;c.innerHTML+=h;
   });
   if(fk){const t=document.querySelector(`[data-fk="${fk}"]`);if(t)t.focus();}
+  window.scrollTo(0,scrollY);
 }
 
 function renderTierTable(){
