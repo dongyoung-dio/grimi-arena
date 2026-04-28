@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>GRIMI ARENA</title>
 <link rel="icon" type="image/png" href="grimi-logo.png">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -526,6 +529,19 @@ input:focus,select:focus{border-color:#3b82f6;}
         </div>
         <p class="setup-info" id="rulePreviewText">예 : 승급 상위 1팀, 강등 꼴등만 → 나머지는 유지</p>
       </div>
+      <div class="card setup-section"><h3>티어별 목표점수</h3>
+        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+          <button class="btn btn-xs btn-gray" onclick="applyTierPreset('default')">기본값</button>
+          <button class="btn btn-xs btn-gray" onclick="applyTierPreset('compact')">압축형</button>
+          <button class="btn btn-xs btn-gray" onclick="applyTierPreset('equal')">균등형</button>
+        </div>
+        <div id="tierScoreGrid" style="display:grid;grid-template-columns:48px repeat(3,1fr);gap:0;border:1px solid #334155;border-radius:8px;overflow:hidden;"></div>
+        <p class="setup-info" id="tierScoreInfo">1T 상(60) ~ 6T 하(5) — 격차 12배</p>
+        <div style="margin-top:8px;display:flex;gap:8px;">
+          <button class="btn btn-xs btn-green" onclick="saveTierScores()">저장</button>
+          <button class="btn btn-xs btn-gray" onclick="loadTierScores()">초기화</button>
+        </div>
+      </div>
       <div class="card setup-section"><h3>이벤트 관리</h3><div class="setup-row" style="gap:8px;"><button class="btn btn-sm btn-green" onclick="endEvent()">종료 (결과 저장 + 승급)</button><button class="btn btn-sm btn-red" onclick="resetEvent()">초기화</button></div><p class="setup-info" id="rulePreview">승급/강등 규칙에 따라 자동 반영</p></div>
     </div>
     <div id="tab-ranking" class="hidden">
@@ -634,9 +650,16 @@ input:focus,select:focus{border-color:#3b82f6;}
 <script>
 firebase.initializeApp({apiKey:"AIzaSyABoG4B0ahW0OAZURa3WZAz9HDST49A2K4",authDomain:"grimi-pubg.firebaseapp.com",databaseURL:"https://grimi-pubg-default-rtdb.firebaseio.com",projectId:"grimi-pubg",storageBucket:"grimi-pubg.firebasestorage.app",messagingSenderId:"507556279092",appId:"1:507556279092:web:71182597db9c8c8a71ab61"});
 const db=firebase.database(),ROOT='killcount/grimi',dataRef=db.ref(ROOT);
-const TS={1:{upper:60,mid:50,lower:40},2:{upper:40,mid:35,lower:30},3:{upper:30,mid:25,lower:20},4:{upper:20,mid:15,lower:12},5:{upper:12,mid:10,lower:8},6:{upper:8,mid:6,lower:5}};
+const TS_DEFAULT={1:{upper:60,mid:50,lower:40},2:{upper:40,mid:35,lower:30},3:{upper:30,mid:25,lower:20},4:{upper:20,mid:15,lower:12},5:{upper:12,mid:10,lower:8},6:{upper:8,mid:6,lower:5}};
+const TS_PRESETS={
+  default:{1:{upper:60,mid:50,lower:40},2:{upper:40,mid:35,lower:30},3:{upper:30,mid:25,lower:20},4:{upper:20,mid:15,lower:12},5:{upper:12,mid:10,lower:8},6:{upper:8,mid:6,lower:5}},
+  compact:{1:{upper:40,mid:35,lower:30},2:{upper:30,mid:27,lower:24},3:{upper:24,mid:21,lower:18},4:{upper:18,mid:15,lower:13},5:{upper:13,mid:11,lower:10},6:{upper:10,mid:9,lower:8}},
+  equal:{1:{upper:30,mid:27,lower:24},2:{upper:24,mid:22,lower:20},3:{upper:20,mid:18,lower:16},4:{upper:16,mid:14,lower:13},5:{upper:13,mid:12,lower:11},6:{upper:11,mid:10,lower:10}}
+};
+let TS=JSON.parse(JSON.stringify(TS_DEFAULT));
 const SL={upper:'상',mid:'중',lower:'하'};const EMOJIS=['😀','😎','🤗','🥳','😈','👻','🤖','👽','🦊','🐶','🐱','🐯','🦁','🐸','🐧','🔥','⭐','💀','🎮','🎯','🏆','🎪','🍗','🍕'];
 function mScore(m){return(TS[m.tier||4]||TS[4])[m.subTier||'mid'];}
+function loadTierScoresFromDB(){const saved=appData.tierScores;if(saved){for(let t=1;t<=6;t++){if(saved[t])TS[t]={upper:saved[t].upper||TS_DEFAULT[t].upper,mid:saved[t].mid||TS_DEFAULT[t].mid,lower:saved[t].lower||TS_DEFAULT[t].lower};}}}
 
 let currentUser=null,isAdmin=false,isGuest=false,appData={},loginMembers={},timerInterval=null,selectedRounds={},presenceData={};
 let pendingLoginId=null,pendingLoginData=null;
@@ -908,6 +931,33 @@ function endEvent(){
   dataRef.update(updates);if(timerInterval)clearInterval(timerInterval);selectedRounds={};switchTab('ranking');
 }
 function saveRule(){if(!isAdmin)return;const promoTo=parseInt(document.getElementById('rulePromoTo').value)||1;const relegBottom=parseInt(document.getElementById('ruleRelegBottom').value)||1;dataRef.child('tierRule').set({promoTo,relegBottom});}
+function loadTierScores(){
+  const grid=document.getElementById('tierScoreGrid');if(!grid)return;
+  let h='<div style="background:#334155;padding:8px;text-align:center;font-size:13px;font-weight:700;color:#94a3b8;border-bottom:1px solid #475569;">티어</div><div style="background:#334155;padding:8px;text-align:center;font-size:13px;font-weight:700;color:#94a3b8;border-bottom:1px solid #475569;">상</div><div style="background:#334155;padding:8px;text-align:center;font-size:13px;font-weight:700;color:#94a3b8;border-bottom:1px solid #475569;">중</div><div style="background:#334155;padding:8px;text-align:center;font-size:13px;font-weight:700;color:#94a3b8;border-bottom:1px solid #475569;">하</div>';
+  for(let t=1;t<=6;t++){const s=TS[t];const brd=t<6?'border-bottom:1px solid #1e293b;':'';
+    h+=`<div style="padding:6px;text-align:center;${brd}"><span class="tier-badge tier-sm tier-${t}">${t}T</span></div>`;
+    ['upper','mid','lower'].forEach(sub=>{
+      h+=`<div style="padding:4px 6px;text-align:center;${brd}"><input type="number" id="ts_${t}_${sub}" value="${s[sub]}" min="1" max="99" style="width:48px;height:30px;text-align:center;font-size:14px;font-weight:700;padding:4px;border:1px solid #334155;border-radius:6px;background:#0f172a;color:#e2e8f0;" onchange="updateTierScoreInfo()"></div>`;
+    });
+  }
+  grid.innerHTML=h;updateTierScoreInfo();
+}
+function updateTierScoreInfo(){
+  const hi=parseInt(document.getElementById('ts_1_upper')?.value)||60;
+  const lo=parseInt(document.getElementById('ts_6_lower')?.value)||5;
+  const ratio=lo>0?(hi/lo).toFixed(1):'?';
+  const info=document.getElementById('tierScoreInfo');if(info)info.textContent=`1T 상(${hi}) ~ 6T 하(${lo}) — 격차 ${ratio}배`;
+}
+function applyTierPreset(name){
+  const p=TS_PRESETS[name];if(!p)return;
+  for(let t=1;t<=6;t++){['upper','mid','lower'].forEach(sub=>{const el=document.getElementById('ts_'+t+'_'+sub);if(el)el.value=p[t][sub];});}
+  updateTierScoreInfo();
+}
+function saveTierScores(){
+  if(!isAdmin)return;const scores={};
+  for(let t=1;t<=6;t++){scores[t]={};['upper','mid','lower'].forEach(sub=>{scores[t][sub]=parseInt(document.getElementById('ts_'+t+'_'+sub)?.value)||1;});}
+  dataRef.child('tierScores').set(scores);alert('티어 점수가 저장되었습니다.');
+}
 function loadRule(){const rule=appData.tierRule||{};const promoTo=rule.promoTo||1;const relegBottom=rule.relegBottom||(rule.relegFrom?null:1);const pEl=document.getElementById('rulePromoTo');const rEl=document.getElementById('ruleRelegBottom');if(pEl&&pEl!==document.activeElement)pEl.value=promoTo;if(rEl&&relegBottom!==null&&rEl!==document.activeElement)rEl.value=relegBottom;const preview=document.getElementById('rulePreviewText');if(preview)preview.textContent=`승급 상위 ${promoTo}팀, 강등 하위 ${(relegBottom||1)===1?'꼴등만':relegBottom+'팀'} → 나머지는 유지`;}
 function resetEvent(){if(!isAdmin||!confirm('초기화? 결과 저장 안됨'))return;dataRef.update({teams:null,scores:null,rounds:0,roundMaps:null,eventStatus:'idle',timer:null});if(timerInterval)clearInterval(timerInterval);selectedRounds={};}
 function deleteHistory(ek){
@@ -993,7 +1043,7 @@ function getPlayerTotal(tid,mid){return getPlayerStats(tid,mid).total;}
 function selectRound(tid,r){selectedRounds[tid]=r;renderGame();}
 
 // 렌더링
-function renderAll(){renderEventStatus();updateTimer();renderGame();renderTierTable();renderMembers();renderSetup();renderRanking();}
+function renderAll(){loadTierScoresFromDB();renderEventStatus();updateTimer();renderGame();renderTierTable();renderMembers();renderSetup();renderRanking();}
 function renderEventStatus(){const bar=document.getElementById('eventStatusBar');const r=appData.rounds||0;const d=new Date();const ds=(d.getMonth()+1)+'/'+d.getDate();if((appData.eventStatus||'idle')==='live'||Object.keys(appData.teams||{}).length>0){bar.className='event-status event-live';bar.textContent='이벤트 진행 중 · '+ds+' ('+r+'라운드)';}else{bar.className='event-status event-idle';bar.textContent='이벤트 대기 중';}}
 
 function renderGame(){
@@ -1148,7 +1198,7 @@ function bulkSelectAll(checked){const members=appData.members||{};const searchVa
 function applyBulkTier(){if(!isAdmin||!bulkSelected.size)return;const tier=document.getElementById('bulkTier').value;const sub=document.getElementById('bulkSubTier').value;if(!tier&&!sub){alert('티어 또는 등급을 선택해주세요.');return;}const names=[...bulkSelected].map(id=>(appData.members||{})[id]?.name).filter(Boolean);if(!confirm(`${names.length}명에게 ${tier?tier+'T ':''}${sub?({'upper':'상','mid':'중','lower':'하'}[sub])+' ':''}일괄 적용하시겠습니까?\n\n${names.join(', ')}`))return;const updates={};bulkSelected.forEach(id=>{if(tier)updates[`members/${id}/tier`]=parseInt(tier);if(sub)updates[`members/${id}/subTier`]=sub;});dataRef.update(updates);}
 
 function renderSetup(){
-  renderParticipants();document.getElementById('roundDisplay').textContent=appData.rounds||0;loadRule();loadChickenPts();
+  renderParticipants();document.getElementById('roundDisplay').textContent=appData.rounds||0;loadRule();loadChickenPts();loadTierScores();
   const la=document.getElementById('roundListArea');const rounds=appData.rounds||0;const maps=appData.roundMaps||{};
   if(!rounds){la.innerHTML='<p style="font-size:13px;color:#475569;">라운드 없음</p>';return;}
   const MAPS=['에란겔','사녹','테이고','미라마','비켄디','파라모','카라킨','론도'];
@@ -1984,6 +2034,22 @@ let starfieldAnim=null;
   draw();
 })();
 function stopStarfield(){if(starfieldAnim){cancelAnimationFrame(starfieldAnim);starfieldAnim=null;}}
+
+// 자동 업데이트 체크 (5분마다)
+(function(){
+  let lastHash=null;
+  async function checkUpdate(){
+    try{
+      const res=await fetch(location.href,{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
+      const text=await res.text();
+      let hash=0;for(let i=0;i<text.length;i++){hash=((hash<<5)-hash)+text.charCodeAt(i);hash|=0;}
+      if(lastHash===null){lastHash=hash;return;}
+      if(hash!==lastHash){location.reload();}
+    }catch(e){}
+  }
+  checkUpdate();
+  setInterval(checkUpdate,5*60*1000);
+})();
 </script>
 </body>
 </html>
