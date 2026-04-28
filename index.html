@@ -244,8 +244,9 @@ input:focus,select:focus{border-color:#3b82f6;}
 .manual-picker-empty{padding:8px 10px;color:#64748b;font-size:13px;text-align:center;}
 
 /* 티어표 */
-.tier-table{width:100%;border-collapse:collapse;font-size:15px;}
+.tier-table{width:100%;border-collapse:collapse;font-size:15px;table-layout:fixed;}
 .tier-table th{background:#334155;padding:12px 14px;text-align:center;font-weight:700;font-size:14px;color:#94a3b8;}
+.tier-table th:first-child{width:60px;}
 .tier-table td{padding:12px 10px;text-align:center;border-bottom:1px solid #0f172a;vertical-align:top;}
 .tier-table .tier-head{font-weight:800;font-size:16px;text-align:center;vertical-align:middle;}
 .tier-cell-score{font-size:13px;color:#fbbf24;font-weight:700;display:block;margin-bottom:4px;}
@@ -909,7 +910,15 @@ function endEvent(){
 function saveRule(){if(!isAdmin)return;const promoTo=parseInt(document.getElementById('rulePromoTo').value)||1;const relegBottom=parseInt(document.getElementById('ruleRelegBottom').value)||1;dataRef.child('tierRule').set({promoTo,relegBottom});}
 function loadRule(){const rule=appData.tierRule||{};const promoTo=rule.promoTo||1;const relegBottom=rule.relegBottom||(rule.relegFrom?null:1);const pEl=document.getElementById('rulePromoTo');const rEl=document.getElementById('ruleRelegBottom');if(pEl&&pEl!==document.activeElement)pEl.value=promoTo;if(rEl&&relegBottom!==null&&rEl!==document.activeElement)rEl.value=relegBottom;const preview=document.getElementById('rulePreviewText');if(preview)preview.textContent=`승급 상위 ${promoTo}팀, 강등 하위 ${(relegBottom||1)===1?'꼴등만':relegBottom+'팀'} → 나머지는 유지`;}
 function resetEvent(){if(!isAdmin||!confirm('초기화? 결과 저장 안됨'))return;dataRef.update({teams:null,scores:null,rounds:0,roundMaps:null,eventStatus:'idle',timer:null});if(timerInterval)clearInterval(timerInterval);selectedRounds={};}
-function deleteHistory(ek){if(!isAdmin||!confirm(ek.replace('event_','')+'회차 삭제?'))return;dataRef.child('history/'+ek).remove();}
+function deleteHistory(ek){
+  if(!isAdmin||!confirm(ek.replace('event_','')+'회차 삭제?'))return;
+  const history=appData.history||{};
+  const keys=Object.keys(history).sort((a,b)=>parseInt(a.replace('event_',''))-parseInt(b.replace('event_','')));
+  const remaining=keys.filter(k=>k!==ek);
+  const newHistory={};
+  remaining.forEach((k,i)=>{newHistory['event_'+(i+1)]=history[k];});
+  dataRef.child('history').set(Object.keys(newHistory).length?newHistory:null);
+}
 function recalcEvent(ek){
   if(!isAdmin)return;
   const ev=(appData.history||{})[ek];if(!ev||!ev.teams||!ev.tierSnapshot)return alert('해당 회차 데이터 없음');
@@ -1074,7 +1083,7 @@ function renderTierTable(){
   const members=appData.members||{};const ids=Object.keys(members);const area=document.getElementById('tierTableArea');
   const groups={};[1,2,3,4,5,6].forEach(t=>{groups[t]={upper:[],mid:[],lower:[]};});
   ids.forEach(id=>{const m=members[id];if(groups[m.tier||4])groups[m.tier||4][m.subTier||'mid'].push(m.name);});
-  let h=`<table class="tier-table"><thead><tr><th style="width:60px;white-space:nowrap;">티어</th><th>상</th><th>중</th><th>하</th></tr></thead><tbody>`;
+  let h=`<table class="tier-table"><thead><tr><th>티어</th><th>상</th><th>중</th><th>하</th></tr></thead><tbody>`;
   [1,2,3,4,5,6].forEach(t=>{const s=TS[t];
     h+=`<tr><td class="tier-head"><span class="tier-badge tier-${t}">${t}T</span></td>`;
     ['upper','mid','lower'].forEach(sub=>{h+=`<td><span class="tier-cell-score">${s[sub]}점</span><div class="tier-cell-members">${groups[t][sub].length?groups[t][sub].map(n=>`<span class="tier-cell-member">${n}</span>`).join(''):'<span style="color:#334155;">-</span>'}</div></td>`;});
