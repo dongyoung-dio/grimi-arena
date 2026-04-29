@@ -530,10 +530,17 @@ input:focus,select:focus{border-color:#3b82f6;}
         <p class="setup-info" id="rulePreviewText">예 : 승급 상위 1팀, 강등 꼴등만 → 나머지는 유지</p>
       </div>
       <div class="card setup-section"><h3>티어별 목표점수</h3>
-        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
-          <button class="btn btn-xs btn-gray" onclick="applyTierPreset('default')">기본값</button>
-          <button class="btn btn-xs btn-gray" onclick="applyTierPreset('compact')">압축형</button>
-          <button class="btn btn-xs btn-gray" onclick="applyTierPreset('equal')">균등형</button>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:6px 12px;">
+            <span style="font-size:13px;color:#94a3b8;font-weight:600;">활성 티어</span>
+            <span style="font-size:13px;color:#e2e8f0;font-weight:700;">1T ~</span>
+            <select id="maxTierSelect" style="font-size:13px;padding:5px 8px;border:1px solid #334155;border-radius:6px;background:#1e293b;color:#e2e8f0;" onchange="saveMaxTier()"><option value="3">3T</option><option value="4">4T</option><option value="5">5T</option><option value="6">6T</option></select>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-xs btn-gray" onclick="applyTierPreset('default')">기본값</button>
+            <button class="btn btn-xs btn-gray" onclick="applyTierPreset('compact')">압축형</button>
+            <button class="btn btn-xs btn-gray" onclick="applyTierPreset('equal')">균등형</button>
+          </div>
         </div>
         <div id="tierScoreGrid" style="display:grid;grid-template-columns:48px repeat(3,1fr);gap:0;border:1px solid #334155;border-radius:8px;overflow:hidden;"></div>
         <p class="setup-info" id="tierScoreInfo">1T 상(60) ~ 6T 하(5) — 격차 12배</p>
@@ -657,9 +664,11 @@ const TS_PRESETS={
   equal:{1:{upper:30,mid:27,lower:24},2:{upper:24,mid:22,lower:20},3:{upper:20,mid:18,lower:16},4:{upper:16,mid:14,lower:13},5:{upper:13,mid:12,lower:11},6:{upper:11,mid:10,lower:10}}
 };
 let TS=JSON.parse(JSON.stringify(TS_DEFAULT));
+function getMaxTier(){return appData.maxTier||6;}
 const SL={upper:'상',mid:'중',lower:'하'};const EMOJIS=['😀','😎','🤗','🥳','😈','👻','🤖','👽','🦊','🐶','🐱','🐯','🦁','🐸','🐧','🔥','⭐','💀','🎮','🎯','🏆','🎪','🍗','🍕'];
 function mScore(m){return(TS[m.tier||4]||TS[4])[m.subTier||'mid'];}
 function loadTierScoresFromDB(){const saved=appData.tierScores;if(saved){for(let t=1;t<=6;t++){if(saved[t])TS[t]={upper:saved[t].upper||TS_DEFAULT[t].upper,mid:saved[t].mid||TS_DEFAULT[t].mid,lower:saved[t].lower||TS_DEFAULT[t].lower};}}}
+function loadMaxTier(){return appData.maxTier||6;}
 
 let currentUser=null,isAdmin=false,isGuest=false,appData={},loginMembers={},timerInterval=null,selectedRounds={},presenceData={};
 let pendingLoginId=null,pendingLoginData=null;
@@ -804,12 +813,12 @@ function previewTeams(mode){
   const maxSize=parseInt(document.getElementById('teamSize').value);const numTeams=Math.ceil(ids.length/maxSize);
   const ta=Array.from({length:numTeams},()=>[]);
   if(mode==='balance'){
-    // 티어 밸런스: 1~2티어를 분산, 나머지는 균등 배분
-    const high=ids.filter(id=>(members[id].tier||4)<=2);const mid=ids.filter(id=>{const t=members[id].tier||4;return t===3||t===4;});const low=ids.filter(id=>(members[id].tier||4)>=5);
-    shuffle(high);shuffle(mid);shuffle(low);
-    high.forEach((id,i)=>ta[i%numTeams].push(id));
-    mid.forEach(id=>{ta.sort((a,b)=>a.length-b.length);ta[0].push(id);});
-    low.forEach(id=>{ta.sort((a,b)=>a.length-b.length);ta[0].push(id);});
+    // 밸런스: 목표점수 기준 스네이크 드래프트 (상중하까지 반영)
+    const sorted=ids.slice().sort((a,b)=>mScore(members[b])-mScore(members[a]));
+    // 동일 점수 내에서 랜덤 섞기
+    let i=0;while(i<sorted.length){let j=i;while(j<sorted.length&&mScore(members[sorted[j]])===mScore(members[sorted[i]]))j++;if(j-i>1){const sub=sorted.slice(i,j);shuffle(sub);for(let k=i;k<j;k++)sorted[k]=sub[k-i];}i=j;}
+    // 스네이크 드래프트: 홀수 라운드 정방향, 짝수 라운드 역방향
+    sorted.forEach((id,idx)=>{const rd=Math.floor(idx/numTeams);const pos=idx%numTeams;const ti=rd%2===0?pos:numTeams-1-pos;ta[ti].push(id);});
   }else{
     // 올랜덤: 완전 랜덤
     const all=ids.slice();shuffle(all);
@@ -916,12 +925,12 @@ function endEvent(){
     Object.keys(team.members||{}).forEach(mid=>{const st=getPlayerStats(tid,mid);result.playerScores[mid]={name:team.members[mid].name,score:st.total,damage:st.damage,kills:st.kills,target:mScore(team.members[mid]),team:team.name,rank:i+1};});
   });
   // 승급/강등 계산 + 저장
-  const updates={};const tierChanges={};
+  const updates={};const tierChanges={};const mt=getMaxTier();
   sorted.forEach((tid,i)=>{
     const rank=i+1;Object.keys(teams[tid].members||{}).forEach(mid=>{
       const m=members[mid];if(!m)return;const beforeTier=m.tier||4;const beforeSub=m.subTier||'mid';let tier=beforeTier,sub=beforeSub;
       if(rank<=promoTo){if(sub==='lower')sub='mid';else if(sub==='mid')sub='upper';else if(sub==='upper'&&tier>1){tier--;sub='lower';}}
-      else if(rank>=relegFrom){if(sub==='upper')sub='mid';else if(sub==='mid')sub='lower';else if(sub==='lower'&&tier<6){tier++;sub='upper';}}
+      else if(rank>=relegFrom){if(sub==='upper')sub='mid';else if(sub==='mid')sub='lower';else if(sub==='lower'&&tier<mt){tier++;sub='upper';}}
       updates['members/'+mid+'/tier']=tier;updates['members/'+mid+'/subTier']=sub;
       if(tier!==beforeTier||sub!==beforeSub){const dir=(tier<beforeTier||(tier===beforeTier&&['lower','mid','upper'].indexOf(sub)>['lower','mid','upper'].indexOf(beforeSub)))?'up':'down';tierChanges[mid]={name:m.name,from:{tier:beforeTier,subTier:beforeSub},to:{tier,subTier:sub},dir};}
     });
@@ -933,9 +942,9 @@ function endEvent(){
 }
 function saveRule(){if(!isAdmin)return;const promoTo=parseInt(document.getElementById('rulePromoTo').value)||1;const relegBottom=parseInt(document.getElementById('ruleRelegBottom').value)||1;dataRef.child('tierRule').set({promoTo,relegBottom});}
 function loadTierScores(){
-  const grid=document.getElementById('tierScoreGrid');if(!grid)return;
+  const grid=document.getElementById('tierScoreGrid');if(!grid)return;const mt=getMaxTier();
   let h='<div style="background:#334155;padding:8px;text-align:center;font-size:13px;font-weight:700;color:#94a3b8;border-bottom:1px solid #475569;">티어</div><div style="background:#334155;padding:8px;text-align:center;font-size:13px;font-weight:700;color:#94a3b8;border-bottom:1px solid #475569;">상</div><div style="background:#334155;padding:8px;text-align:center;font-size:13px;font-weight:700;color:#94a3b8;border-bottom:1px solid #475569;">중</div><div style="background:#334155;padding:8px;text-align:center;font-size:13px;font-weight:700;color:#94a3b8;border-bottom:1px solid #475569;">하</div>';
-  for(let t=1;t<=6;t++){const s=TS[t];const brd=t<6?'border-bottom:1px solid #1e293b;':'';
+  for(let t=1;t<=mt;t++){const s=TS[t];const brd=t<mt?'border-bottom:1px solid #1e293b;':'';
     h+=`<div style="padding:6px;text-align:center;${brd}"><span class="tier-badge tier-sm tier-${t}">${t}T</span></div>`;
     ['upper','mid','lower'].forEach(sub=>{
       h+=`<div style="padding:4px 6px;text-align:center;${brd}"><input type="number" id="ts_${t}_${sub}" value="${s[sub]}" min="1" max="99" style="width:48px;height:30px;text-align:center;font-size:14px;font-weight:700;padding:4px;border:1px solid #334155;border-radius:6px;background:#0f172a;color:#e2e8f0;" onchange="updateTierScoreInfo()"></div>`;
@@ -944,20 +953,38 @@ function loadTierScores(){
   grid.innerHTML=h;updateTierScoreInfo();
 }
 function updateTierScoreInfo(){
+  const mt=getMaxTier();
   const hi=parseInt(document.getElementById('ts_1_upper')?.value)||60;
-  const lo=parseInt(document.getElementById('ts_6_lower')?.value)||5;
+  const lo=parseInt(document.getElementById('ts_'+mt+'_lower')?.value)||5;
   const ratio=lo>0?(hi/lo).toFixed(1):'?';
-  const info=document.getElementById('tierScoreInfo');if(info)info.textContent=`1T 상(${hi}) ~ 6T 하(${lo}) — 격차 ${ratio}배`;
+  const info=document.getElementById('tierScoreInfo');if(info)info.textContent=`1T 상(${hi}) ~ ${mt}T 하(${lo}) — 격차 ${ratio}배`;
 }
 function applyTierPreset(name){
-  const p=TS_PRESETS[name];if(!p)return;
-  for(let t=1;t<=6;t++){['upper','mid','lower'].forEach(sub=>{const el=document.getElementById('ts_'+t+'_'+sub);if(el)el.value=p[t][sub];});}
+  const p=TS_PRESETS[name];if(!p)return;const mt=getMaxTier();
+  for(let t=1;t<=mt;t++){['upper','mid','lower'].forEach(sub=>{const el=document.getElementById('ts_'+t+'_'+sub);if(el&&p[t])el.value=p[t][sub];});}
   updateTierScoreInfo();
 }
 function saveTierScores(){
-  if(!isAdmin)return;const scores={};
-  for(let t=1;t<=6;t++){scores[t]={};['upper','mid','lower'].forEach(sub=>{scores[t][sub]=parseInt(document.getElementById('ts_'+t+'_'+sub)?.value)||1;});}
+  if(!isAdmin)return;const scores={};const mt=getMaxTier();
+  for(let t=1;t<=mt;t++){scores[t]={};['upper','mid','lower'].forEach(sub=>{scores[t][sub]=parseInt(document.getElementById('ts_'+t+'_'+sub)?.value)||1;});}
   dataRef.child('tierScores').set(scores);alert('티어 점수가 저장되었습니다.');
+}
+function saveMaxTier(){
+  if(!isAdmin)return;
+  const val=parseInt(document.getElementById('maxTierSelect')?.value)||6;
+  const members=appData.members||{};
+  const over=Object.keys(members).filter(id=>(members[id].tier||4)>val);
+  if(over.length>0){
+    const names=over.map(id=>members[id].name).join(', ');
+    if(!confirm(`${val}T 초과 멤버 ${over.length}명을 ${val}T하로 이동합니다.\n(${names})\n계속하시겠습니까?`))return;
+    const updates={};
+    over.forEach(id=>{updates['members/'+id+'/tier']=val;updates['members/'+id+'/subTier']='lower';});
+    updates['maxTier']=val;
+    dataRef.update(updates);
+  }else{
+    dataRef.child('maxTier').set(val);
+  }
+  loadTierScores();
 }
 function loadRule(){const rule=appData.tierRule||{};const promoTo=rule.promoTo||1;const relegBottom=rule.relegBottom||(rule.relegFrom?null:1);const pEl=document.getElementById('rulePromoTo');const rEl=document.getElementById('ruleRelegBottom');if(pEl&&pEl!==document.activeElement)pEl.value=promoTo;if(rEl&&relegBottom!==null&&rEl!==document.activeElement)rEl.value=relegBottom;const preview=document.getElementById('rulePreviewText');if(preview)preview.textContent=`승급 상위 ${promoTo}팀, 강등 하위 ${(relegBottom||1)===1?'꼴등만':relegBottom+'팀'} → 나머지는 유지`;}
 function resetEvent(){if(!isAdmin||!confirm('초기화? 결과 저장 안됨'))return;dataRef.update({teams:null,scores:null,rounds:0,roundMaps:null,eventStatus:'idle',timer:null});if(timerInterval)clearInterval(timerInterval);selectedRounds={};}
@@ -991,7 +1018,7 @@ function recalcEvent(ek){
   });
   // tierSnapshot 기준으로 승급/강등 재계산
   const snap=ev.tierSnapshot;const members=appData.members||{};
-  const tierChanges={};const memberUpdates={};
+  const tierChanges={};const memberUpdates={};const mt=getMaxTier();
   sorted.forEach((tid,i)=>{
     const rank=i+1;
     Object.keys(ev.teams[tid].members||{}).forEach(mid=>{
@@ -999,7 +1026,7 @@ function recalcEvent(ek){
       let tier=s.tier||4,sub=s.subTier||'mid';
       const beforeTier=tier,beforeSub=sub;
       if(rank<=promoTo){if(sub==='lower')sub='mid';else if(sub==='mid')sub='upper';else if(sub==='upper'&&tier>1){tier--;sub='lower';}}
-      else if(rank>=relegFrom){if(sub==='upper')sub='mid';else if(sub==='mid')sub='lower';else if(sub==='lower'&&tier<6){tier++;sub='upper';}}
+      else if(rank>=relegFrom){if(sub==='upper')sub='mid';else if(sub==='mid')sub='lower';else if(sub==='lower'&&tier<mt){tier++;sub='upper';}}
       if(members[mid]){memberUpdates['members/'+mid+'/tier']=tier;memberUpdates['members/'+mid+'/subTier']=sub;}
       if(tier!==beforeTier||sub!==beforeSub){
         const dir=(tier<beforeTier||(tier===beforeTier&&['lower','mid','upper'].indexOf(sub)>['lower','mid','upper'].indexOf(beforeSub)))?'up':'down';
@@ -1132,10 +1159,11 @@ function renderGame(){
 
 function renderTierTable(){
   const members=appData.members||{};const ids=Object.keys(members);const area=document.getElementById('tierTableArea');
-  const groups={};[1,2,3,4,5,6].forEach(t=>{groups[t]={upper:[],mid:[],lower:[]};});
-  ids.forEach(id=>{const m=members[id];if(groups[m.tier||4])groups[m.tier||4][m.subTier||'mid'].push(m.name);});
+  const mt=getMaxTier();const tiers=[];for(let i=1;i<=mt;i++)tiers.push(i);
+  const groups={};tiers.forEach(t=>{groups[t]={upper:[],mid:[],lower:[]};});
+  ids.forEach(id=>{const m=members[id];const t=m.tier||4;if(t<=mt&&groups[t])groups[t][m.subTier||'mid'].push(m.name);});
   let h=`<table class="tier-table"><thead><tr><th>티어</th><th>상</th><th>중</th><th>하</th></tr></thead><tbody>`;
-  [1,2,3,4,5,6].forEach(t=>{const s=TS[t];
+  tiers.forEach(t=>{const s=TS[t];
     h+=`<tr><td class="tier-head"><span class="tier-badge tier-${t}">${t}T</span></td>`;
     ['upper','mid','lower'].forEach(sub=>{h+=`<td><span class="tier-cell-score">${s[sub]}점</span><div class="tier-cell-members">${groups[t][sub].length?groups[t][sub].map(n=>`<span class="tier-cell-member">${n}</span>`).join(''):'<span style="color:#334155;">-</span>'}</div></td>`;});
     h+=`</tr>`;
@@ -1169,7 +1197,8 @@ function renderMembers(){
   const members=appData.members||{};const ids=Object.keys(members);
   document.getElementById('memberCount').textContent=`(${ids.length}명)`;
   const addArea=document.getElementById('adminAddArea');
-  if(isAdmin){addArea.innerHTML=`<div class="add-member-bar"><input type="text" id="addMemberName" placeholder="새 멤버 이름" onkeydown="if(event.key==='Enter')addMember()"><select id="addMemberTier" style="width:65px;">${[1,2,3,4,5,6].map(t=>`<option value="${t}" ${t===4?'selected':''}>${t}T</option>`).join('')}</select><select id="addMemberSubTier" style="width:80px;"><option value="upper">상</option><option value="mid" selected>중</option><option value="lower">하</option></select><button class="btn btn-blue" onclick="addMember()" style="padding:18px 48px;font-size:20px;font-weight:800;border-radius:12px;min-width:120px;">+ 추가</button></div>`;}else addArea.innerHTML='';
+  const mt=getMaxTier();
+  if(isAdmin){addArea.innerHTML=`<div class="add-member-bar"><input type="text" id="addMemberName" placeholder="새 멤버 이름" onkeydown="if(event.key==='Enter')addMember()"><select id="addMemberTier" style="width:65px;">${Array.from({length:mt},(_,i)=>i+1).map(t=>`<option value="${t}" ${t===Math.min(4,mt)?'selected':''}>${t}T</option>`).join('')}</select><select id="addMemberSubTier" style="width:80px;"><option value="upper">상</option><option value="mid" selected>중</option><option value="lower">하</option></select><button class="btn btn-blue" onclick="addMember()" style="padding:18px 48px;font-size:20px;font-weight:800;border-radius:12px;min-width:120px;">+ 추가</button></div>`;}else addArea.innerHTML='';
   const searchVal=(document.getElementById('memberSearchInput')?.value||'').trim().toLowerCase();
   const filtered=ids.filter(id=>{if(!searchVal)return true;return members[id].name.toLowerCase().includes(searchVal);});
   const searchCount=document.getElementById('memberSearchCount');
@@ -1180,7 +1209,7 @@ function renderMembers(){
     const selCount=bulkSelected.size;
     const prevTier=document.getElementById('bulkTier')?.value||'';
     const prevSub=document.getElementById('bulkSubTier')?.value||'';
-    bulkArea.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;padding:8px 12px;background:#0f172a;border:1px solid #334155;border-radius:10px;"><label style="font-size:13px;color:#94a3b8;font-weight:600;">일괄 적용</label><select id="bulkTier" style="width:65px;padding:6px;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:13px;"><option value="">티어</option>${[1,2,3,4,5,6].map(t=>`<option value="${t}" ${t==parseInt(prevTier)?'selected':''}>${t}T</option>`).join('')}</select><select id="bulkSubTier" style="width:65px;padding:6px;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:13px;"><option value="">등급</option><option value="upper" ${prevSub==='upper'?'selected':''}>상</option><option value="mid" ${prevSub==='mid'?'selected':''}>중</option><option value="lower" ${prevSub==='lower'?'selected':''}>하</option></select><button class="btn btn-xs btn-blue" onclick="applyBulkTier()" style="padding:6px 14px;font-size:13px;">적용</button><span style="font-size:12px;color:#64748b;margin-left:4px;">${selCount}명 선택</span><button class="btn btn-xs btn-gray" onclick="bulkSelectAll(true)" style="font-size:11px;padding:4px 8px;">전체선택</button><button class="btn btn-xs btn-gray" onclick="bulkSelectAll(false)" style="font-size:11px;padding:4px 8px;">전체해제</button></div>`;
+    bulkArea.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;padding:8px 12px;background:#0f172a;border:1px solid #334155;border-radius:10px;"><label style="font-size:13px;color:#94a3b8;font-weight:600;">일괄 적용</label><select id="bulkTier" style="width:65px;padding:6px;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:13px;"><option value="">티어</option>${Array.from({length:mt},(_,i)=>i+1).map(t=>`<option value="${t}" ${t==parseInt(prevTier)?'selected':''}>${t}T</option>`).join('')}</select><select id="bulkSubTier" style="width:65px;padding:6px;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:13px;"><option value="">등급</option><option value="upper" ${prevSub==='upper'?'selected':''}>상</option><option value="mid" ${prevSub==='mid'?'selected':''}>중</option><option value="lower" ${prevSub==='lower'?'selected':''}>하</option></select><button class="btn btn-xs btn-blue" onclick="applyBulkTier()" style="padding:6px 14px;font-size:13px;">적용</button><span style="font-size:12px;color:#64748b;margin-left:4px;">${selCount}명 선택</span><button class="btn btn-xs btn-gray" onclick="bulkSelectAll(true)" style="font-size:11px;padding:4px 8px;">전체선택</button><button class="btn btn-xs btn-gray" onclick="bulkSelectAll(false)" style="font-size:11px;padding:4px 8px;">전체해제</button></div>`;
   }else bulkArea.innerHTML='';
   const area=document.getElementById('memberTableArea');
   if(!filtered.length){area.innerHTML=`<p style="color:#64748b;text-align:center;padding:20px;">${searchVal?'검색 결과 없음':'멤버 없음'}</p>`;return;}
@@ -1188,7 +1217,7 @@ function renderMembers(){
   let h=`<table class="member-table"><thead><tr>${isAdmin?'<th style="width:32px;"><input type="checkbox" onchange="bulkSelectAll(this.checked)" style="cursor:pointer;"></th>':''}<th>이름</th><th>티어</th><th>등급</th><th>점수</th>${isAdmin?'<th>역할</th><th>PIN</th><th>숨김</th><th></th>':''}</tr></thead><tbody>`;
   filtered.forEach(id=>{const m=members[id];const sc=mScore(m);const isOnline=onlineIds.has(id);const checked=bulkSelected.has(id);
     h+=`<tr><td>${isAdmin?`<input type="checkbox" ${checked?'checked':''} onchange="toggleBulkSelect('${id}',this.checked)" style="cursor:pointer;">`:''}</td><td><span class="m-name">${isOnline?'<span style="display:inline-block;width:8px;height:8px;background:#3b82f6;border-radius:50%;margin-right:5px;box-shadow:0 0 6px #3b82f6;"></span>':''}${m.name}</span> ${m.role==='admin'?'<span class="badge-admin" style="font-size:10px;">관리자</span>':''} ${m.hidden?'<span style="font-size:10px;color:#64748b;background:#1e293b;padding:2px 6px;border-radius:4px;">숨김</span>':''}</td>
-    <td>${isAdmin?`<select class="m-select" onchange="changeTier('${id}',this.value)">${[1,2,3,4,5,6].map(t=>`<option value="${t}" ${t===(m.tier||4)?'selected':''}>${t}T</option>`).join('')}</select>`:`<span class="tier-badge tier-${m.tier||4}">${m.tier||4}T</span>`}</td>
+    <td>${isAdmin?`<select class="m-select" onchange="changeTier('${id}',this.value)">${Array.from({length:mt},(_,i)=>i+1).map(t=>`<option value="${t}" ${t===(m.tier||4)?'selected':''}>${t}T</option>`).join('')}</select>`:`<span class="tier-badge tier-${m.tier||4}">${m.tier||4}T</span>`}</td>
     <td>${isAdmin?`<select class="m-select" onchange="changeSubTier('${id}',this.value)"><option value="upper" ${m.subTier==='upper'?'selected':''}>상</option><option value="mid" ${(!m.subTier||m.subTier==='mid')?'selected':''}>중</option><option value="lower" ${m.subTier==='lower'?'selected':''}>하</option></select>`:`${SL[m.subTier||'mid']}`}</td>
     <td><span class="m-score">${sc}점</span></td>
     ${isAdmin?`<td><select class="m-select" onchange="changeRole('${id}',this.value)"><option value="member" ${m.role!=='admin'?'selected':''}>일반</option><option value="admin" ${m.role==='admin'?'selected':''}>관리자</option></select></td><td><button class="btn btn-xs btn-gray" onclick="resetPin('${id}','${m.name}')">초기화</button></td><td><button class="btn btn-xs ${m.hidden?'btn-red':'btn-gray'}" onclick="toggleHidden('${id}',${!m.hidden})" style="font-size:11px;padding:4px 8px;">${m.hidden?'해제':'숨김'}</button></td><td><button class="m-delete" onclick="removeMember('${id}','${m.name}')">✕</button></td>`:''}</tr>`;
@@ -1199,7 +1228,9 @@ function bulkSelectAll(checked){const members=appData.members||{};const searchVa
 function applyBulkTier(){if(!isAdmin||!bulkSelected.size)return;const tier=document.getElementById('bulkTier').value;const sub=document.getElementById('bulkSubTier').value;if(!tier&&!sub){alert('티어 또는 등급을 선택해주세요.');return;}const names=[...bulkSelected].map(id=>(appData.members||{})[id]?.name).filter(Boolean);if(!confirm(`${names.length}명에게 ${tier?tier+'T ':''}${sub?({'upper':'상','mid':'중','lower':'하'}[sub])+' ':''}일괄 적용하시겠습니까?\n\n${names.join(', ')}`))return;const updates={};bulkSelected.forEach(id=>{if(tier)updates[`members/${id}/tier`]=parseInt(tier);if(sub)updates[`members/${id}/subTier`]=sub;});dataRef.update(updates);}
 
 function renderSetup(){
-  renderParticipants();document.getElementById('roundDisplay').textContent=appData.rounds||0;loadRule();loadChickenPts();loadTierScores();
+  renderParticipants();document.getElementById('roundDisplay').textContent=appData.rounds||0;loadRule();loadChickenPts();
+  const mtSel=document.getElementById('maxTierSelect');if(mtSel&&mtSel!==document.activeElement)mtSel.value=getMaxTier();
+  loadTierScores();
   const la=document.getElementById('roundListArea');const rounds=appData.rounds||0;const maps=appData.roundMaps||{};
   if(!rounds){la.innerHTML='<p style="font-size:13px;color:#475569;">라운드 없음</p>';return;}
   const MAPS=['에란겔','사녹','테이고','미라마','비켄디','파라모','카라킨','론도'];
