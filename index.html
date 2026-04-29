@@ -813,12 +813,19 @@ function previewTeams(mode){
   const maxSize=parseInt(document.getElementById('teamSize').value);const numTeams=Math.ceil(ids.length/maxSize);
   const ta=Array.from({length:numTeams},()=>[]);
   if(mode==='balance'){
-    // 밸런스: 목표점수 기준 스네이크 드래프트 (상중하까지 반영)
+    // 밸런스: 목표점수 강한 순 정렬 → 가장 약한 팀에 배정 (동점 시 랜덤)
     const sorted=ids.slice().sort((a,b)=>mScore(members[b])-mScore(members[a]));
     // 동일 점수 내에서 랜덤 섞기
     let i=0;while(i<sorted.length){let j=i;while(j<sorted.length&&mScore(members[sorted[j]])===mScore(members[sorted[i]]))j++;if(j-i>1){const sub=sorted.slice(i,j);shuffle(sub);for(let k=i;k<j;k++)sorted[k]=sub[k-i];}i=j;}
-    // 스네이크 드래프트: 홀수 라운드 정방향, 짝수 라운드 역방향
-    sorted.forEach((id,idx)=>{const rd=Math.floor(idx/numTeams);const pos=idx%numTeams;const ti=rd%2===0?pos:numTeams-1-pos;ta[ti].push(id);});
+    // 그리디 배정: 현재 팀 목표합이 가장 낮은 팀에 배정, 동점 시 랜덤
+    sorted.forEach(id=>{
+      const totals=ta.map((arr,ti)=>({ti,total:arr.reduce((s,mid)=>s+mScore(members[mid]),0),len:arr.length}));
+      const avail=totals.filter(t=>t.len<maxSize);
+      const minTotal=Math.min(...avail.map(t=>t.total));
+      const candidates=avail.filter(t=>t.total===minTotal);
+      const pick=candidates[Math.floor(Math.random()*candidates.length)];
+      ta[pick.ti].push(id);
+    });
   }else{
     // 올랜덤: 완전 랜덤
     const all=ids.slice();shuffle(all);
