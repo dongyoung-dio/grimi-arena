@@ -552,8 +552,9 @@ input:focus,select:focus{border-color:#3b82f6;}
   <div id="eventStatusBar" class="event-status event-idle">이벤트 대기 중</div>
   <div id="timerBar" class="timer-bar hidden"><span class="timer-display" id="timerDisplay">00:00:00</span></div>
   <div class="tabs">
-    <div class="tab active" data-tab="home" onclick="switchTab('home')">홈</div>
-    <div class="tab" data-tab="tier" onclick="switchTab('tier')">티어표</div>
+    <!-- 홈 탭: 테스트 완료 후 아래 주석 해제 -->
+    <!-- <div class="tab" data-tab="home" onclick="switchTab('home')">홈</div> -->
+    <div class="tab active" data-tab="tier" onclick="switchTab('tier')">티어표</div>
     <div class="tab" data-tab="game" onclick="switchTab('game')">게임 현황</div>
     <div class="tab" data-tab="setup" onclick="switchTab('setup')">팀 배정</div>
     <div class="tab" data-tab="ranking" onclick="switchTab('ranking')">순위/결과</div>
@@ -840,7 +841,7 @@ function enterAsGuest(){isGuest=true;isAdmin=false;currentUser={id:'guest',name:
   document.getElementById('dispName').textContent='게스트';document.getElementById('userAvatarTop').textContent='👤';
   document.getElementById('roleBadge').innerHTML='<span class="badge-member">구경</span>';
   document.querySelectorAll('.tab[data-tab="members"],.tab[data-tab="setup"],.tab[data-tab="tier"]').forEach(el=>el.style.display='none');
-  switchTab('home');
+  switchTab('game'); // 홈 탭 테스트 완료 후 'home'으로 변경
   const presRef=dataRef.child('presence');const myRef=presRef.push();myRef.set({name:'게스트',type:'guest'});myRef.onDisconnect().remove();
   presRef.on('value',s=>{presenceData=s.exists()?s.val():{};updateOnlineDisplay();});
   dataRef.on('value',snap=>{appData=snap.val()||{};renderAll();});
