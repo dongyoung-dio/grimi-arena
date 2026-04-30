@@ -1318,22 +1318,27 @@ async function searchPubgStats(nickOverride){
   area.innerHTML='<div class="pubg-loading">전적 조회 중...</div>';
 
   try{
-    // 1) 플레이어 검색 (워커 경유)
-    const pRes=await fetch(`${PUBG_WORKER_URL}/shards/steam/players?filter[playerNames]=${encodeURIComponent(nick)}`);
-    if(pRes.status===404){area.innerHTML=`<div class="pubg-error">플레이어를 찾을 수 없습니다 <a href="https://dak.gg/pubg/profile/${encodeURIComponent(nick)}" target="_blank" style="color:#60a5fa;margin-left:6px;">dak.gg에서 확인</a></div>`;return;}
+    // 1) 플레이어 검색 — steam 먼저, 실패 시 kakao 시도
+    let pRes=null,pData=null,shard='steam';
+    const shards=['steam','kakao'];
+    for(const sh of shards){
+      pRes=await fetch(`${PUBG_WORKER_URL}/shards/${sh}/players?filter[playerNames]=${encodeURIComponent(nick)}`);
+      if(pRes.ok){shard=sh;pData=await pRes.json();break;}
+    }
+    if(!pData){
+      area.innerHTML=`<div class="pubg-error">플레이어를 찾을 수 없습니다. 대소문자를 정확히 입력해주세요. <a href="https://dak.gg/pubg/profile/${encodeURIComponent(nick)}" target="_blank" style="color:#60a5fa;margin-left:6px;">dak.gg에서 확인</a></div>`;return;
+    }
     if(pRes.status===429){area.innerHTML='<div class="pubg-error">API 호출 제한 초과. 1분 후 다시 시도하세요.</div>';return;}
-    if(!pRes.ok){area.innerHTML=`<div class="pubg-error">API 오류 (${pRes.status}). <a href="https://dak.gg/pubg/profile/${encodeURIComponent(nick)}" target="_blank" style="color:#60a5fa;">dak.gg에서 확인</a></div>`;return;}
-    const pData=await pRes.json();
     const playerId=pData.data[0].id;
 
     // 2) 시즌 통계 (lifetime)
-    const sRes=await fetch(`${PUBG_WORKER_URL}/shards/steam/players/${playerId}/seasons/lifetime`);
+    const sRes=await fetch(`${PUBG_WORKER_URL}/shards/${shard}/players/${playerId}/seasons/lifetime`);
     if(!sRes.ok){area.innerHTML='<div class="pubg-error">전적 데이터를 불러올 수 없습니다.</div>';return;}
     const sData=await sRes.json();
 
     pubgCurrentData={stats:sData.data.attributes.gameModeStats,name:pData.data[0].attributes.name};
     pubgCache[cacheKey]={data:pubgCurrentData,ts:Date.now()};
-    renderPubgResult(nick);
+    renderPubgResult(pData.data[0].attributes.name);
 
   }catch(e){
     // 실패 시 dak.gg 폴백
