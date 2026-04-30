@@ -564,7 +564,7 @@ input:focus,select:focus{border-color:#3b82f6;}
   </div>
   <div class="main">
     <!-- 홈 탭 -->
-    <div id="tab-home" class="home-grid">
+    <div id="tab-home" class="home-grid hidden">
       <!-- 클랜 대시보드 (풀 너비) -->
       <div class="card home-section home-full" id="homeDashboard" style="padding:14px;">
         <div id="homeDashContent" class="dash-grid"></div>
@@ -859,7 +859,7 @@ function enterApp(id,memberData){
   const presRef=dataRef.child('presence');const myRef=presRef.push();myRef.set({name:memberData.name,id:id,type:'member'});myRef.onDisconnect().remove();
   presRef.on('value',s=>{presenceData=s.exists()?s.val():{};updateOnlineDisplay();});
   let firstLoad=true;
-  dataRef.on('value',snap=>{appData=snap.val()||{};if(appData.members&&appData.members[id]){currentUser={id,...appData.members[id]};isAdmin=appData.members[id].role==='admin';document.getElementById('userAvatarTop').textContent=appData.members[id].avatar||appData.members[id].name.charAt(0);}renderAll();if(firstLoad){firstLoad=false;ensureDefaultNotice();}});
+  dataRef.on('value',snap=>{appData=snap.val()||{};if(appData.members&&appData.members[id]){currentUser={id,...appData.members[id]};isAdmin=appData.members[id].role==='admin';document.getElementById('userAvatarTop').textContent=appData.members[id].avatar||appData.members[id].name.charAt(0);}renderAll();if(firstLoad){firstLoad=false;ensureDefaultNotice();switchTab('tier');}});
 }
 function logout(){localStorage.removeItem('grimi_kill_user');isGuest=false;location.reload();}
 function switchTab(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));['home','game','tier','members','setup','ranking','bingo','minigame'].forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});window.scrollTo(0,0);if(tab==='home')renderHome();if(tab==='minigame')drawMarbleBoard();if(tab==='bingo'){const f=document.getElementById('bingoFrame');if(!f.getAttribute('src'))f.src='bingo.html'+(isGuest?'?guest=1':'');}}
