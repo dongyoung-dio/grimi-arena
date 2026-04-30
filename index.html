@@ -73,6 +73,79 @@ input:focus,select:focus{border-color:#3b82f6;}
 .app-twinkle{position:fixed;width:2px;height:2px;border-radius:50%;background:#94a3b8;opacity:0;pointer-events:none;z-index:0;animation:appTwinkle ease-in-out infinite;}
 @keyframes appTwinkle{0%,100%{opacity:0;transform:scale(.3)}50%{opacity:.12;transform:scale(1)}}
 
+/* ===== 홈 탭 ===== */
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.home-full{grid-column:1/-1;}
+.home-left{grid-column:1/2;}
+.home-right{grid-column:2/3;}
+@media(max-width:600px){.home-grid{grid-template-columns:1fr;}.home-left,.home-right{grid-column:1/-1;}}
+.home-section{margin-bottom:0;}
+.home-section-title{font-size:14px;font-weight:700;color:#94a3b8;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.dash-grid{display:flex;flex-wrap:wrap;gap:6px;}
+.dash-card{flex:1 1 calc(16.6% - 6px);min-width:70px;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 6px;text-align:center;}
+.dash-card .dash-label{font-size:10px;color:#64748b;margin-bottom:2px;}
+.dash-card .dash-value{font-size:18px;font-weight:800;}
+.dash-card .dash-value span{font-size:10px;color:#64748b;font-weight:400;}
+.dash-card .dash-small{font-size:13px;font-weight:700;}
+@media(max-width:400px){.dash-card{flex:1 1 calc(33% - 6px);}}
+/* 공지사항 */
+.notice-list{display:flex;flex-direction:column;gap:8px;}
+.notice-item{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .2s;}
+.notice-item:hover{border-color:rgba(96,165,250,.3);}
+.notice-head{display:flex;align-items:center;gap:8px;}
+.notice-pin{color:#fbbf24;font-size:12px;}
+.notice-title{font-size:14px;font-weight:600;color:#e2e8f0;flex:1;}
+.notice-date{font-size:11px;color:#64748b;white-space:nowrap;}
+.notice-body{margin-top:8px;font-size:13px;color:#94a3b8;line-height:1.6;white-space:pre-wrap;display:none;}
+.notice-item.open .notice-body{display:block;}
+.notice-item.open{border-color:rgba(96,165,250,.25);}
+.notice-toggle{font-size:11px;color:#64748b;transition:transform .2s;margin-left:4px;}
+.notice-item.open .notice-toggle{transform:rotate(180deg);}
+.notice-admin-actions{display:flex;gap:6px;margin-left:auto;}
+.notice-admin-actions button{font-size:11px;padding:2px 8px;border:none;border-radius:4px;cursor:pointer;}
+.notice-edit-btn{background:#334155;color:#94a3b8;}
+.notice-del-btn{background:rgba(239,68,68,.15);color:#ef4444;}
+/* 전적검색 */
+.search-pubg-wrap{display:flex;gap:8px;margin-bottom:10px;}
+.search-pubg-input{flex:1;padding:10px 14px;border-radius:10px;background:#0f172a;border:1px solid #334155;color:#e2e8f0;font-size:14px;}
+.search-pubg-btn{padding:10px 16px;border:none;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap;}
+.member-chip-grid{display:flex;flex-wrap:wrap;gap:6px;}
+.member-search-chip{padding:5px 10px;border-radius:16px;background:#1e293b;border:1px solid #334155;font-size:12px;color:#94a3b8;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px;}
+.member-search-chip:hover{border-color:#3b82f6;color:#60a5fa;background:rgba(59,130,246,.08);}
+.member-search-chip .chip-avatar{font-size:14px;}
+/* 전적 결과 카드 */
+.pubg-result{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px;margin-top:8px;}
+.pubg-result-name{font-size:15px;font-weight:700;color:#e2e8f0;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.pubg-result-name a{font-size:11px;color:#60a5fa;text-decoration:none;}
+.pubg-stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+.pubg-stat{background:#1e293b;border-radius:6px;padding:6px 8px;text-align:center;}
+.pubg-stat-label{font-size:10px;color:#64748b;}
+.pubg-stat-value{font-size:16px;font-weight:800;color:#e2e8f0;}
+.pubg-mode-tabs{display:flex;gap:4px;margin-bottom:8px;}
+.pubg-mode-tab{padding:3px 8px;border-radius:4px;font-size:11px;cursor:pointer;color:#64748b;background:#1e293b;border:1px solid transparent;}
+.pubg-mode-tab.active{color:#60a5fa;border-color:#3b82f6;background:rgba(59,130,246,.1);}
+.pubg-loading{text-align:center;color:#64748b;padding:16px;font-size:13px;}
+.pubg-error{text-align:center;color:#ef4444;padding:10px;font-size:13px;background:rgba(239,68,68,.08);border-radius:8px;margin-top:8px;}
+/* YouTube 슬라이드 */
+.yt-slide-wrap{position:relative;overflow:hidden;border-radius:12px;background:#000;}
+.yt-slide-inner{display:flex;transition:transform .3s ease;}
+.yt-slide-item{min-width:100%;aspect-ratio:16/9;}
+.yt-slide-item iframe{width:100%;height:100%;border:none;border-radius:12px;}
+.yt-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);color:#fff;border:none;font-size:20px;padding:8px 10px;cursor:pointer;border-radius:8px;z-index:2;transition:background .2s;}
+.yt-nav:hover{background:rgba(0,0,0,.8);}
+.yt-nav.prev{left:6px;}
+.yt-nav.next{right:6px;}
+.yt-dots{display:flex;justify-content:center;gap:6px;margin-top:8px;}
+.yt-dot{width:8px;height:8px;border-radius:50%;background:#334155;cursor:pointer;transition:background .2s;}
+.yt-dot.active{background:#60a5fa;}
+.yt-empty{text-align:center;color:#64748b;padding:30px;font-size:14px;}
+.yt-admin-bar{display:flex;gap:6px;margin-bottom:8px;align-items:center;}
+.yt-admin-input{flex:1;padding:8px 12px;border-radius:8px;background:#0f172a;border:1px solid #334155;color:#e2e8f0;font-size:13px;}
+.yt-list{display:flex;flex-direction:column;gap:4px;margin-top:8px;}
+.yt-list-item{display:flex;align-items:center;gap:8px;padding:6px 10px;background:#0f172a;border:1px solid #334155;border-radius:6px;font-size:12px;color:#94a3b8;}
+.yt-list-item span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.yt-list-item button{font-size:11px;padding:2px 8px;border:none;border-radius:4px;cursor:pointer;background:rgba(239,68,68,.15);color:#ef4444;}
+
 /* 로그인 */
 #loginScreen{max-width:460px;margin:0 auto;text-align:center;padding:20px;position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;}
 .login-header{display:flex;align-items:center;gap:14px;justify-content:center;margin-bottom:6px;}
@@ -479,7 +552,8 @@ input:focus,select:focus{border-color:#3b82f6;}
   <div id="eventStatusBar" class="event-status event-idle">이벤트 대기 중</div>
   <div id="timerBar" class="timer-bar hidden"><span class="timer-display" id="timerDisplay">00:00:00</span></div>
   <div class="tabs">
-    <div class="tab active" data-tab="tier" onclick="switchTab('tier')">티어표</div>
+    <div class="tab active" data-tab="home" onclick="switchTab('home')">홈</div>
+    <div class="tab" data-tab="tier" onclick="switchTab('tier')">티어표</div>
     <div class="tab" data-tab="game" onclick="switchTab('game')">게임 현황</div>
     <div class="tab" data-tab="setup" onclick="switchTab('setup')">팀 배정</div>
     <div class="tab" data-tab="ranking" onclick="switchTab('ranking')">순위/결과</div>
@@ -488,6 +562,38 @@ input:focus,select:focus{border-color:#3b82f6;}
     <div class="tab" data-tab="members" onclick="switchTab('members')">멤버 관리</div>
   </div>
   <div class="main">
+    <!-- 홈 탭 -->
+    <div id="tab-home" class="home-grid">
+      <!-- 클랜 대시보드 (풀 너비) -->
+      <div class="card home-section home-full" id="homeDashboard" style="padding:14px;">
+        <div id="homeDashContent" class="dash-grid"></div>
+      </div>
+      <!-- 공지사항 -->
+      <div class="card home-section home-left">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <div class="home-section-title" style="margin-bottom:0;">📢 공지사항</div>
+          <button class="btn btn-xs btn-blue guest-hide" onclick="openNoticeEditor()" style="display:none;" id="noticeAddBtn">+ 작성</button>
+        </div>
+        <div id="noticeEditorArea" class="hidden" style="margin-bottom:10px;"></div>
+        <div id="noticeListArea" class="notice-list"></div>
+      </div>
+      <!-- 전적검색 -->
+      <div class="card home-section home-right">
+        <div class="home-section-title">🔍 전적검색</div>
+        <div class="search-pubg-wrap">
+          <input type="text" class="search-pubg-input" id="pubgSearchInput" placeholder="PUBG 닉네임 입력..." onkeydown="if(event.key==='Enter')searchPubgStats()">
+          <button class="search-pubg-btn" onclick="searchPubgStats()">검색</button>
+        </div>
+        <div id="pubgResultArea"></div>
+        <div class="member-chip-grid" id="memberChipGrid" style="margin-top:8px;"></div>
+      </div>
+      <!-- YouTube 영상 (풀 너비) -->
+      <div class="card home-section home-full">
+        <div class="home-section-title">🎬 영상</div>
+        <div id="ytAdminArea" class="hidden guest-hide"></div>
+        <div id="ytPlayerArea"></div>
+      </div>
+    </div>
     <div id="tab-game" class="hidden">
       <div id="gameEndEventArea" class="guest-hide" style="margin-bottom:12px;text-align:right;"></div>
       <div id="rankDashboard" class="rank-dashboard hidden"></div>
@@ -734,7 +840,7 @@ function enterAsGuest(){isGuest=true;isAdmin=false;currentUser={id:'guest',name:
   document.getElementById('dispName').textContent='게스트';document.getElementById('userAvatarTop').textContent='👤';
   document.getElementById('roleBadge').innerHTML='<span class="badge-member">구경</span>';
   document.querySelectorAll('.tab[data-tab="members"],.tab[data-tab="setup"],.tab[data-tab="tier"]').forEach(el=>el.style.display='none');
-  switchTab('game');
+  switchTab('home');
   const presRef=dataRef.child('presence');const myRef=presRef.push();myRef.set({name:'게스트',type:'guest'});myRef.onDisconnect().remove();
   presRef.on('value',s=>{presenceData=s.exists()?s.val():{};updateOnlineDisplay();});
   dataRef.on('value',snap=>{appData=snap.val()||{};renderAll();});
@@ -751,10 +857,11 @@ function enterApp(id,memberData){
   else document.querySelectorAll('.tab[data-tab="members"],.tab[data-tab="setup"]').forEach(el=>el.style.display='');
   const presRef=dataRef.child('presence');const myRef=presRef.push();myRef.set({name:memberData.name,id:id,type:'member'});myRef.onDisconnect().remove();
   presRef.on('value',s=>{presenceData=s.exists()?s.val():{};updateOnlineDisplay();});
-  dataRef.on('value',snap=>{appData=snap.val()||{};if(appData.members&&appData.members[id]){currentUser={id,...appData.members[id]};isAdmin=appData.members[id].role==='admin';document.getElementById('userAvatarTop').textContent=appData.members[id].avatar||appData.members[id].name.charAt(0);}renderAll();});
+  let firstLoad=true;
+  dataRef.on('value',snap=>{appData=snap.val()||{};if(appData.members&&appData.members[id]){currentUser={id,...appData.members[id]};isAdmin=appData.members[id].role==='admin';document.getElementById('userAvatarTop').textContent=appData.members[id].avatar||appData.members[id].name.charAt(0);}renderAll();if(firstLoad){firstLoad=false;ensureDefaultNotice();}});
 }
 function logout(){localStorage.removeItem('grimi_kill_user');isGuest=false;location.reload();}
-function switchTab(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));['game','tier','members','setup','ranking','bingo','minigame'].forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});window.scrollTo(0,0);if(tab==='minigame')drawMarbleBoard();if(tab==='bingo'){const f=document.getElementById('bingoFrame');if(!f.getAttribute('src'))f.src='bingo.html'+(isGuest?'?guest=1':'');}}
+function switchTab(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));['home','game','tier','members','setup','ranking','bingo','minigame'].forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});window.scrollTo(0,0);if(tab==='home')renderHome();if(tab==='minigame')drawMarbleBoard();if(tab==='bingo'){const f=document.getElementById('bingoFrame');if(!f.getAttribute('src'))f.src='bingo.html'+(isGuest?'?guest=1':'');}}
 function switchMiniGame(mg){document.querySelectorAll('.mini-tab').forEach(t=>t.classList.toggle('active',t.dataset.mg===mg));['plinko','ladder','snail'].forEach(g=>{const el=document.getElementById('mg-'+g);if(el)el.classList.toggle('hidden',g!==mg);});if(mg==='plinko')drawMarbleBoard();}
 
 // 프로필
@@ -1078,7 +1185,325 @@ function getPlayerTotal(tid,mid){return getPlayerStats(tid,mid).total;}
 function selectRound(tid,r){selectedRounds[tid]=r;renderGame();}
 
 // 렌더링
-function renderAll(){loadTierScoresFromDB();renderEventStatus();updateTimer();renderGame();renderTierTable();renderMembers();renderSetup();renderRanking();}
+// ===== 홈 탭 =====
+let ytSlideIdx=0;
+let editingNoticeId=null;
+
+function renderHome(){
+  renderDashboard();
+  renderNotices();
+  renderMemberChips();
+  renderYouTube();
+  // 관리자 버튼 표시
+  const addBtn=document.getElementById('noticeAddBtn');
+  if(addBtn)addBtn.style.display=isAdmin?'':'none';
+  const ytAdmin=document.getElementById('ytAdminArea');
+  if(ytAdmin){ytAdmin.classList.toggle('hidden',!isAdmin);if(isAdmin)renderYtAdmin();}
+}
+
+// -- 대시보드 --
+function renderDashboard(){
+  const el=document.getElementById('homeDashContent');if(!el)return;
+  const members=appData.members||{};
+  const mCount=Object.keys(members).length;
+  const history=appData.history||{};
+  const hCount=Object.keys(history).length;
+  const evStatus=appData.eventStatus||'idle';
+  const online=Object.keys(presenceData).length;
+  const statusLabel=evStatus==='active'?'🟢 진행 중':'⏸️ 대기';
+  const statusColor=evStatus==='active'?'#10b981':'#64748b';
+  // 최근 우승팀
+  const hKeys=Object.keys(history).sort((a,b)=>parseInt(b.replace('event_',''))-parseInt(a.replace('event_','')));
+  let lastWinner='-';
+  if(hKeys.length>0){
+    const last=history[hKeys[0]];
+    if(last&&last.ranking){
+      const ranked=Object.entries(last.ranking).sort((a,b)=>(a[1].rank||99)-(b[1].rank||99));
+      if(ranked.length>0)lastWinner='🏆 '+ranked[0][0].replace('team_','')+'팀';
+    }
+  }
+  el.innerHTML=`
+    <div class="dash-card"><div class="dash-label">멤버</div><div class="dash-value" style="color:#60a5fa;">${mCount}<span>명</span></div></div>
+    <div class="dash-card"><div class="dash-label">이벤트</div><div class="dash-value" style="color:#a78bfa;">${hCount}<span>회</span></div></div>
+    <div class="dash-card"><div class="dash-label">접속</div><div class="dash-value" style="color:#10b981;">${online}<span>명</span></div></div>
+    <div class="dash-card"><div class="dash-label">상태</div><div class="dash-small" style="color:${statusColor};">${statusLabel}</div></div>
+    <div class="dash-card"><div class="dash-label">최근 우승</div><div class="dash-small" style="color:#fbbf24;">${lastWinner}</div></div>
+    <div class="dash-card" style="cursor:pointer;" onclick="switchTab('ranking')"><div class="dash-label">기록</div><div class="dash-small" style="color:#94a3b8;">→ 보기</div></div>
+  `;
+}
+
+// -- 공지사항 --
+function renderNotices(){
+  const area=document.getElementById('noticeListArea');if(!area)return;
+  const notices=appData.notices||{};
+  const keys=Object.keys(notices).sort((a,b)=>{
+    const na=notices[a],nb=notices[b];
+    if(na.pinned&&!nb.pinned)return -1;if(!na.pinned&&nb.pinned)return 1;
+    return (nb.createdAt||0)-(na.createdAt||0);
+  });
+  if(!keys.length){area.innerHTML='<div style="text-align:center;color:#64748b;padding:20px;font-size:14px;">아직 공지사항이 없습니다.</div>';return;}
+  area.innerHTML=keys.map(k=>{
+    const n=notices[k];
+    const d=n.createdAt?new Date(n.createdAt).toLocaleDateString('ko-KR',{month:'short',day:'numeric'}):'';
+    const admin=isAdmin?`<div class="notice-admin-actions"><button class="notice-edit-btn" onclick="event.stopPropagation();editNotice('${k}')">수정</button><button class="notice-del-btn" onclick="event.stopPropagation();deleteNotice('${k}')">삭제</button></div>`:'';
+    return `<div class="notice-item" onclick="this.classList.toggle('open')">
+      <div class="notice-head">${n.pinned?'<span class="notice-pin">📌</span>':''}<span class="notice-title">${escHtml(n.title||'')}</span><span class="notice-date">${d}</span><span class="notice-toggle">▼</span>${admin}</div>
+      <div class="notice-body">${escHtml(n.body||'')}</div>
+    </div>`;
+  }).join('');
+}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function openNoticeEditor(id){
+  editingNoticeId=id||null;
+  const area=document.getElementById('noticeEditorArea');
+  const n=id?(appData.notices||{})[id]:{};
+  area.classList.remove('hidden');
+  area.innerHTML=`
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:14px;">
+      <input type="text" id="noticeEditTitle" placeholder="공지 제목" value="${escHtml(n.title||'')}" style="width:100%;margin-bottom:8px;padding:8px 12px;border:1px solid #334155;border-radius:8px;background:#1e293b;color:#e2e8f0;font-size:14px;">
+      <textarea id="noticeEditBody" placeholder="내용을 입력하세요..." rows="4" style="width:100%;padding:8px 12px;border:1px solid #334155;border-radius:8px;background:#1e293b;color:#e2e8f0;font-size:13px;resize:vertical;">${escHtml(n.body||'')}</textarea>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+        <label style="font-size:13px;color:#94a3b8;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" id="noticeEditPin" ${n.pinned?'checked':''}> 📌 상단 고정</label>
+        <div style="margin-left:auto;display:flex;gap:6px;">
+          <button class="btn btn-xs btn-green" onclick="saveNotice()">저장</button>
+          <button class="btn btn-xs btn-gray" onclick="cancelNotice()">취소</button>
+        </div>
+      </div>
+    </div>`;
+}
+function cancelNotice(){document.getElementById('noticeEditorArea').classList.add('hidden');editingNoticeId=null;}
+function saveNotice(){
+  if(!isAdmin)return;
+  const title=document.getElementById('noticeEditTitle').value.trim();
+  const body=document.getElementById('noticeEditBody').value.trim();
+  const pinned=document.getElementById('noticeEditPin').checked;
+  if(!title){alert('제목을 입력하세요');return;}
+  const id=editingNoticeId||('notice_'+Date.now());
+  const existing=(appData.notices||{})[id];
+  dataRef.child('notices/'+id).set({title,body,pinned,createdAt:existing?.createdAt||Date.now()});
+  cancelNotice();
+}
+function editNotice(id){openNoticeEditor(id);}
+function deleteNotice(id){
+  if(!isAdmin||!confirm('이 공지를 삭제하시겠습니까?'))return;
+  dataRef.child('notices/'+id).remove();
+}
+
+// -- 전적검색 --
+// PUBG API 프록시 워커 URL (Cloudflare Worker 배포 후 여기에 URL 입력)
+const PUBG_WORKER_URL='https://pubg-proxy.kimdy220.workers.dev';
+let pubgCache={};
+let pubgCurrentData=null;
+
+async function searchPubgStats(nickOverride){
+  const nick=nickOverride||document.getElementById('pubgSearchInput').value.trim();
+  if(!nick)return;
+  if(!nickOverride)document.getElementById('pubgSearchInput').value=nick;
+  const area=document.getElementById('pubgResultArea');
+
+  // 워커 미설정 시 dak.gg로 바로 이동
+  if(!PUBG_WORKER_URL){
+    window.open('https://dak.gg/pubg/profile/'+encodeURIComponent(nick),'_blank');
+    return;
+  }
+
+  const cacheKey=nick.toLowerCase();
+  // 캐시 확인 (5분)
+  if(pubgCache[cacheKey]&&Date.now()-pubgCache[cacheKey].ts<300000){
+    pubgCurrentData=pubgCache[cacheKey].data;
+    renderPubgResult(nick);return;
+  }
+
+  area.innerHTML='<div class="pubg-loading">전적 조회 중...</div>';
+
+  try{
+    // 1) 플레이어 검색 (워커 경유)
+    const pRes=await fetch(`${PUBG_WORKER_URL}/shards/steam/players?filter[playerNames]=${encodeURIComponent(nick)}`);
+    if(pRes.status===404){area.innerHTML=`<div class="pubg-error">플레이어를 찾을 수 없습니다 <a href="https://dak.gg/pubg/profile/${encodeURIComponent(nick)}" target="_blank" style="color:#60a5fa;margin-left:6px;">dak.gg에서 확인</a></div>`;return;}
+    if(pRes.status===429){area.innerHTML='<div class="pubg-error">API 호출 제한 초과. 1분 후 다시 시도하세요.</div>';return;}
+    if(!pRes.ok){area.innerHTML=`<div class="pubg-error">API 오류 (${pRes.status}). <a href="https://dak.gg/pubg/profile/${encodeURIComponent(nick)}" target="_blank" style="color:#60a5fa;">dak.gg에서 확인</a></div>`;return;}
+    const pData=await pRes.json();
+    const playerId=pData.data[0].id;
+
+    // 2) 시즌 통계 (lifetime)
+    const sRes=await fetch(`${PUBG_WORKER_URL}/shards/steam/players/${playerId}/seasons/lifetime`);
+    if(!sRes.ok){area.innerHTML='<div class="pubg-error">전적 데이터를 불러올 수 없습니다.</div>';return;}
+    const sData=await sRes.json();
+
+    pubgCurrentData={stats:sData.data.attributes.gameModeStats,name:pData.data[0].attributes.name};
+    pubgCache[cacheKey]={data:pubgCurrentData,ts:Date.now()};
+    renderPubgResult(nick);
+
+  }catch(e){
+    // 실패 시 dak.gg 폴백
+    area.innerHTML=`<div class="pubg-error">API 연결 실패. <a href="https://dak.gg/pubg/profile/${encodeURIComponent(nick)}" target="_blank" style="color:#60a5fa;">dak.gg에서 전적 확인</a></div>`;
+  }
+}
+
+function renderPubgResult(nick){
+  const area=document.getElementById('pubgResultArea');if(!area||!pubgCurrentData)return;
+  const stats=pubgCurrentData.stats;
+  const modes=[
+    {key:'squad-fpp',label:'스쿼드 FPP'},
+    {key:'squad',label:'스쿼드 TPP'},
+    {key:'duo-fpp',label:'듀오 FPP'},
+    {key:'duo',label:'듀오 TPP'},
+    {key:'solo-fpp',label:'솔로 FPP'},
+    {key:'solo',label:'솔로 TPP'}
+  ];
+  // 데이터 있는 모드만 필터
+  const avail=modes.filter(m=>stats[m.key]&&stats[m.key].roundsPlayed>0);
+  if(!avail.length){area.innerHTML='<div class="pubg-error">전적 데이터가 없습니다.</div>';return;}
+
+  // 기본: 첫 번째 유효 모드
+  const activeMode=area.dataset.mode&&avail.find(m=>m.key===area.dataset.mode)?area.dataset.mode:avail[0].key;
+  area.dataset.mode=activeMode;
+  const s=stats[activeMode];
+
+  const kills=s.kills||0,assists=s.assists||0,rounds=s.roundsPlayed||1;
+  const kd=(kills/(Math.max(1,s.losses||rounds-s.wins))).toFixed(2);
+  const winRate=((s.wins||0)/rounds*100).toFixed(1);
+  const avgDmg=(s.damageDealt/rounds).toFixed(0);
+  const top10Rate=((s.top10s||0)/rounds*100).toFixed(1);
+  const avgKills=(kills/rounds).toFixed(1);
+  const longestKill=(s.longestKill||0).toFixed(0);
+
+  let h=`<div class="pubg-result">`;
+  h+=`<div class="pubg-result-name"><span>${escHtml(pubgCurrentData.name)}</span><a href="https://dak.gg/pubg/profile/${encodeURIComponent(nick)}" target="_blank">dak.gg 더보기 →</a></div>`;
+  // 모드 탭
+  h+=`<div class="pubg-mode-tabs">`;
+  avail.forEach(m=>{h+=`<div class="pubg-mode-tab ${m.key===activeMode?'active':''}" onclick="switchPubgMode('${m.key}')">${m.label}</div>`;});
+  h+=`</div>`;
+  // 스탯 그리드
+  h+=`<div class="pubg-stats-grid">`;
+  h+=`<div class="pubg-stat"><div class="pubg-stat-label">K/D</div><div class="pubg-stat-value" style="color:#fbbf24;">${kd}</div></div>`;
+  h+=`<div class="pubg-stat"><div class="pubg-stat-label">승률</div><div class="pubg-stat-value" style="color:#10b981;">${winRate}%</div></div>`;
+  h+=`<div class="pubg-stat"><div class="pubg-stat-label">평균 딜량</div><div class="pubg-stat-value" style="color:#60a5fa;">${avgDmg}</div></div>`;
+  h+=`<div class="pubg-stat"><div class="pubg-stat-label">TOP 10</div><div class="pubg-stat-value" style="color:#a78bfa;">${top10Rate}%</div></div>`;
+  h+=`<div class="pubg-stat"><div class="pubg-stat-label">평균 킬</div><div class="pubg-stat-value">${avgKills}</div></div>`;
+  h+=`<div class="pubg-stat"><div class="pubg-stat-label">최장 킬</div><div class="pubg-stat-value">${longestKill}m</div></div>`;
+  h+=`</div>`;
+  h+=`<div style="margin-top:6px;font-size:11px;color:#64748b;text-align:right;">${rounds}게임 · ${kills}킬 · ${s.wins||0}승</div>`;
+  h+=`</div>`;
+  area.innerHTML=h;
+}
+
+function switchPubgMode(mode){
+  const area=document.getElementById('pubgResultArea');
+  area.dataset.mode=mode;
+  const nick=document.getElementById('pubgSearchInput').value.trim();
+  renderPubgResult(nick);
+}
+
+function renderMemberChips(){
+  const grid=document.getElementById('memberChipGrid');if(!grid)return;
+  const members=appData.members||{};
+  const ids=Object.keys(members).filter(id=>!members[id].hidden);
+  grid.innerHTML=ids.map(id=>{
+    const m=members[id];const av=getAvatar(m);
+    return `<div class="member-search-chip" onclick="document.getElementById('pubgSearchInput').value='${m.name.replace(/'/g,"\\'")}';searchPubgStats('${m.name.replace(/'/g,"\\'")}')">
+      ${av?'<span class="chip-avatar">'+av+'</span>':''}<span>${m.name}</span></div>`;
+  }).join('');
+}
+
+// -- YouTube 영상 --
+function extractYtId(url){
+  if(!url)return null;
+  const m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
+  return m?m[1]:null;
+}
+function renderYouTube(){
+  const area=document.getElementById('ytPlayerArea');if(!area)return;
+  const videos=appData.homeVideos||{};
+  const keys=Object.keys(videos).sort((a,b)=>(videos[b].addedAt||0)-(videos[a].addedAt||0));
+  if(!keys.length){area.innerHTML='<div class="yt-empty">등록된 영상이 없습니다.</div>';return;}
+  ytSlideIdx=Math.min(ytSlideIdx,keys.length-1);
+  let h='<div class="yt-slide-wrap">';
+  h+='<div class="yt-slide-inner" id="ytSlideInner" style="transform:translateX(-'+ytSlideIdx*100+'%)">';
+  keys.forEach(k=>{
+    const vid=extractYtId(videos[k].url);
+    if(vid)h+=`<div class="yt-slide-item"><iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen loading="lazy"></iframe></div>`;
+  });
+  h+='</div>';
+  if(keys.length>1){
+    h+='<button class="yt-nav prev" onclick="ytSlide(-1)">‹</button>';
+    h+='<button class="yt-nav next" onclick="ytSlide(1)">›</button>';
+  }
+  h+='</div>';
+  if(keys.length>1){
+    h+='<div class="yt-dots">';
+    keys.forEach((_,i)=>{h+=`<div class="yt-dot ${i===ytSlideIdx?'active':''}" onclick="ytSlideTo(${i})"></div>`;});
+    h+='</div>';
+  }
+  // 영상 제목 표시
+  const cur=videos[keys[ytSlideIdx]];
+  if(cur&&cur.title)h+=`<div style="text-align:center;font-size:13px;color:#94a3b8;margin-top:6px;">${escHtml(cur.title)}</div>`;
+  area.innerHTML=h;
+}
+function ytSlide(dir){
+  const videos=appData.homeVideos||{};
+  const cnt=Object.keys(videos).length;
+  if(cnt<=1)return;
+  ytSlideIdx=(ytSlideIdx+dir+cnt)%cnt;
+  const inner=document.getElementById('ytSlideInner');
+  if(inner)inner.style.transform='translateX(-'+ytSlideIdx*100+'%)';
+  document.querySelectorAll('.yt-dot').forEach((d,i)=>d.classList.toggle('active',i===ytSlideIdx));
+  // 제목 업데이트
+  renderYouTube();
+}
+function ytSlideTo(idx){ytSlideIdx=idx;renderYouTube();}
+
+function renderYtAdmin(){
+  const area=document.getElementById('ytAdminArea');if(!area||!isAdmin)return;
+  const videos=appData.homeVideos||{};
+  const keys=Object.keys(videos).sort((a,b)=>(videos[b].addedAt||0)-(videos[a].addedAt||0));
+  let h=`<div class="yt-admin-bar">
+    <input type="text" class="yt-admin-input" id="ytUrlInput" placeholder="YouTube URL 붙여넣기...">
+    <input type="text" style="width:100px;padding:8px;border-radius:8px;background:#0f172a;border:1px solid #334155;color:#e2e8f0;font-size:13px;" id="ytTitleInput" placeholder="제목 (선택)">
+    <button class="btn btn-xs btn-blue" onclick="addYtVideo()">추가</button>
+  </div>`;
+  if(keys.length){
+    h+='<div class="yt-list">';
+    keys.forEach(k=>{
+      const v=videos[k];
+      h+=`<div class="yt-list-item"><span>${escHtml(v.title||v.url||'')}</span><button onclick="removeYtVideo('${k}')">삭제</button></div>`;
+    });
+    h+='</div>';
+  }
+  area.innerHTML=h;
+}
+function addYtVideo(){
+  if(!isAdmin)return;
+  const url=document.getElementById('ytUrlInput').value.trim();
+  const title=document.getElementById('ytTitleInput').value.trim();
+  if(!url){alert('URL을 입력하세요');return;}
+  if(!extractYtId(url)){alert('올바른 YouTube URL이 아닙니다');return;}
+  const id='yt_'+Date.now();
+  dataRef.child('homeVideos/'+id).set({url,title:title||'',addedAt:Date.now()});
+  document.getElementById('ytUrlInput').value='';
+  document.getElementById('ytTitleInput').value='';
+}
+function removeYtVideo(id){
+  if(!isAdmin||!confirm('이 영상을 삭제하시겠습니까?'))return;
+  dataRef.child('homeVideos/'+id).remove();
+}
+
+// 첫 접속 시 기본 공지 생성
+function ensureDefaultNotice(){
+  if(!isAdmin)return;
+  const notices=appData.notices||{};
+  if(Object.keys(notices).length===0){
+    dataRef.child('notices/notice_default').set({
+      title:'GRIMI ARENA 사용 가이드',
+      body:'GRIMI ARENA에 오신 것을 환영합니다!\n\n• 상단 📖 가이드 버튼을 눌러 자세한 사용법을 확인하세요\n• 관리자는 팀 배정, 라운드 관리, 멤버 관리가 가능합니다\n• 게스트는 게임 현황과 순위를 실시간으로 확인할 수 있습니다\n• 전적검색에서 PUBG 닉네임을 검색하면 dak.gg에서 전적을 확인할 수 있습니다',
+      pinned:true,
+      createdAt:Date.now()
+    });
+  }
+}
+
+function renderAll(){loadTierScoresFromDB();renderEventStatus();updateTimer();renderHome();renderGame();renderTierTable();renderMembers();renderSetup();renderRanking();}
 function renderEventStatus(){const bar=document.getElementById('eventStatusBar');const r=appData.rounds||0;const d=new Date();const ds=(d.getMonth()+1)+'/'+d.getDate();if((appData.eventStatus||'idle')==='live'||Object.keys(appData.teams||{}).length>0){bar.className='event-status event-live';bar.textContent='이벤트 진행 중 · '+ds+' ('+r+'라운드)';}else{bar.className='event-status event-idle';bar.textContent='이벤트 대기 중';}}
 
 function renderGame(){
@@ -1823,6 +2248,25 @@ function endSnailRace(){
 
 // 가이드
 const GUIDE_DATA={
+  home:{title:'홈',content:`
+<h3>클랜 현황</h3>
+<p>총 멤버 수, 누적 이벤트 횟수, 현재 진행 상태, 접속자 수, 최근 우승팀을 한눈에 볼 수 있습니다.</p>
+
+<h3>공지사항</h3>
+<p><span class="g-label g-admin">관리자</span> "+ 작성" 버튼으로 공지를 등록할 수 있습니다.</p>
+<p>제목, 본문 입력 후 📌 상단 고정 여부를 선택하세요.</p>
+<p>공지를 클릭하면 내용이 펼쳐집니다.</p>
+
+<h3>전적검색</h3>
+<p>PUBG 닉네임을 입력하고 검색하면 K/D, 승률, 평균 딜량 등이 바로 표시됩니다.</p>
+<p>플랫폼(Steam/카카오)을 선택하고 검색하세요. 모드별(스쿼드/듀오/솔로) 전환도 가능합니다.</p>
+<p>아래 멤버 칩을 클릭하면 해당 멤버 전적이 바로 조회됩니다.</p>
+<p>"dak.gg 더보기"를 누르면 상세 전적 페이지로 이동합니다.</p>
+
+<h3>영상</h3>
+<p><span class="g-label g-admin">관리자</span> YouTube URL을 등록하면 임베드 플레이어로 표시됩니다.</p>
+<p>여러 영상을 등록하면 좌우 화살표로 슬라이드 전환이 가능합니다.</p>
+`},
   tier:{title:'티어표',content:`
 <h3>티어 구조</h3>
 <p class="g-tip">게스트에게는 티어표 탭이 보이지 않습니다.</p>
@@ -1951,13 +2395,13 @@ const GUIDE_DATA={
 `}
 };
 
-const GUIDE_TAB_MAP={game:'game',tier:'tier',setup:'setup',ranking:'ranking',bingo:'bingo',minigame:'minigame',members:'members'};
-let currentGuideTab='tier';
+const GUIDE_TAB_MAP={home:'home',game:'game',tier:'tier',setup:'setup',ranking:'ranking',bingo:'bingo',minigame:'minigame',members:'members'};
+let currentGuideTab='home';
 
 function openGuide(){
   const activeTab=document.querySelector('.tab.active');
   const tabKey=activeTab?activeTab.dataset.tab:'game';
-  currentGuideTab=GUIDE_TAB_MAP[tabKey]||'tier';
+  currentGuideTab=GUIDE_TAB_MAP[tabKey]||'home';
   renderGuide();
   document.getElementById('guideModal').classList.remove('hidden');
 }
