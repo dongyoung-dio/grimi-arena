@@ -74,20 +74,20 @@ input:focus,select:focus{border-color:#3b82f6;}
 @keyframes appTwinkle{0%,100%{opacity:0;transform:scale(.3)}50%{opacity:.12;transform:scale(1)}}
 
 /* ===== 홈 탭 ===== */
-.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;}
 .home-full{grid-column:1/-1;}
-.home-left{grid-column:1/2;}
-.home-right{grid-column:2/3;}
-@media(max-width:600px){.home-grid{grid-template-columns:1fr;}.home-left,.home-right{grid-column:1/-1;}}
+.home-col{display:flex;flex-direction:column;gap:12px;}
+@media(max-width:600px){.home-grid{grid-template-columns:1fr;}}
 .home-section{margin-bottom:0;}
 .home-section-title{font-size:14px;font-weight:700;color:#94a3b8;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
-.dash-grid{display:flex;flex-wrap:wrap;gap:6px;}
-.dash-card{flex:1 1 calc(16.6% - 6px);min-width:70px;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 6px;text-align:center;}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.dash-card{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 10px;text-align:center;}
+.dash-card.dash-wide{text-align:left;padding:8px 12px;}
 .dash-card .dash-label{font-size:10px;color:#64748b;margin-bottom:2px;}
 .dash-card .dash-value{font-size:18px;font-weight:800;}
 .dash-card .dash-value span{font-size:10px;color:#64748b;font-weight:400;}
-.dash-card .dash-small{font-size:13px;font-weight:700;}
-@media(max-width:400px){.dash-card{flex:1 1 calc(33% - 6px);}}
+.dash-card .dash-small{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+@media(max-width:500px){.dash-grid{grid-template-columns:1fr 1fr;}}
 /* 공지사항 */
 .notice-list{display:flex;flex-direction:column;gap:8px;}
 .notice-item{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .2s;}
@@ -109,10 +109,17 @@ input:focus,select:focus{border-color:#3b82f6;}
 .search-pubg-wrap{display:flex;gap:8px;margin-bottom:10px;}
 .search-pubg-input{flex:1;padding:10px 14px;border-radius:10px;background:#0f172a;border:1px solid #334155;color:#e2e8f0;font-size:14px;}
 .search-pubg-btn{padding:10px 16px;border:none;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap;}
-.member-chip-grid{display:flex;flex-wrap:wrap;gap:6px;}
+.member-chip-grid{margin-top:8px;}
+.chip-toolbar{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.chip-filter-input{flex:1;padding:6px 10px;border-radius:8px;background:#0f172a;border:1px solid #334155;color:#e2e8f0;font-size:12px;min-width:0;}
+.chip-filter-input::placeholder{color:#64748b;}
+.chip-toggle-btn{padding:5px 10px;border-radius:8px;background:#1e293b;border:1px solid #334155;color:#94a3b8;font-size:11px;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.chip-toggle-btn:hover{border-color:#3b82f6;color:#60a5fa;}
+.chip-list{display:flex;flex-wrap:wrap;gap:6px;}
 .member-search-chip{padding:5px 10px;border-radius:16px;background:#1e293b;border:1px solid #334155;font-size:12px;color:#94a3b8;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px;}
 .member-search-chip:hover{border-color:#3b82f6;color:#60a5fa;background:rgba(59,130,246,.08);}
 .member-search-chip .chip-avatar{font-size:14px;}
+.member-search-chip .chip-match{color:#60a5fa;text-decoration:underline;}
 /* 전적 결과 카드 */
 .pubg-result{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px;margin-top:8px;}
 .pubg-result-name{font-size:15px;font-weight:700;color:#e2e8f0;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
@@ -128,6 +135,52 @@ input:focus,select:focus{border-color:#3b82f6;}
 .pubg-error{text-align:center;color:#ef4444;padding:10px;font-size:13px;background:rgba(239,68,68,.08);border-radius:8px;margin-top:8px;}
 /* YouTube 슬라이드 */
 .yt-slide-wrap{position:relative;overflow:hidden;border-radius:12px;background:#000;}
+.map-link-grid{display:grid;grid-template-columns:1fr;gap:5px;}
+.map-link-card{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#0f172a;border:1px solid #334155;border-radius:6px;text-decoration:none;transition:border-color .2s,background .2s;cursor:pointer;}
+.map-link-card:hover{border-color:#3b82f6;background:rgba(59,130,246,.08);}
+.map-link-name{font-size:12px;font-weight:700;color:#e2e8f0;}
+.map-link-desc{font-size:10px;color:#64748b;}
+.map-link-card .map-img-icon{font-size:12px;color:#64748b;margin-left:4px;}
+.map-link-card:hover .map-img-icon{color:#60a5fa;}
+.map-modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.map-modal-overlay.active{opacity:1;pointer-events:auto;}
+.map-modal-content{position:relative;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;align-items:center;}
+.map-modal-content img{max-width:95vw;max-height:80vh;object-fit:contain;border-radius:8px;}
+.map-modal-title{color:#fff;font-size:16px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.map-modal-close{position:absolute;top:-10px;right:-10px;width:32px;height:32px;border-radius:50%;background:#1e293b;border:1px solid #475569;color:#e2e8f0;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1;}
+.map-modal-close:hover{background:#334155;}
+.map-modal-links{margin-top:8px;display:flex;gap:12px;}
+.map-modal-links a{font-size:12px;color:#60a5fa;text-decoration:none;}
+.map-modal-links a:hover{text-decoration:underline;}
+.map-modal-noimg{color:#94a3b8;font-size:14px;padding:40px 20px;text-align:center;}
+/* 카배 소식 */
+.news-cat-tabs{display:flex;gap:4px;margin-bottom:8px;}
+.news-cat-tab{padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;background:#1e293b;color:#94a3b8;border:1px solid #334155;transition:all .2s;}
+.news-cat-tab.active{color:#fff;}
+.news-cat-tab[data-cat="map"].active{background:#10b981;border-color:#10b981;}
+.news-cat-tab[data-cat="update"].active{background:#3b82f6;border-color:#3b82f6;}
+.news-cat-tab[data-cat="free"].active{background:#a78bfa;border-color:#a78bfa;}
+.news-form{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px;margin-bottom:10px;}
+.news-form label{font-size:12px;color:#94a3b8;display:block;margin-bottom:4px;margin-top:8px;}
+.news-form label:first-child{margin-top:0;}
+.news-form input,.news-form textarea,.news-form select{width:100%;padding:7px 10px;border-radius:6px;background:#1e293b;border:1px solid #334155;color:#e2e8f0;font-size:13px;box-sizing:border-box;}
+.news-form textarea{resize:vertical;min-height:60px;}
+.news-form .map-check-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.news-form .map-check-item{display:flex;align-items:center;gap:4px;font-size:12px;color:#e2e8f0;cursor:pointer;}
+.news-form .map-check-item input{width:auto;margin:0;}
+.news-item{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer;}
+.news-item .news-detail{display:none;margin-top:6px;}
+.news-item.open .news-detail{display:block;}
+.news-toggle{font-size:10px;color:#64748b;transition:transform .2s;margin-left:auto;flex-shrink:0;}
+.news-item.open .news-toggle{transform:rotate(180deg);}
+.news-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin-right:6px;}
+.news-badge.map{background:rgba(16,185,129,.15);color:#10b981;}
+.news-badge.update{background:rgba(59,130,246,.15);color:#60a5fa;}
+.news-badge.free{background:rgba(167,139,250,.15);color:#a78bfa;}
+.news-title{font-size:13px;font-weight:600;color:#e2e8f0;}
+.news-body{font-size:12px;color:#94a3b8;margin-top:4px;white-space:pre-line;}
+.news-meta{font-size:11px;color:#475569;margin-top:4px;}
+.news-del{font-size:11px;padding:2px 8px;border:none;border-radius:4px;cursor:pointer;background:rgba(239,68,68,.15);color:#ef4444;flex-shrink:0;}
 .yt-slide-inner{display:flex;transition:transform .3s ease;}
 .yt-slide-item{min-width:100%;aspect-ratio:16/9;}
 .yt-slide-item iframe{width:100%;height:100%;border:none;border-radius:12px;}
@@ -552,9 +605,8 @@ input:focus,select:focus{border-color:#3b82f6;}
   <div id="eventStatusBar" class="event-status event-idle">이벤트 대기 중</div>
   <div id="timerBar" class="timer-bar hidden"><span class="timer-display" id="timerDisplay">00:00:00</span></div>
   <div class="tabs">
-    <!-- 홈 탭: 테스트 완료 후 아래 주석 해제 -->
-    <!-- <div class="tab" data-tab="home" onclick="switchTab('home')">홈</div> -->
-    <div class="tab active" data-tab="tier" onclick="switchTab('tier')">티어표</div>
+    <div class="tab active" data-tab="home" onclick="switchTab('home')">홈</div>
+    <div class="tab" data-tab="tier" onclick="switchTab('tier')">티어표</div>
     <div class="tab" data-tab="game" onclick="switchTab('game')">게임 현황</div>
     <div class="tab" data-tab="setup" onclick="switchTab('setup')">팀 배정</div>
     <div class="tab" data-tab="ranking" onclick="switchTab('ranking')">순위/결과</div>
@@ -565,34 +617,57 @@ input:focus,select:focus{border-color:#3b82f6;}
   <div class="main">
     <!-- 홈 탭 -->
     <div id="tab-home" class="home-grid hidden">
-      <!-- 클랜 대시보드 (풀 너비) -->
+      <!-- ROW 1: 대시보드 (슬림 바) -->
       <div class="card home-section home-full" id="homeDashboard" style="padding:14px;">
         <div id="homeDashContent" class="dash-grid"></div>
       </div>
-      <!-- 공지사항 -->
-      <div class="card home-section home-left">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-          <div class="home-section-title" style="margin-bottom:0;">📢 공지사항</div>
-          <button class="btn btn-xs btn-blue guest-hide" onclick="openNoticeEditor()" style="display:none;" id="noticeAddBtn">+ 작성</button>
+      <!-- 좌우 독립 칼럼 -->
+      <div class="home-col">
+        <div class="card home-section">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div class="home-section-title" style="margin-bottom:0;">📢 공지사항</div>
+            <button class="btn btn-xs btn-blue guest-hide" onclick="openNoticeEditor()" style="display:none;" id="noticeAddBtn">+ 작성</button>
+          </div>
+          <div id="noticeEditorArea" class="hidden" style="margin-bottom:10px;"></div>
+          <div id="noticeListArea" class="notice-list"></div>
         </div>
-        <div id="noticeEditorArea" class="hidden" style="margin-bottom:10px;"></div>
-        <div id="noticeListArea" class="notice-list"></div>
-      </div>
-      <!-- 전적검색 -->
-      <div class="card home-section home-right">
-        <div class="home-section-title">🔍 전적검색</div>
-        <div class="search-pubg-wrap">
-          <input type="text" class="search-pubg-input" id="pubgSearchInput" placeholder="PUBG 닉네임 입력..." onkeydown="if(event.key==='Enter')searchPubgStats()">
-          <button class="search-pubg-btn" onclick="searchPubgStats()">검색</button>
+        <div class="card home-section">
+          <div class="home-section-title">🔍 전적검색</div>
+          <div class="search-pubg-wrap">
+            <input type="text" class="search-pubg-input" id="pubgSearchInput" placeholder="PUBG 닉네임 입력 (대소문자 구분)" onkeydown="if(event.key==='Enter')searchPubgStats()">
+            <button class="search-pubg-btn" onclick="searchPubgStats()">검색</button>
+          </div>
+          <div id="pubgResultArea"></div>
+          <div class="member-chip-grid" id="memberChipGrid"></div>
         </div>
-        <div id="pubgResultArea"></div>
-        <div class="member-chip-grid" id="memberChipGrid" style="margin-top:8px;"></div>
+        <div class="card home-section">
+          <div class="home-section-title">🗺️ 맵 정보</div>
+          <div class="map-link-grid" id="mapLinkGrid" style="grid-template-columns:1fr 1fr;"></div>
+          <div style="margin-top:6px;text-align:center;"><a href="https://pubg.inven.co.kr/dataninfo/map/erangel/" target="_blank" style="font-size:11px;color:#60a5fa;text-decoration:none;">인벤 맵 정보 →</a></div>
+          <div class="map-modal-overlay" id="mapModalOverlay" onclick="closeMapModal()">
+            <div class="map-modal-content" onclick="event.stopPropagation()">
+              <button class="map-modal-close" onclick="closeMapModal()">✕</button>
+              <div class="map-modal-title" id="mapModalTitle"></div>
+              <div id="mapModalBody"></div>
+              <div class="map-modal-links" id="mapModalLinks"></div>
+            </div>
+          </div>
+        </div>
       </div>
-      <!-- YouTube 영상 (풀 너비) -->
-      <div class="card home-section home-full">
-        <div class="home-section-title">🎬 영상</div>
-        <div id="ytAdminArea" class="hidden guest-hide"></div>
-        <div id="ytPlayerArea"></div>
+      <div class="home-col">
+        <div class="card home-section">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div class="home-section-title" style="margin-bottom:0;">📰 카배 소식</div>
+            <button class="btn btn-xs btn-blue guest-hide" onclick="toggleNewsForm()" style="display:none;" id="newsAddBtn">+ 작성</button>
+          </div>
+          <div id="newsFormArea" class="hidden"></div>
+          <div id="newsListArea"></div>
+        </div>
+        <div class="card home-section">
+          <div class="home-section-title">🎬 영상</div>
+          <div id="ytAdminArea" class="hidden guest-hide"></div>
+          <div id="ytPlayerArea"></div>
+        </div>
       </div>
     </div>
     <div id="tab-game" class="hidden">
@@ -841,7 +916,7 @@ function enterAsGuest(){isGuest=true;isAdmin=false;currentUser={id:'guest',name:
   document.getElementById('dispName').textContent='게스트';document.getElementById('userAvatarTop').textContent='👤';
   document.getElementById('roleBadge').innerHTML='<span class="badge-member">구경</span>';
   document.querySelectorAll('.tab[data-tab="members"],.tab[data-tab="setup"],.tab[data-tab="tier"]').forEach(el=>el.style.display='none');
-  switchTab('game'); // 홈 탭 테스트 완료 후 'home'으로 변경
+  switchTab('home');
   const presRef=dataRef.child('presence');const myRef=presRef.push();myRef.set({name:'게스트',type:'guest'});myRef.onDisconnect().remove();
   presRef.on('value',s=>{presenceData=s.exists()?s.val():{};updateOnlineDisplay();});
   dataRef.on('value',snap=>{appData=snap.val()||{};renderAll();});
@@ -859,7 +934,7 @@ function enterApp(id,memberData){
   const presRef=dataRef.child('presence');const myRef=presRef.push();myRef.set({name:memberData.name,id:id,type:'member'});myRef.onDisconnect().remove();
   presRef.on('value',s=>{presenceData=s.exists()?s.val():{};updateOnlineDisplay();});
   let firstLoad=true;
-  dataRef.on('value',snap=>{appData=snap.val()||{};if(appData.members&&appData.members[id]){currentUser={id,...appData.members[id]};isAdmin=appData.members[id].role==='admin';document.getElementById('userAvatarTop').textContent=appData.members[id].avatar||appData.members[id].name.charAt(0);}renderAll();if(firstLoad){firstLoad=false;ensureDefaultNotice();switchTab('tier');}});
+  dataRef.on('value',snap=>{appData=snap.val()||{};if(appData.members&&appData.members[id]){currentUser={id,...appData.members[id]};isAdmin=appData.members[id].role==='admin';document.getElementById('userAvatarTop').textContent=appData.members[id].avatar||appData.members[id].name.charAt(0);}renderAll();if(firstLoad){firstLoad=false;ensureDefaultNotice();ensureDefaultNews();ensureDefaultPubgNicks();switchTab('home');}});
 }
 function logout(){localStorage.removeItem('grimi_kill_user');isGuest=false;location.reload();}
 function switchTab(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));['home','game','tier','members','setup','ranking','bingo','minigame'].forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});window.scrollTo(0,0);if(tab==='home')renderHome();if(tab==='minigame')drawMarbleBoard();if(tab==='bingo'){const f=document.getElementById('bingoFrame');if(!f.getAttribute('src'))f.src='bingo.html'+(isGuest?'?guest=1':'');}}
@@ -887,12 +962,30 @@ function changeMyPin(){
 }
 
 // 멤버 CRUD
-function addMember(){if(!isAdmin)return;const name=document.getElementById('addMemberName').value.trim();const tier=parseInt(document.getElementById('addMemberTier').value);const subTier=document.getElementById('addMemberSubTier').value;if(!name)return;const members=appData.members||{};const dup=Object.values(members).some(m=>m.name===name);if(dup){alert('이미 같은 이름의 멤버가 있습니다.');return;}const id=name.replace(/[.#$/\[\]]/g,'_');dataRef.child('members/'+id).set({name,tier,subTier,role:'member',pin:'0000'});document.getElementById('addMemberName').value='';}
+function addMember(){if(!isAdmin)return;const name=document.getElementById('addMemberName').value.trim();const tier=parseInt(document.getElementById('addMemberTier').value);const subTier=document.getElementById('addMemberSubTier').value;const pubgNick=(document.getElementById('addMemberPubgNick')?.value||'').trim();if(!name)return;const members=appData.members||{};const dup=Object.values(members).some(m=>m.name===name);if(dup){alert('이미 같은 이름의 멤버가 있습니다.');return;}const id=name.replace(/[.#$/\[\]]/g,'_');const mData={name,tier,subTier,role:'member',pin:'0000'};if(pubgNick)mData.pubgNick=pubgNick;dataRef.child('members/'+id).set(mData);document.getElementById('addMemberName').value='';if(document.getElementById('addMemberPubgNick'))document.getElementById('addMemberPubgNick').value='';}
 function removeMember(id,name){if(!isAdmin||!confirm(name+' 삭제?'))return;dataRef.child('members/'+id).remove();}
 function changeTier(id,tier){if(!isAdmin)return;dataRef.child('members/'+id+'/tier').set(parseInt(tier));}
 function changeSubTier(id,sub){if(!isAdmin)return;dataRef.child('members/'+id+'/subTier').set(sub);}
 function changeRole(id,role){if(!isAdmin)return;dataRef.child('members/'+id+'/role').set(role);}
 function toggleHidden(id,hidden){if(!isAdmin)return;dataRef.child('members/'+id+'/hidden').set(hidden||null);}
+function savePubgNick(id,nick){if(!isAdmin)return;dataRef.child('members/'+id+'/pubgNick').set(nick.trim()||null,()=>{alert(nick.trim()?'PUBG 닉네임 저장 완료':'PUBG 닉네임 삭제 완료');});}
+function saveAllPubgNicks(){
+  if(!isAdmin)return;
+  const members=appData.members||{};
+  const updates={};let count=0;
+  Object.keys(members).forEach(id=>{
+    const el=document.getElementById('pnick_'+id);
+    if(el){
+      const val=el.value.trim();
+      const old=members[id].pubgNick||'';
+      if(val!==old){updates['members/'+id+'/pubgNick']=val||null;count++;}
+    }
+  });
+  if(!count){alert('변경된 닉네임이 없습니다.');return;}
+  if(!confirm(count+'명의 PUBG 닉네임을 저장하시겠습니까?'))return;
+  dataRef.update(updates);
+  alert(count+'명 저장 완료');
+}
 function resetPin(id,name){if(!isAdmin||!confirm(name+' PIN 초기화?'))return;dataRef.child('members/'+id+'/pin').set('0000');}
 
 // 참가자
@@ -1194,10 +1287,14 @@ function renderHome(){
   renderDashboard();
   renderNotices();
   renderMemberChips();
+  renderMapGrid();
   renderYouTube();
+  renderNews();
   // 관리자 버튼 표시
   const addBtn=document.getElementById('noticeAddBtn');
   if(addBtn)addBtn.style.display=isAdmin?'':'none';
+  const newsBtn=document.getElementById('newsAddBtn');
+  if(newsBtn)newsBtn.style.display=isAdmin?'':'none';
   const ytAdmin=document.getElementById('ytAdminArea');
   if(ytAdmin){ytAdmin.classList.toggle('hidden',!isAdmin);if(isAdmin)renderYtAdmin();}
 }
@@ -1208,28 +1305,39 @@ function renderDashboard(){
   const members=appData.members||{};
   const mCount=Object.keys(members).length;
   const history=appData.history||{};
-  const hCount=Object.keys(history).length;
-  const evStatus=appData.eventStatus||'idle';
-  const online=Object.keys(presenceData).length;
-  const statusLabel=evStatus==='active'?'🟢 진행 중':'⏸️ 대기';
-  const statusColor=evStatus==='active'?'#10b981':'#64748b';
-  // 최근 우승팀
-  const hKeys=Object.keys(history).sort((a,b)=>parseInt(b.replace('event_',''))-parseInt(a.replace('event_','')));
-  let lastWinner='-';
-  if(hKeys.length>0){
-    const last=history[hKeys[0]];
-    if(last&&last.ranking){
-      const ranked=Object.entries(last.ranking).sort((a,b)=>(a[1].rank||99)-(b[1].rank||99));
-      if(ranked.length>0)lastWinner='🏆 '+ranked[0][0].replace('team_','')+'팀';
-    }
+  let chickenName='-',effName='-',killName='-',dmgName='-';
+  const hAll=Object.values(history);
+  const totalEvents=hAll.length;
+  if(totalEvents>0){
+    const winCount={},effData={},killData={},dmgData={};
+    hAll.forEach(ev=>{
+      const ps=ev.playerScores||{};
+      Object.entries(ps).forEach(([mid,p])=>{
+        if(p.rank===1){winCount[p.name]=(winCount[p.name]||0)+1;}
+        if(p.score&&p.target){
+          if(!effData[p.name])effData[p.name]={total:0,cnt:0};
+          effData[p.name].total+=(p.score/p.target);effData[p.name].cnt++;
+        }
+        killData[p.name]=(killData[p.name]||0)+(p.kills||0);
+        dmgData[p.name]=(dmgData[p.name]||0)+(p.damage||0);
+      });
+    });
+    const topWin=Object.entries(winCount).sort((a,b)=>b[1]-a[1])[0];
+    if(topWin)chickenName=`${topWin[0]} <span style="color:#64748b;font-size:11px;">${topWin[1]}회</span>`;
+    const topEff=Object.entries(effData).map(([n,d])=>({n,avg:d.total/d.cnt})).sort((a,b)=>b.avg-a.avg)[0];
+    if(topEff)effName=`${topEff.n} <span style="color:#64748b;font-size:11px;">${Math.round(topEff.avg*100)}%</span>`;
+    const topKill=Object.entries(killData).sort((a,b)=>b[1]-a[1])[0];
+    if(topKill)killName=`${topKill[0]} <span style="color:#64748b;font-size:11px;">${topKill[1]}킬</span>`;
+    const topDmg=Object.entries(dmgData).sort((a,b)=>b[1]-a[1])[0];
+    if(topDmg)dmgName=`${topDmg[0]} <span style="color:#64748b;font-size:11px;">${topDmg[1]}</span>`;
   }
   el.innerHTML=`
     <div class="dash-card"><div class="dash-label">멤버</div><div class="dash-value" style="color:#60a5fa;">${mCount}<span>명</span></div></div>
-    <div class="dash-card"><div class="dash-label">이벤트</div><div class="dash-value" style="color:#a78bfa;">${hCount}<span>회</span></div></div>
-    <div class="dash-card"><div class="dash-label">접속</div><div class="dash-value" style="color:#10b981;">${online}<span>명</span></div></div>
-    <div class="dash-card"><div class="dash-label">상태</div><div class="dash-small" style="color:${statusColor};">${statusLabel}</div></div>
-    <div class="dash-card"><div class="dash-label">최근 우승</div><div class="dash-small" style="color:#fbbf24;">${lastWinner}</div></div>
-    <div class="dash-card" style="cursor:pointer;" onclick="switchTab('ranking')"><div class="dash-label">기록</div><div class="dash-small" style="color:#94a3b8;">→ 보기</div></div>
+    <div class="dash-card"><div class="dash-label">이벤트</div><div class="dash-value" style="color:#a78bfa;">${totalEvents}<span>회</span></div></div>
+    <div class="dash-card"><div class="dash-label">🍗 치킨왕</div><div style="font-size:13px;font-weight:700;color:#fbbf24;">${chickenName}</div></div>
+    <div class="dash-card"><div class="dash-label">⚡ 효율왕</div><div style="font-size:13px;font-weight:700;color:#a78bfa;">${effName}</div></div>
+    <div class="dash-card"><div class="dash-label">🔫 킬왕</div><div style="font-size:13px;font-weight:700;color:#f87171;">${killName}</div></div>
+    <div class="dash-card"><div class="dash-label">💥 딜왕</div><div style="font-size:13px;font-weight:700;color:#fb923c;">${dmgName}</div></div>
   `;
 }
 
@@ -1296,6 +1404,20 @@ function deleteNotice(id){
 const PUBG_WORKER_URL='https://pubg-proxy.kimdy220.workers.dev';
 let pubgCache={};
 let pubgCurrentData=null;
+let pubgCurrentSeason=null; // 현재 시즌 ID 캐시
+
+async function getPubgCurrentSeason(){
+  if(pubgCurrentSeason)return pubgCurrentSeason;
+  try{
+    const res=await fetch(`${PUBG_WORKER_URL}/shards/steam/seasons`);
+    if(res.ok){
+      const d=await res.json();
+      const cur=d.data.find(s=>s.attributes.isCurrentSeason);
+      if(cur){pubgCurrentSeason=cur.id;return pubgCurrentSeason;}
+    }
+  }catch(e){}
+  return null;
+}
 
 async function searchPubgStats(nickOverride){
   const nick=nickOverride||document.getElementById('pubgSearchInput').value.trim();
@@ -1305,7 +1427,7 @@ async function searchPubgStats(nickOverride){
 
   // 워커 미설정 시 dak.gg로 바로 이동
   if(!PUBG_WORKER_URL){
-    window.open('https://dak.gg/pubg/profile/'+encodeURIComponent(nick),'_blank');
+    window.open('https://dak.gg/pubg/profile/kakao/'+encodeURIComponent(nick.toLowerCase()),'_blank');
     return;
   }
 
@@ -1313,70 +1435,139 @@ async function searchPubgStats(nickOverride){
   // 캐시 확인 (5분)
   if(pubgCache[cacheKey]&&Date.now()-pubgCache[cacheKey].ts<300000){
     pubgCurrentData=pubgCache[cacheKey].data;
-    renderPubgResult(nick);return;
+    renderPubgResult(pubgCache[cacheKey].displayName);return;
   }
 
   area.innerHTML='<div class="pubg-loading">전적 조회 중...</div>';
 
   try{
     // 1) 플레이어 검색 — steam 먼저, 실패 시 kakao 시도
-    let pRes=null,pData=null,shard='steam';
-    const shards=['steam','kakao'];
-    for(const sh of shards){
-      pRes=await fetch(`${PUBG_WORKER_URL}/shards/${sh}/players?filter[playerNames]=${encodeURIComponent(nick)}`);
-      if(pRes.ok){shard=sh;pData=await pRes.json();break;}
+    let pData=null;
+    for(const sh of ['steam','kakao']){
+      const pRes=await fetch(`${PUBG_WORKER_URL}/shards/${sh}/players?filter[playerNames]=${encodeURIComponent(nick)}`);
+      if(pRes.ok){pData=await pRes.json();break;}
+      if(pRes.status===429){area.innerHTML='<div class="pubg-error">API 호출 제한 초과. 1분 후 다시 시도하세요.</div>';return;}
     }
     if(!pData){
-      area.innerHTML=`<div class="pubg-error">플레이어를 찾을 수 없습니다. 대소문자를 정확히 입력해주세요. <a href="https://dak.gg/pubg/profile/${encodeURIComponent(nick)}" target="_blank" style="color:#60a5fa;margin-left:6px;">dak.gg에서 확인</a></div>`;return;
+      area.innerHTML=`<div class="pubg-error">플레이어를 찾을 수 없습니다. 대소문자를 정확히 입력해주세요. <a href="https://dak.gg/pubg/profile/kakao/${encodeURIComponent(nick.toLowerCase())}" target="_blank" style="color:#60a5fa;margin-left:6px;">dak.gg에서 확인</a></div>`;return;
     }
-    if(pRes.status===429){area.innerHTML='<div class="pubg-error">API 호출 제한 초과. 1분 후 다시 시도하세요.</div>';return;}
     const playerId=pData.data[0].id;
+    const displayName=pData.data[0].attributes.name;
 
-    // 2) 시즌 통계 (lifetime)
-    const sRes=await fetch(`${PUBG_WORKER_URL}/shards/${shard}/players/${playerId}/seasons/lifetime`);
-    if(!sRes.ok){area.innerHTML='<div class="pubg-error">전적 데이터를 불러올 수 없습니다.</div>';return;}
-    const sData=await sRes.json();
+    // 2) 현재 시즌 ID 가져오기
+    const seasonId=await getPubgCurrentSeason();
 
-    pubgCurrentData={stats:sData.data.attributes.gameModeStats,name:pData.data[0].attributes.name};
-    pubgCache[cacheKey]={data:pubgCurrentData,ts:Date.now()};
-    renderPubgResult(pData.data[0].attributes.name);
+    // 3) 일반전 + 경쟁전 조회 (kakao 우선, 최소 호출)
+    let stats=null,rankedStats=null,statsShard='kakao';
+
+    // kakao 현재시즌 먼저 시도 (대부분 여기서 잡힘)
+    if(seasonId){
+      try{
+        const sRes=await fetch(`${PUBG_WORKER_URL}/shards/kakao/players/${playerId}/seasons/${seasonId}`);
+        if(sRes.ok){
+          const sData=await sRes.json();
+          const gms=sData.data.attributes.gameModeStats;
+          if(Object.values(gms).some(m=>m&&m.roundsPlayed>0)){stats=gms;statsShard='kakao';}
+        }
+      }catch(e){}
+      // kakao에 없으면 steam 시도
+      if(!stats){
+        try{
+          const sRes=await fetch(`${PUBG_WORKER_URL}/shards/steam/players/${playerId}/seasons/${seasonId}`);
+          if(sRes.ok){
+            const sData=await sRes.json();
+            const gms=sData.data.attributes.gameModeStats;
+            if(Object.values(gms).some(m=>m&&m.roundsPlayed>0)){stats=gms;statsShard='steam';}
+          }
+        }catch(e){}
+      }
+    }
+
+    // 경쟁전 조회 (일반전 찾은 shard 우선, 1회만)
+    if(seasonId){
+      try{
+        const rRes=await fetch(`${PUBG_WORKER_URL}/shards/${statsShard}/players/${playerId}/seasons/${seasonId}/ranked`);
+        if(rRes.ok){
+          const rData=await rRes.json();
+          const rgms=rData.data.attributes.rankedGameModeStats;
+          if(rgms&&Object.values(rgms).some(m=>m&&m.roundsPlayed>0)){rankedStats=rgms;}
+        }
+      }catch(e){}
+    }
+
+    const dakggUrl=`https://dak.gg/pubg/profile/${statsShard}/${encodeURIComponent(displayName.toLowerCase())}`;
+
+    if(!stats&&!rankedStats){
+      area.innerHTML=`<div class="pubg-error">전적 데이터가 없습니다. <a href="${dakggUrl}" target="_blank" style="color:#60a5fa;">dak.gg에서 확인</a></div>`;return;
+    }
+
+    const seasonLabel=seasonId?'시즌 '+seasonId.replace(/.*-(\d+)$/,'$1'):'통산';
+    pubgCurrentData={stats,rankedStats,name:displayName,seasonLabel,dakggUrl};
+    pubgCache[cacheKey]={data:pubgCurrentData,displayName,ts:Date.now()};
+    renderPubgResult(displayName);
 
   }catch(e){
-    // 실패 시 dak.gg 폴백
-    area.innerHTML=`<div class="pubg-error">API 연결 실패. <a href="https://dak.gg/pubg/profile/${encodeURIComponent(nick)}" target="_blank" style="color:#60a5fa;">dak.gg에서 전적 확인</a></div>`;
+    area.innerHTML=`<div class="pubg-error">API 연결 실패. <a href="https://dak.gg/pubg/profile/kakao/${encodeURIComponent(nick.toLowerCase())}" target="_blank" style="color:#60a5fa;">dak.gg에서 전적 확인</a></div>`;
   }
 }
 
 function renderPubgResult(nick){
   const area=document.getElementById('pubgResultArea');if(!area||!pubgCurrentData)return;
-  const stats=pubgCurrentData.stats;
-  const modes=[
-    {key:'squad-fpp',label:'스쿼드 FPP'},
-    {key:'squad',label:'스쿼드 TPP'},
-    {key:'duo-fpp',label:'듀오 FPP'},
-    {key:'duo',label:'듀오 TPP'},
-    {key:'solo-fpp',label:'솔로 FPP'},
-    {key:'solo',label:'솔로 TPP'}
-  ];
-  // 데이터 있는 모드만 필터
-  const avail=modes.filter(m=>stats[m.key]&&stats[m.key].roundsPlayed>0);
-  if(!avail.length){area.innerHTML='<div class="pubg-error">전적 데이터가 없습니다.</div>';return;}
+  const isRanked=(area.dataset.matchType==='ranked');
+  const curStats=isRanked?pubgCurrentData.rankedStats:pubgCurrentData.stats;
 
-  // 기본: 첫 번째 유효 모드
+  if(!curStats){
+    if(isRanked){area.dataset.matchType='normal';renderPubgResult(nick);return;}
+    area.innerHTML='<div class="pubg-error">전적 데이터가 없습니다.</div>';return;
+  }
+
+  const normalModes=[
+    {key:'squad-fpp',label:'스쿼드 FPP'},{key:'squad',label:'스쿼드 TPP'},
+    {key:'duo-fpp',label:'듀오 FPP'},{key:'duo',label:'듀오 TPP'},
+    {key:'solo-fpp',label:'솔로 FPP'},{key:'solo',label:'솔로 TPP'}
+  ];
+  const rankedModes=[
+    {key:'squad-fpp',label:'스쿼드 FPP'},{key:'squad',label:'스쿼드 TPP'},
+    {key:'duo-fpp',label:'듀오 FPP'},{key:'duo',label:'듀오 TPP'},
+    {key:'solo-fpp',label:'솔로 FPP'},{key:'solo',label:'솔로 TPP'}
+  ];
+  const modes=isRanked?rankedModes:normalModes;
+  const avail=modes.filter(m=>curStats[m.key]&&curStats[m.key].roundsPlayed>0);
+  if(!avail.length){
+    if(isRanked){area.dataset.matchType='normal';renderPubgResult(nick);return;}
+    area.innerHTML='<div class="pubg-error">전적 데이터가 없습니다.</div>';return;
+  }
+
   const activeMode=area.dataset.mode&&avail.find(m=>m.key===area.dataset.mode)?area.dataset.mode:avail[0].key;
   area.dataset.mode=activeMode;
-  const s=stats[activeMode];
+  const s=curStats[activeMode];
 
-  const kills=s.kills||0,assists=s.assists||0,rounds=s.roundsPlayed||1;
-  const kd=(kills/(Math.max(1,s.losses||rounds-s.wins))).toFixed(2);
+  const kills=s.kills||0,rounds=s.roundsPlayed||1;
+  const kd=(kills/(Math.max(1,s.losses||rounds-(s.wins||0)))).toFixed(2);
   const winRate=((s.wins||0)/rounds*100).toFixed(1);
-  const avgDmg=(s.damageDealt/rounds).toFixed(0);
+  const avgDmg=((s.damageDealt||0)/rounds).toFixed(0);
   const top10Rate=((s.top10s||0)/rounds*100).toFixed(1);
-  const avgKills=(kills/rounds).toFixed(1);
   const longestKill=(s.longestKill||0).toFixed(0);
+  const avgRank=(s.avgRank||(rounds>0?((s.rankPoints||0)/rounds):0)).toFixed(1);
+
+  const cacheEntry=pubgCache[nick.toLowerCase()]||pubgCache[pubgCurrentData.name.toLowerCase()];
+  const queryTime=cacheEntry?new Date(cacheEntry.ts).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+  const seasonInfo=pubgCurrentData.seasonLabel||'';
 
   let h=`<div class="pubg-result">`;
-  h+=`<div class="pubg-result-name"><span>${escHtml(pubgCurrentData.name)}</span><a href="https://dak.gg/pubg/profile/${encodeURIComponent(nick)}" target="_blank">dak.gg 더보기 →</a></div>`;
+  const dakUrl=pubgCurrentData.dakggUrl||`https://dak.gg/pubg/profile/kakao/${encodeURIComponent(nick.toLowerCase())}`;
+  h+=`<div class="pubg-result-name"><span>${escHtml(pubgCurrentData.name)}</span><span style="font-size:12px;color:#94a3b8;font-weight:400;margin-left:8px;">${seasonInfo} · ${queryTime}</span><a href="${dakUrl}" target="_blank">dak.gg →</a></div>`;
+
+  // 일반전/경쟁전 탭
+  const hasNormal=pubgCurrentData.stats&&Object.values(pubgCurrentData.stats).some(m=>m&&m.roundsPlayed>0);
+  const hasRanked=pubgCurrentData.rankedStats&&Object.values(pubgCurrentData.rankedStats).some(m=>m&&m.roundsPlayed>0);
+  if(hasNormal||hasRanked){
+    h+=`<div style="display:flex;gap:4px;margin-bottom:6px;">`;
+    if(hasNormal)h+=`<div onclick="document.getElementById('pubgResultArea').dataset.matchType='normal';document.getElementById('pubgResultArea').dataset.mode='';renderPubgResult('${nick.replace(/'/g,"\\'")}')" style="padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;${!isRanked?'background:#3b82f6;color:#fff;':'background:#1e293b;color:#94a3b8;border:1px solid #334155;'}">일반전</div>`;
+    if(hasRanked)h+=`<div onclick="document.getElementById('pubgResultArea').dataset.matchType='ranked';document.getElementById('pubgResultArea').dataset.mode='';renderPubgResult('${nick.replace(/'/g,"\\'")}')" style="padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;${isRanked?'background:#f59e0b;color:#000;':'background:#1e293b;color:#94a3b8;border:1px solid #334155;'}">경쟁전</div>`;
+    h+=`</div>`;
+  }
+
   // 모드 탭
   h+=`<div class="pubg-mode-tabs">`;
   avail.forEach(m=>{h+=`<div class="pubg-mode-tab ${m.key===activeMode?'active':''}" onclick="switchPubgMode('${m.key}')">${m.label}</div>`;});
@@ -1387,10 +1578,17 @@ function renderPubgResult(nick){
   h+=`<div class="pubg-stat"><div class="pubg-stat-label">승률</div><div class="pubg-stat-value" style="color:#10b981;">${winRate}%</div></div>`;
   h+=`<div class="pubg-stat"><div class="pubg-stat-label">평균 딜량</div><div class="pubg-stat-value" style="color:#60a5fa;">${avgDmg}</div></div>`;
   h+=`<div class="pubg-stat"><div class="pubg-stat-label">TOP 10</div><div class="pubg-stat-value" style="color:#a78bfa;">${top10Rate}%</div></div>`;
-  h+=`<div class="pubg-stat"><div class="pubg-stat-label">평균 킬</div><div class="pubg-stat-value">${avgKills}</div></div>`;
-  h+=`<div class="pubg-stat"><div class="pubg-stat-label">최장 킬</div><div class="pubg-stat-value">${longestKill}m</div></div>`;
+  h+=`<div class="pubg-stat"><div class="pubg-stat-label">게임수</div><div class="pubg-stat-value">${rounds}</div></div>`;
+  if(isRanked){
+    h+=`<div class="pubg-stat"><div class="pubg-stat-label">평균 등수</div><div class="pubg-stat-value">${avgRank}</div></div>`;
+  }else{
+    h+=`<div class="pubg-stat"><div class="pubg-stat-label">최장 킬</div><div class="pubg-stat-value">${longestKill}m</div></div>`;
+  }
   h+=`</div>`;
-  h+=`<div style="margin-top:6px;font-size:11px;color:#64748b;text-align:right;">${rounds}게임 · ${kills}킬 · ${s.wins||0}승</div>`;
+  h+=`<div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">`;
+  h+=`<button onclick="pubgCache['${pubgCurrentData.name.toLowerCase()}']=null;searchPubgStats('${pubgCurrentData.name.replace(/'/g,"\\'")}')" style="background:none;border:1px solid #334155;color:#94a3b8;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;">↻ 새로고침</button>`;
+  h+=`<div style="font-size:12px;color:#94a3b8;">${kills}킬 · ${s.wins||0}승</div>`;
+  h+=`</div>`;
   h+=`</div>`;
   area.innerHTML=h;
 }
@@ -1402,15 +1600,321 @@ function switchPubgMode(mode){
   renderPubgResult(nick);
 }
 
+let chipExpanded=false;
+let chipFilterText='';
+let chipRandomIds=[];
+
+function shuffleArray(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+
+function getChipSortedIds(ids,members,filterText){
+  const sorted=[...ids].sort((a,b)=>members[a].name.localeCompare(members[b].name,'ko'));
+  if(!filterText)return sorted;
+  const q=filterText.toLowerCase();
+  const match=sorted.filter(id=>members[id].name.toLowerCase().includes(q)||members[id].pubgNick.toLowerCase().includes(q));
+  return match;
+}
+
 function renderMemberChips(){
   const grid=document.getElementById('memberChipGrid');if(!grid)return;
   const members=appData.members||{};
   const ids=Object.keys(members).filter(id=>!members[id].hidden);
-  grid.innerHTML=ids.map(id=>{
-    const m=members[id];const av=getAvatar(m);
-    return `<div class="member-search-chip" onclick="document.getElementById('pubgSearchInput').value='${m.name.replace(/'/g,"\\'")}';searchPubgStats('${m.name.replace(/'/g,"\\'")}')">
-      ${av?'<span class="chip-avatar">'+av+'</span>':''}<span>${m.name}</span></div>`;
+  const withNick=ids.filter(id=>members[id].pubgNick);
+
+  if(!withNick.length){
+    grid.innerHTML='<div style="text-align:center;padding:10px;font-size:13px;color:#94a3b8;">멤버 관리에서 PUBG 닉네임을 등록하면 바로 조회할 수 있어요</div>';
+    return;
+  }
+
+  const allSorted=getChipSortedIds(withNick,members,'');
+  if(!chipRandomIds.length||chipRandomIds.some(id=>!withNick.includes(id))){
+    chipRandomIds=shuffleArray([...withNick]).slice(0,10);
+  }
+
+  let h='';
+  h+='<div class="chip-toolbar">';
+  h+='<input type="text" class="chip-filter-input" placeholder="멤버 검색..." value="'+chipFilterText.replace(/"/g,'&quot;')+'" oninput="chipFilterText=this.value;renderChipList()" id="chipFilterInput">';
+  const remaining=withNick.length-(chipExpanded?0:Math.min(chipRandomIds.length,withNick.length));
+  if(!chipFilterText){
+    if(!chipExpanded){
+      h+='<button class="chip-toggle-btn" onclick="chipExpanded=true;renderChipList()">외 '+remaining+'명 ▼</button>';
+    } else {
+      h+='<button class="chip-toggle-btn" onclick="chipExpanded=false;renderChipList()">접기 ▲</button>';
+    }
+  }
+  h+='</div>';
+  h+='<div class="chip-list" id="chipListInner"></div>';
+  grid.innerHTML=h;
+  renderChipList();
+}
+
+function renderChipList(){
+  const inner=document.getElementById('chipListInner');if(!inner)return;
+  const members=appData.members||{};
+  const ids=Object.keys(members).filter(id=>!members[id].hidden);
+  const withNick=ids.filter(id=>members[id].pubgNick);
+
+  let displayIds;
+  const q=chipFilterText.trim();
+
+  if(q){
+    displayIds=getChipSortedIds(withNick,members,q);
+  } else if(chipExpanded){
+    displayIds=getChipSortedIds(withNick,members,'');
+  } else {
+    displayIds=chipRandomIds.filter(id=>withNick.includes(id));
+  }
+
+  const toggleBtn=document.querySelector('.chip-toggle-btn');
+  if(toggleBtn){
+    if(q){
+      toggleBtn.style.display='none';
+    } else {
+      toggleBtn.style.display='';
+      const previewCount=chipRandomIds.filter(id=>withNick.includes(id)).length;
+      const remaining=withNick.length-previewCount;
+      if(!chipExpanded){
+        toggleBtn.textContent='외 '+remaining+'명 ▼';
+        toggleBtn.onclick=()=>{chipExpanded=true;renderChipList();};
+      } else {
+        toggleBtn.textContent='접기 ▲';
+        toggleBtn.onclick=()=>{chipExpanded=false;renderChipList();};
+      }
+    }
+  }
+
+  let h='';
+  displayIds.forEach(id=>{
+    const m=members[id];const av=getAvatar(m);const nick=m.pubgNick;
+    let nameHtml=m.name;
+    if(q){
+      const idx=m.name.toLowerCase().indexOf(q.toLowerCase());
+      if(idx>=0){
+        nameHtml=m.name.substring(0,idx)+'<span class="chip-match">'+m.name.substring(idx,idx+q.length)+'</span>'+m.name.substring(idx+q.length);
+      }
+    }
+    h+=`<div class="member-search-chip" onclick="document.getElementById('pubgSearchInput').value='${nick.replace(/'/g,"\\'")}';searchPubgStats('${nick.replace(/'/g,"\\'")}')">
+      ${av?'<span class="chip-avatar">'+av+'</span>':''}<span>${nameHtml}</span></div>`;
+  });
+
+  if(q&&!displayIds.length){
+    h='<div style="font-size:12px;color:#64748b;padding:4px;">일치하는 멤버가 없습니다</div>';
+  }
+  inner.innerHTML=h;
+}
+
+// -- 맵 정보 --
+const MAP_DATA=[
+  {id:'erangel',name:'에란겔',size:'8×8',img:'maps/erangel.jpg',inven:'https://pubg.inven.co.kr/dataninfo/map/erangel/'},
+  {id:'miramar',name:'미라마',size:'8×8',img:'maps/miramar.jpg',inven:'https://pubg.inven.co.kr/dataninfo/map/miramar/'},
+  {id:'taego',name:'테이고',size:'8×8',img:'maps/taego.jpg',inven:'https://pubg.inven.co.kr/dataninfo/map/taego/'},
+  {id:'sanhok',name:'사녹',size:'4×4',img:null,inven:'https://pubg.inven.co.kr/dataninfo/map/sanhok/'},
+  {id:'vikendi',name:'비켄디',size:'6×6',img:'maps/vikendi.jpg',inven:'https://pubg.inven.co.kr/dataninfo/map/vikendi/'},
+  {id:'deston',name:'데스턴',size:'8×8',img:'maps/deston.jpg',inven:null},
+  {id:'rondo',name:'론도',size:'8×8',img:'maps/rondo.png',inven:null},
+  {id:'karakin',name:'카라킨',size:'2×2',img:null,inven:'https://pubg.inven.co.kr/dataninfo/map/karakin/'},
+  {id:'paramo',name:'파라모',size:'3×3',img:null,inven:'https://pubg.inven.co.kr/dataninfo/map/paramo/'},
+  {id:'haven',name:'헤이본',size:'1×1',img:null,inven:'https://pubg.inven.co.kr/dataninfo/map/haven/'}
+];
+
+function renderMapGrid(){
+  const grid=document.getElementById('mapLinkGrid');if(!grid)return;
+  grid.innerHTML=MAP_DATA.map(m=>{
+    const hasImg=!!m.img;
+    if(hasImg){
+      return `<div class="map-link-card" onclick="openMapModal('${m.id}')">
+        <div class="map-link-name">${m.name}</div>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <span class="map-img-icon">🖼</span>
+          <div class="map-link-desc">${m.size}</div>
+        </div>
+      </div>`;
+    } else if(m.inven){
+      return `<a href="${m.inven}" target="_blank" class="map-link-card">
+        <div class="map-link-name">${m.name}</div>
+        <div class="map-link-desc">${m.size}</div>
+      </a>`;
+    } else {
+      return `<div class="map-link-card" style="opacity:.5;cursor:default;">
+        <div class="map-link-name">${m.name}</div>
+        <div class="map-link-desc">${m.size}</div>
+      </div>`;
+    }
   }).join('');
+}
+
+function openMapModal(mapId){
+  const m=MAP_DATA.find(d=>d.id===mapId);if(!m)return;
+  const overlay=document.getElementById('mapModalOverlay');
+  document.getElementById('mapModalTitle').textContent=m.name+' ('+m.size+')';
+  let bodyH='';
+  if(m.img){
+    bodyH=`<img src="${m.img}" alt="${m.name} 맵" onerror="this.outerHTML='<div class=\\'map-modal-noimg\\'>이미지 파일이 아직 없습니다<br><span style=\\'font-size:12px;color:#64748b;\\'>${m.img} 파일을 추가해주세요</span></div>'">`;
+  } else {
+    bodyH='<div class="map-modal-noimg">이미지가 등록되지 않은 맵입니다</div>';
+  }
+  document.getElementById('mapModalBody').innerHTML=bodyH;
+  let linksH='';
+  if(m.inven)linksH+=`<a href="${m.inven}" target="_blank">인벤 맵 정보 →</a>`;
+  document.getElementById('mapModalLinks').innerHTML=linksH;
+  overlay.classList.add('active');
+  document.body.style.overflow='hidden';
+}
+
+function closeMapModal(){
+  document.getElementById('mapModalOverlay').classList.remove('active');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMapModal();});
+
+// -- 카배 소식 --
+const PUBG_MAPS=['에란겔','미라마','테이고','사녹','비켄디','카라킨','파라모','헤이본','론도','데스턴'];
+let newsFormCat='map',newsMapWeeks=[{from:'',to:'',fixed:['에란겔','테이고','사녹'],rotation:[]}];
+
+function toggleNewsForm(){
+  const area=document.getElementById('newsFormArea');if(!area)return;
+  if(!area.classList.contains('hidden')){area.classList.add('hidden');return;}
+  newsFormCat='map';newsMapWeeks=[{from:'',to:'',fixed:['에란겔','테이고','사녹'],rotation:[]}];
+  renderNewsForm();area.classList.remove('hidden');
+}
+function switchNewsCat(cat){newsFormCat=cat;renderNewsForm();}
+
+function renderNewsForm(){
+  const area=document.getElementById('newsFormArea');if(!area)return;
+  let h=`<div class="news-form">`;
+  h+=`<div class="news-cat-tabs">`;
+  h+=`<div class="news-cat-tab ${newsFormCat==='map'?'active':''}" data-cat="map" onclick="switchNewsCat('map')">🗺️ 맵 로테이션</div>`;
+  h+=`<div class="news-cat-tab ${newsFormCat==='update'?'active':''}" data-cat="update" onclick="switchNewsCat('update')">📦 업데이트</div>`;
+  h+=`<div class="news-cat-tab ${newsFormCat==='free'?'active':''}" data-cat="free" onclick="switchNewsCat('free')">📝 자유</div>`;
+  h+=`</div>`;
+
+  if(newsFormCat==='map'){
+    h+=`<label>업데이트 버전</label><input type="text" id="newsMapVer" placeholder="예: 41.1">`;
+    h+=`<label>주차별 일반 매치 <button class="btn btn-xs btn-gray" onclick="newsMapWeeks.push({from:'',to:'',fixed:['에란겔','테이고','사녹'],rotation:[]});renderNewsForm()" style="margin-left:6px;">+ 주차 추가</button></label>`;
+    newsMapWeeks.forEach((w,i)=>{
+      h+=`<div style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:8px;margin-bottom:6px;">`;
+      h+=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">`;
+      h+=`<span style="font-size:12px;font-weight:700;color:#60a5fa;">${i+1}주차</span>`;
+      h+=`<input type="date" value="${w.from}" onchange="newsMapWeeks[${i}].from=this.value" style="flex:1;padding:4px 6px;border-radius:4px;background:#1e293b;border:1px solid #334155;color:#e2e8f0;font-size:11px;">`;
+      h+=`<span style="color:#64748b;font-size:11px;">~</span>`;
+      h+=`<input type="date" value="${w.to}" onchange="newsMapWeeks[${i}].to=this.value" style="flex:1;padding:4px 6px;border-radius:4px;background:#1e293b;border:1px solid #334155;color:#e2e8f0;font-size:11px;">`;
+      if(newsMapWeeks.length>1)h+=`<button onclick="newsMapWeeks.splice(${i},1);renderNewsForm()" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:14px;">✕</button>`;
+      h+=`</div>`;
+      h+=`<div style="font-size:11px;color:#64748b;margin-bottom:3px;">로테이션 맵</div>`;
+      h+=`<div class="map-check-grid">`;
+      PUBG_MAPS.filter(m=>!['에란겔','테이고','사녹'].includes(m)).forEach(m=>{
+        const checked=w.rotation.includes(m)?'checked':'';
+        h+=`<label class="map-check-item"><input type="checkbox" value="${m}" ${checked} onchange="toggleWeekMap(${i},'${m}',this.checked)"> ${m}</label>`;
+      });
+      h+=`</div></div>`;
+    });
+    h+=`<label>고정 맵</label><div style="font-size:12px;color:#94a3b8;margin-bottom:4px;">에란겔, 테이고, 사녹 (기본 고정)</div>`;
+    h+=`<label>경쟁전 맵 (쉼표로 구분)</label><input type="text" id="newsMapRanked" placeholder="예: 에란겔(25%), 미라마(25%), 테이고(25%), 론도(25%)">`;
+    h+=`<label>비고 (선택)</label><textarea id="newsMapNote" placeholder="추가 참고사항..." rows="2"></textarea>`;
+  }else if(newsFormCat==='update'){
+    h+=`<label>업데이트 버전</label><input type="text" id="newsUpdVer" placeholder="예: 41.1">`;
+    h+=`<label>제목</label><input type="text" id="newsUpdTitle" placeholder="업데이트 제목">`;
+    h+=`<label>주요 내용</label><textarea id="newsUpdBody" placeholder="■ 하이라이트\n• 항목1\n• 항목2" rows="4"></textarea>`;
+    h+=`<label>패치노트 링크 (선택)</label><input type="text" id="newsUpdLink" placeholder="https://pubg.com/ko/news/...">`;
+  }else{
+    h+=`<label>제목</label><input type="text" id="newsFreeTitle" placeholder="소식 제목">`;
+    h+=`<label>내용</label><textarea id="newsFreeBody" placeholder="자유롭게 작성..." rows="3"></textarea>`;
+    h+=`<label>링크 (선택)</label><input type="text" id="newsFreeLink" placeholder="https://...">`;
+  }
+  h+=`<div style="display:flex;gap:6px;margin-top:10px;justify-content:flex-end;">`;
+  h+=`<button class="btn btn-xs btn-gray" onclick="document.getElementById('newsFormArea').classList.add('hidden')">취소</button>`;
+  h+=`<button class="btn btn-xs btn-blue" onclick="submitNews()">등록</button>`;
+  h+=`</div></div>`;
+  area.innerHTML=h;
+}
+function toggleWeekMap(weekIdx,map,checked){
+  const r=newsMapWeeks[weekIdx].rotation;
+  if(checked&&!r.includes(map))r.push(map);
+  else if(!checked){const idx=r.indexOf(map);if(idx>=0)r.splice(idx,1);}
+}
+function submitNews(){
+  if(!isAdmin)return;
+  const cat=newsFormCat;
+  const entry={cat,createdAt:Date.now()};
+  if(cat==='map'){
+    const ver=(document.getElementById('newsMapVer').value||'').trim();
+    const weeks=newsMapWeeks.map(w=>({from:w.from,to:w.to,fixed:w.fixed,rotation:[...w.rotation]}));
+    if(!weeks.some(w=>w.rotation.length)){alert('로테이션 맵을 하나 이상 선택하세요');return;}
+    entry.ver=ver;entry.title='맵 서비스'+(ver?' - 업데이트 '+ver:'');
+    entry.weeks=weeks;
+    entry.ranked=(document.getElementById('newsMapRanked').value||'').trim();
+    entry.note=(document.getElementById('newsMapNote').value||'').trim();
+  }else if(cat==='update'){
+    const ver=(document.getElementById('newsUpdVer').value||'').trim();
+    const title=(document.getElementById('newsUpdTitle').value||'').trim();
+    if(!title){alert('제목을 입력하세요');return;}
+    entry.ver=ver;entry.title=(ver?'['+ver+'] ':'')+title;
+    entry.body=(document.getElementById('newsUpdBody').value||'').trim();
+    entry.link=(document.getElementById('newsUpdLink').value||'').trim();
+  }else{
+    const title=(document.getElementById('newsFreeTitle').value||'').trim();
+    if(!title){alert('제목을 입력하세요');return;}
+    entry.title=title;
+    entry.body=(document.getElementById('newsFreeBody').value||'').trim();
+    entry.link=(document.getElementById('newsFreeLink').value||'').trim();
+  }
+  dataRef.child('homeNews/news_'+Date.now()).set(entry);
+  document.getElementById('newsFormArea').classList.add('hidden');
+}
+function renderNews(){
+  const area=document.getElementById('newsListArea');if(!area)return;
+  const news=appData.homeNews||{};
+  const keys=Object.keys(news).sort((a,b)=>(news[b].createdAt||0)-(news[a].createdAt||0));
+  if(!keys.length){area.innerHTML='<div style="text-align:center;color:#64748b;padding:20px;font-size:13px;">등록된 소식이 없습니다.</div>';return;}
+  let h='';
+  const today=new Date().toISOString().slice(0,10);
+  keys.forEach(k=>{
+    const n=news[k];
+    const catLabel=n.cat==='map'?'맵 로테이션':n.cat==='update'?'업데이트':'자유';
+    const catClass=n.cat||'free';
+    const date=n.createdAt?new Date(n.createdAt).toLocaleDateString('ko-KR',{month:'short',day:'numeric'}):'';
+    h+=`<div class="news-item" onclick="this.classList.toggle('open')">`;
+    h+=`<div style="display:flex;align-items:center;gap:6px;"><span class="news-badge ${catClass}">${catLabel}</span><span class="news-title" style="flex:1;">${escHtml(n.title||'')}</span><span class="news-meta" style="margin:0;">${date}</span>`;
+    if(isAdmin)h+=`<button class="news-del" onclick="event.stopPropagation();if(confirm('삭제하시겠습니까?'))dataRef.child('homeNews/${k}').remove()">삭제</button>`;
+    h+=`<span class="news-toggle">▼</span></div>`;
+    h+=`<div class="news-detail">`;
+
+    if(n.cat==='map'&&n.weeks){
+      h+=`<div style="font-size:11px;color:#64748b;margin:6px 0 4px;">※ 매주 수요일 11:00 맵 교체</div>`;
+      h+=`<div style="font-size:12px;font-weight:700;color:#60a5fa;margin-bottom:3px;">◇ 일반 매치</div>`;
+      h+=`<table style="width:100%;border-collapse:collapse;font-size:11px;"><thead><tr style="border-bottom:1px solid #334155;">`;
+      h+=`<th style="padding:4px 6px;text-align:left;color:#64748b;font-weight:600;width:50px;">주차</th>`;
+      h+=`<th style="padding:4px 6px;text-align:left;color:#64748b;font-weight:600;width:110px;">기간</th>`;
+      h+=`<th style="padding:4px 6px;text-align:left;color:#64748b;font-weight:600;">고정</th>`;
+      h+=`<th style="padding:4px 6px;text-align:left;color:#64748b;font-weight:600;">로테이션</th>`;
+      h+=`</tr></thead><tbody>`;
+      const weeks=Array.isArray(n.weeks)?n.weeks:Object.values(n.weeks);
+      weeks.forEach((w,i)=>{
+        const isCurrent=today>=w.from&&today<w.to;
+        const bg=isCurrent?'background:rgba(59,130,246,.08);':'';
+        const dateLabel=(w.from||'').slice(5).replace('-','/')+' ~ '+(w.to||'').slice(5).replace('-','/');
+        h+=`<tr style="border-bottom:1px solid rgba(51,65,85,.4);${bg}">`;
+        h+=`<td style="padding:4px 6px;font-weight:600;${isCurrent?'color:#fbbf24;':'color:#94a3b8;'}">${isCurrent?'◀ ':''}${i+1}주차</td>`;
+        h+=`<td style="padding:4px 6px;color:#94a3b8;">${dateLabel}</td>`;
+        h+=`<td style="padding:4px 6px;">${(w.fixed||['에란겔','테이고','사녹']).join(', ')}</td>`;
+        h+=`<td style="padding:4px 6px;color:#10b981;">${(Array.isArray(w.rotation)?w.rotation:Object.values(w.rotation||{})).join(', ')}</td>`;
+        h+=`</tr>`;
+      });
+      h+=`</tbody></table>`;
+      if(n.ranked){
+        h+=`<div style="font-size:12px;font-weight:700;color:#f59e0b;margin:8px 0 3px;">◇ 경쟁전</div>`;
+        h+=`<div style="font-size:11px;color:#94a3b8;background:#0f172a;border:1px solid #334155;border-radius:5px;padding:5px 8px;">${escHtml(n.ranked)}</div>`;
+      }
+      if(n.note)h+=`<div style="font-size:11px;color:#64748b;margin-top:4px;">※ ${escHtml(n.note)}</div>`;
+    }else if(n.cat==='update'){
+      if(n.body)h+=`<div class="news-body" style="white-space:pre-line;margin-top:6px;">${escHtml(n.body)}</div>`;
+      if(n.link)h+=`<div style="margin-top:6px;"><a href="${escHtml(n.link)}" target="_blank" onclick="event.stopPropagation()" style="font-size:12px;color:#60a5fa;text-decoration:none;">패치노트 전문 보기 →</a></div>`;
+    }else{
+      if(n.body)h+=`<div class="news-body" style="margin-top:4px;">${escHtml(n.body)}</div>`;
+      if(n.link)h+=`<div style="margin-top:4px;"><a href="${escHtml(n.link)}" target="_blank" onclick="event.stopPropagation()" style="font-size:12px;color:#60a5fa;text-decoration:none;">자세히 보기 →</a></div>`;
+    }
+    h+=`</div></div>`;
+  });
+  area.innerHTML=h;
 }
 
 // -- YouTube 영상 --
@@ -1429,7 +1933,7 @@ function renderYouTube(){
   h+='<div class="yt-slide-inner" id="ytSlideInner" style="transform:translateX(-'+ytSlideIdx*100+'%)">';
   keys.forEach(k=>{
     const vid=extractYtId(videos[k].url);
-    if(vid)h+=`<div class="yt-slide-item"><iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen loading="lazy"></iframe></div>`;
+    if(vid)h+=`<div class="yt-slide-item"><iframe src="https://www.youtube-nocookie.com/embed/${vid}?rel=0" allowfullscreen loading="lazy"></iframe></div>`;
   });
   h+='</div>';
   if(keys.length>1){
@@ -1506,6 +2010,69 @@ function ensureDefaultNotice(){
       pinned:true,
       createdAt:Date.now()
     });
+  }
+}
+
+function ensureDefaultNews(){
+  if(!isAdmin)return;
+  const news=appData.homeNews||{};
+  if(!news['news_map_41_1']){
+    dataRef.child('homeNews/news_map_41_1').set({
+      cat:'map',createdAt:1712473200000,ver:'41.1',
+      title:'맵 서비스 - 업데이트 41.1',
+      weeks:[
+        {from:'2026-04-08',to:'2026-04-15',fixed:['에란겔','테이고','사녹'],rotation:['론도','미라마']},
+        {from:'2026-04-15',to:'2026-04-22',fixed:['에란겔','테이고','사녹'],rotation:['카라킨','데스턴']},
+        {from:'2026-04-22',to:'2026-04-29',fixed:['에란겔','테이고','사녹'],rotation:['론도','파라모']},
+        {from:'2026-04-29',to:'2026-05-06',fixed:['에란겔','테이고','사녹'],rotation:['카라킨','비켄디']},
+        {from:'2026-05-06',to:'2026-05-13',fixed:['에란겔','테이고','사녹'],rotation:['론도','미라마']}
+      ],
+      ranked:'에란겔(25%) / 미라마(25%) / 테이고(25%) / 론도(25%)',
+      note:'경쟁전 맵은 한 시즌 동안 서비스됩니다'
+    });
+  }
+  if(!news['news_upd_41_1']){
+    dataRef.child('homeNews/news_upd_41_1').set({
+      cat:'update',createdAt:1714521600000,ver:'41.1',
+      title:'[41.1] 에란겔 지형 파괴 & 신규 장비',
+      body:'◆ 에란겔 지형 파괴\n- 곡괭이로 벽·바닥 파괴 가능 (건물 내 전투 변화)\n- 파괴 가능 구조물에 균열 표시\n\n◆ 신규 부착물\n- 하이브리드 스코프 : 1배↔4배 전환\n- 틸티드 그립 : 수직+수평 반동 감소\n\n◆ 부착물 변경\n- 앵글 손잡이 삭제\n- 하프 그립 → 기존 앵글 역할 통합\n\n◆ 총기 밸런스\n- 드라구노프 반동 감소\n- 6월(42.1) 삭제 예정 : 모신나강, R45, DP-28, PP-19 Bizon, P1911, QBU\n\n◆ 긴급 지원 신호탄\n- 사용 시 해당 위치에 보급 물자 투하',
+      link:'https://pubg.com/ko/news/update-41-1'
+    });
+  }
+}
+function ensureDefaultPubgNicks(){
+  if(!isAdmin)return;
+  const members=appData.members||{};
+  const nickMap={
+    '파랑':'illiiiiiilliiiil','순금이':'sungeum-i','웃거':'UTGYEO','바티':'bati639',
+    '이즈온':'Grimi_ISON','왓':'Grimi_what','머드':'Grimi_MUD','레오':'11lT_Tl11',
+    '승호':'Grimi_grmgrmgrm','육삼':'Grimi_63','지누':'Grimi_technology',
+    '오프':'Grimi_off','뻥지':'GRIMI_HAPPY','테쓰':'Grimi_TES','쫄라':'GRIMI_mokzola',
+    '갱이':'Grimi_Gang','미니':'Grimi_Mini','포차코':'Grimi_Pochacco',
+    '유유':'Grimi_urimi','디노':'Grimi_DINO','호영':'Grimi_imirG','황해':'Grimi_Lisasu',
+    '상D':'Grimi_Operative-','쿨':'Grimi_Keepcool','사피':'Grimi_Sapy',
+    '댕댕':'Grimi_Sonny','쏜쏜':'Grimi_sonson','오삼':'Grimi_o-sam','상밤':'Grimi_bam',
+    '중댐':'Grimi_Jungdaem','강인':'Grimi_kangin_19','포든':'Grimi_Foden_47',
+    '산이':'Grimi_SanE','르시':'Grimi_NoHealXD','범':'Grimi_TiGeR','지단':'Grimi_Zidane',
+    '원이':'Grimi_WonE','구글':'Grimi_Google','라떼':'Grimi_Latte','꼬삼이':'Grimi_GGO3E',
+    '다라':'Grimi_DaRa','현준':'Grimi_Force','마리오':'Grimi_Mario','요시':'Grimi_yosi',
+    '경환':'Grimi_Betty','맹이':'Grimi_ostrich','오징어':'Grimi_CHEONMA',
+    '준섭':'Grimi_Hihat','온':'Grimi_on','쩡구뚜':'Grimi_SnowPapa','명태':'Grimi_JMT',
+    '동동':'Grimi_VIP','프레이':'Grimi_juning','유티':'Grimi_UT','탱이':'Grimi_PanDa',
+    '다이나믹':'Grimi_DYNAMIC','포스걸':'Grimi_Skrrrrrr','가을':'Grimi_Sep20',
+    '서기':'Grimi_Esc','로로':'Grimi_RoRo','용이':'Grimi_Ung','수연':'Grimi_suyeoniii',
+    '헤이':'Grimi_Hey','도도':'Grimi_DoDo','개종':'Grimi_Jjoker','테크':'Grimi_Tech',
+    '박대리':'Grimi_SSONDA','삐유':'Grimi_IVE','삼삼이':'Grimi_SI-lARP'
+  };
+  const updates={};
+  Object.entries(members).forEach(([id,m])=>{
+    if(!m.pubgNick&&nickMap[m.name]){
+      updates['members/'+id+'/pubgNick']=nickMap[m.name];
+    }
+  });
+  if(Object.keys(updates).length>0){
+    const cnt=Object.keys(updates).length;
+    dataRef.update(updates,()=>{alert('PUBG 닉네임 '+cnt+'명 자동 등록 완료');});
   }
 }
 
@@ -1636,7 +2203,7 @@ function renderMembers(){
   document.getElementById('memberCount').textContent=`(${ids.length}명)`;
   const addArea=document.getElementById('adminAddArea');
   const mt=getMaxTier();
-  if(isAdmin){addArea.innerHTML=`<div class="add-member-bar"><input type="text" id="addMemberName" placeholder="새 멤버 이름" onkeydown="if(event.key==='Enter')addMember()"><select id="addMemberTier" style="width:65px;">${Array.from({length:mt},(_,i)=>i+1).map(t=>`<option value="${t}" ${t===Math.min(4,mt)?'selected':''}>${t}T</option>`).join('')}</select><select id="addMemberSubTier" style="width:80px;"><option value="upper">상</option><option value="mid" selected>중</option><option value="lower">하</option></select><button class="btn btn-blue" onclick="addMember()" style="padding:18px 48px;font-size:20px;font-weight:800;border-radius:12px;min-width:120px;">+ 추가</button></div>`;}else addArea.innerHTML='';
+  if(isAdmin){addArea.innerHTML=`<div class="add-member-bar" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><input type="text" id="addMemberName" placeholder="멤버 이름" style="width:120px;" onkeydown="if(event.key==='Enter')addMember()"><input type="text" id="addMemberPubgNick" placeholder="PUBG 닉네임 (선택)" style="width:150px;"><select id="addMemberTier" style="width:75px;padding:8px;">${Array.from({length:mt},(_,i)=>i+1).map(t=>`<option value="${t}" ${t===Math.min(4,mt)?'selected':''}>${t}티어</option>`).join('')}</select><select id="addMemberSubTier" style="width:75px;padding:8px;"><option value="upper">상</option><option value="mid" selected>중</option><option value="lower">하</option></select><button class="btn btn-blue" onclick="addMember()" style="padding:10px 24px;font-size:15px;font-weight:700;border-radius:10px;">+ 추가</button></div>`;}else addArea.innerHTML='';
   const searchVal=(document.getElementById('memberSearchInput')?.value||'').trim().toLowerCase();
   const filtered=ids.filter(id=>{if(!searchVal)return true;return members[id].name.toLowerCase().includes(searchVal);});
   const searchCount=document.getElementById('memberSearchCount');
@@ -1652,9 +2219,10 @@ function renderMembers(){
   const area=document.getElementById('memberTableArea');
   if(!filtered.length){area.innerHTML=`<p style="color:#64748b;text-align:center;padding:20px;">${searchVal?'검색 결과 없음':'멤버 없음'}</p>`;return;}
   const onlineIds=getOnlineIds();
-  let h=`<table class="member-table"><thead><tr>${isAdmin?'<th style="width:32px;"><input type="checkbox" onchange="bulkSelectAll(this.checked)" style="cursor:pointer;"></th>':''}<th>이름</th><th>티어</th><th>등급</th><th>점수</th>${isAdmin?'<th>역할</th><th>PIN</th><th>숨김</th><th></th>':''}</tr></thead><tbody>`;
+  let h=`<table class="member-table"><thead><tr>${isAdmin?'<th style="width:32px;"><input type="checkbox" onchange="bulkSelectAll(this.checked)" style="cursor:pointer;"></th>':''}<th>이름</th>${isAdmin?'<th>PUBG닉 <button onclick="saveAllPubgNicks()" style="padding:2px 8px;background:#3b82f6;border:none;border-radius:4px;color:#fff;font-size:10px;cursor:pointer;margin-left:4px;">전체저장</button></th>':''}<th>티어</th><th>등급</th><th>점수</th>${isAdmin?'<th>역할</th><th>PIN</th><th>숨김</th><th></th>':''}</tr></thead><tbody>`;
   filtered.forEach(id=>{const m=members[id];const sc=mScore(m);const isOnline=onlineIds.has(id);const checked=bulkSelected.has(id);
     h+=`<tr><td>${isAdmin?`<input type="checkbox" ${checked?'checked':''} onchange="toggleBulkSelect('${id}',this.checked)" style="cursor:pointer;">`:''}</td><td><span class="m-name">${isOnline?'<span style="display:inline-block;width:8px;height:8px;background:#3b82f6;border-radius:50%;margin-right:5px;box-shadow:0 0 6px #3b82f6;"></span>':''}${m.name}</span> ${m.role==='admin'?'<span class="badge-admin" style="font-size:10px;">관리자</span>':''} ${m.hidden?'<span style="font-size:10px;color:#64748b;background:#1e293b;padding:2px 6px;border-radius:4px;">숨김</span>':''}</td>
+    ${isAdmin?`<td><div style="display:flex;gap:3px;align-items:center;"><input type="text" id="pnick_${id}" value="${m.pubgNick||''}" placeholder="-" style="width:90px;padding:4px 6px;background:#0f172a;border:1px solid #334155;border-radius:5px;color:#e2e8f0;font-size:12px;"><button onclick="savePubgNick('${id}',document.getElementById('pnick_${id}').value)" style="padding:4px 6px;background:#334155;border:none;border-radius:5px;color:#94a3b8;font-size:10px;cursor:pointer;">저장</button></div></td>`:''}
     <td>${isAdmin?`<select class="m-select" onchange="changeTier('${id}',this.value)">${Array.from({length:mt},(_,i)=>i+1).map(t=>`<option value="${t}" ${t===(m.tier||4)?'selected':''}>${t}T</option>`).join('')}</select>`:`<span class="tier-badge tier-${m.tier||4}">${m.tier||4}T</span>`}</td>
     <td>${isAdmin?`<select class="m-select" onchange="changeSubTier('${id}',this.value)"><option value="upper" ${m.subTier==='upper'?'selected':''}>상</option><option value="mid" ${(!m.subTier||m.subTier==='mid')?'selected':''}>중</option><option value="lower" ${m.subTier==='lower'?'selected':''}>하</option></select>`:`${SL[m.subTier||'mid']}`}</td>
     <td><span class="m-score">${sc}점</span></td>
