@@ -184,20 +184,26 @@ input:focus,select:focus{border-color:#3b82f6;}
 .yt-slide-inner{display:flex;transition:transform .3s ease;}
 .yt-slide-item{min-width:100%;aspect-ratio:16/9;}
 .yt-slide-item iframe{width:100%;height:100%;border:none;border-radius:12px;}
-.yt-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);color:#fff;border:none;font-size:20px;padding:8px 10px;cursor:pointer;border-radius:8px;z-index:2;transition:background .2s;}
-.yt-nav:hover{background:rgba(0,0,0,.8);}
-.yt-nav.prev{left:6px;}
-.yt-nav.next{right:6px;}
-.yt-dots{display:flex;justify-content:center;gap:6px;margin-top:8px;}
-.yt-dot{width:8px;height:8px;border-radius:50%;background:#334155;cursor:pointer;transition:background .2s;}
-.yt-dot.active{background:#60a5fa;}
+.yt-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.6);color:#fff;border:none;font-size:28px;padding:12px 14px;cursor:pointer;border-radius:10px;z-index:2;transition:background .2s;}
+.yt-nav:hover{background:rgba(0,0,0,.9);}
+.yt-nav.prev{left:8px;}
+.yt-nav.next{right:8px;}
+.yt-playlist{display:flex;flex-direction:column;gap:3px;margin-top:8px;}
+.yt-playlist-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#0f172a;border:1px solid #334155;border-radius:6px;font-size:12px;color:#94a3b8;cursor:pointer;transition:all .15s;}
+.yt-playlist-item:hover{border-color:#3b82f6;color:#60a5fa;background:rgba(59,130,246,.05);}
+.yt-playlist-item.active{border-color:#3b82f6;color:#60a5fa;background:rgba(59,130,246,.1);}
+.yt-playlist-item .yt-pl-num{font-size:11px;color:#475569;min-width:16px;text-align:center;}
+.yt-playlist-item.active .yt-pl-num{color:#3b82f6;}
+.yt-playlist-item .yt-pl-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .yt-empty{text-align:center;color:#64748b;padding:30px;font-size:14px;}
 .yt-admin-bar{display:flex;gap:6px;margin-bottom:8px;align-items:center;}
 .yt-admin-input{flex:1;padding:8px 12px;border-radius:8px;background:#0f172a;border:1px solid #334155;color:#e2e8f0;font-size:13px;}
-.yt-list{display:flex;flex-direction:column;gap:4px;margin-top:8px;}
-.yt-list-item{display:flex;align-items:center;gap:8px;padding:6px 10px;background:#0f172a;border:1px solid #334155;border-radius:6px;font-size:12px;color:#94a3b8;}
-.yt-list-item span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.yt-list-item button{font-size:11px;padding:2px 8px;border:none;border-radius:4px;cursor:pointer;background:rgba(239,68,68,.15);color:#ef4444;}
+.yt-admin-toggle{font-size:11px;color:#64748b;cursor:pointer;margin-top:6px;text-align:right;}
+.yt-admin-toggle:hover{color:#94a3b8;}
+.yt-admin-list{display:flex;flex-direction:column;gap:4px;margin-top:6px;}
+.yt-admin-list-item{display:flex;align-items:center;gap:8px;padding:5px 10px;background:#0f172a;border:1px solid #334155;border-radius:6px;font-size:12px;color:#94a3b8;}
+.yt-admin-list-item span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.yt-admin-list-item button{font-size:11px;padding:2px 8px;border:none;border-radius:4px;cursor:pointer;background:rgba(239,68,68,.15);color:#ef4444;}
 
 /* 로그인 */
 #loginScreen{max-width:460px;margin:0 auto;text-align:center;padding:20px;position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;}
@@ -1942,13 +1948,20 @@ function renderYouTube(){
   }
   h+='</div>';
   if(keys.length>1){
-    h+='<div class="yt-dots">';
-    keys.forEach((_,i)=>{h+=`<div class="yt-dot ${i===ytSlideIdx?'active':''}" onclick="ytSlideTo(${i})"></div>`;});
+    h+='<div class="yt-playlist">';
+    keys.forEach((k,i)=>{
+      const v=videos[k];
+      const title=v.title||'영상 '+(i+1);
+      h+=`<div class="yt-playlist-item ${i===ytSlideIdx?'active':''}" onclick="ytSlideTo(${i})">
+        <span class="yt-pl-num">${i===ytSlideIdx?'▶':(i+1)}</span>
+        <span class="yt-pl-title">${escHtml(title)}</span>
+      </div>`;
+    });
     h+='</div>';
+  } else {
+    const cur=videos[keys[0]];
+    if(cur&&cur.title)h+=`<div style="text-align:center;font-size:13px;color:#94a3b8;margin-top:6px;">${escHtml(cur.title)}</div>`;
   }
-  // 영상 제목 표시
-  const cur=videos[keys[ytSlideIdx]];
-  if(cur&&cur.title)h+=`<div style="text-align:center;font-size:13px;color:#94a3b8;margin-top:6px;">${escHtml(cur.title)}</div>`;
   area.innerHTML=h;
 }
 function ytSlide(dir){
@@ -1956,14 +1969,11 @@ function ytSlide(dir){
   const cnt=Object.keys(videos).length;
   if(cnt<=1)return;
   ytSlideIdx=(ytSlideIdx+dir+cnt)%cnt;
-  const inner=document.getElementById('ytSlideInner');
-  if(inner)inner.style.transform='translateX(-'+ytSlideIdx*100+'%)';
-  document.querySelectorAll('.yt-dot').forEach((d,i)=>d.classList.toggle('active',i===ytSlideIdx));
-  // 제목 업데이트
   renderYouTube();
 }
 function ytSlideTo(idx){ytSlideIdx=idx;renderYouTube();}
 
+let ytAdminOpen=false;
 function renderYtAdmin(){
   const area=document.getElementById('ytAdminArea');if(!area||!isAdmin)return;
   const videos=appData.homeVideos||{};
@@ -1974,12 +1984,15 @@ function renderYtAdmin(){
     <button class="btn btn-xs btn-blue" onclick="addYtVideo()">추가</button>
   </div>`;
   if(keys.length){
-    h+='<div class="yt-list">';
-    keys.forEach(k=>{
-      const v=videos[k];
-      h+=`<div class="yt-list-item"><span>${escHtml(v.title||v.url||'')}</span><button onclick="removeYtVideo('${k}')">삭제</button></div>`;
-    });
-    h+='</div>';
+    h+=`<div class="yt-admin-toggle" onclick="ytAdminOpen=!ytAdminOpen;renderYtAdmin()">관리 ${ytAdminOpen?'접기 ▲':'펼치기 ▼'} (${keys.length}개)</div>`;
+    if(ytAdminOpen){
+      h+='<div class="yt-admin-list">';
+      keys.forEach(k=>{
+        const v=videos[k];
+        h+=`<div class="yt-admin-list-item"><span onclick="editYtTitle('${k}')" style="cursor:pointer;" title="클릭하여 제목 수정">${escHtml(v.title||v.url||'')}</span><button onclick="removeYtVideo('${k}')">삭제</button></div>`;
+      });
+      h+='</div>';
+    }
   }
   area.innerHTML=h;
 }
@@ -1993,6 +2006,14 @@ function addYtVideo(){
   dataRef.child('homeVideos/'+id).set({url,title:title||'',addedAt:Date.now()});
   document.getElementById('ytUrlInput').value='';
   document.getElementById('ytTitleInput').value='';
+}
+function editYtTitle(id){
+  if(!isAdmin)return;
+  const videos=appData.homeVideos||{};
+  const v=videos[id];if(!v)return;
+  const newTitle=prompt('영상 제목 수정',v.title||'');
+  if(newTitle===null)return;
+  dataRef.child('homeVideos/'+id+'/title').set(newTitle.trim());
 }
 function removeYtVideo(id){
   if(!isAdmin||!confirm('이 영상을 삭제하시겠습니까?'))return;
