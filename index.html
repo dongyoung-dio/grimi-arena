@@ -201,9 +201,11 @@ input:focus,select:focus{border-color:#3b82f6;}
 .yt-admin-toggle{font-size:11px;color:#64748b;cursor:pointer;margin-top:6px;text-align:right;}
 .yt-admin-toggle:hover{color:#94a3b8;}
 .yt-admin-list{display:flex;flex-direction:column;gap:4px;margin-top:6px;}
-.yt-admin-list-item{display:flex;align-items:center;gap:8px;padding:5px 10px;background:#0f172a;border:1px solid #334155;border-radius:6px;font-size:12px;color:#94a3b8;}
+.yt-admin-list-item{display:flex;align-items:center;gap:6px;padding:5px 10px;background:#0f172a;border:1px solid #334155;border-radius:6px;font-size:12px;color:#94a3b8;}
 .yt-admin-list-item span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .yt-admin-list-item button{font-size:11px;padding:2px 8px;border:none;border-radius:4px;cursor:pointer;background:rgba(239,68,68,.15);color:#ef4444;}
+.yt-admin-list-item .yt-order-btn{background:rgba(59,130,246,.15);color:#60a5fa;font-size:13px;padding:2px 6px;line-height:1;}
+.yt-admin-list-item .yt-order-btn:hover{background:rgba(59,130,246,.3);}
 
 /* 로그인 */
 #loginScreen{max-width:460px;margin:0 auto;text-align:center;padding:20px;position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;}
@@ -1929,10 +1931,18 @@ function extractYtId(url){
   const m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
   return m?m[1]:null;
 }
+function getYtSortedKeys(){
+  const videos=appData.homeVideos||{};
+  return Object.keys(videos).sort((a,b)=>{
+    const oa=videos[a].order!=null?videos[a].order:videos[a].addedAt||0;
+    const ob=videos[b].order!=null?videos[b].order:videos[b].addedAt||0;
+    return oa-ob;
+  });
+}
 function renderYouTube(){
   const area=document.getElementById('ytPlayerArea');if(!area)return;
   const videos=appData.homeVideos||{};
-  const keys=Object.keys(videos).sort((a,b)=>(videos[b].addedAt||0)-(videos[a].addedAt||0));
+  const keys=getYtSortedKeys();
   if(!keys.length){area.innerHTML='<div class="yt-empty">등록된 영상이 없습니다.</div>';return;}
   ytSlideIdx=Math.min(ytSlideIdx,keys.length-1);
   let h='<div class="yt-slide-wrap">';
@@ -1977,7 +1987,7 @@ let ytAdminOpen=false;
 function renderYtAdmin(){
   const area=document.getElementById('ytAdminArea');if(!area||!isAdmin)return;
   const videos=appData.homeVideos||{};
-  const keys=Object.keys(videos).sort((a,b)=>(videos[b].addedAt||0)-(videos[a].addedAt||0));
+  const keys=getYtSortedKeys();
   let h=`<div class="yt-admin-bar">
     <input type="text" class="yt-admin-input" id="ytUrlInput" placeholder="YouTube URL 붙여넣기...">
     <input type="text" style="width:100px;padding:8px;border-radius:8px;background:#0f172a;border:1px solid #334155;color:#e2e8f0;font-size:13px;" id="ytTitleInput" placeholder="제목 (선택)">
@@ -1987,9 +1997,14 @@ function renderYtAdmin(){
     h+=`<div class="yt-admin-toggle" onclick="ytAdminOpen=!ytAdminOpen;renderYtAdmin()">관리 ${ytAdminOpen?'접기 ▲':'펼치기 ▼'} (${keys.length}개)</div>`;
     if(ytAdminOpen){
       h+='<div class="yt-admin-list">';
-      keys.forEach(k=>{
+      keys.forEach((k,i)=>{
         const v=videos[k];
-        h+=`<div class="yt-admin-list-item"><span onclick="editYtTitle('${k}')" style="cursor:pointer;" title="클릭하여 제목 수정">${escHtml(v.title||v.url||'')}</span><button onclick="removeYtVideo('${k}')">삭제</button></div>`;
+        h+=`<div class="yt-admin-list-item">
+          <button class="yt-order-btn" onclick="moveYtVideo('${k}',-1)" ${i===0?'disabled style="opacity:.3;cursor:default;"':''}>▲</button>
+          <button class="yt-order-btn" onclick="moveYtVideo('${k}',1)" ${i===keys.length-1?'disabled style="opacity:.3;cursor:default;"':''}>▼</button>
+          <span onclick="editYtTitle('${k}')" style="cursor:pointer;" title="클릭하여 제목 수정">${escHtml(v.title||v.url||'')}</span>
+          <button onclick="removeYtVideo('${k}')">삭제</button>
+        </div>`;
       });
       h+='</div>';
     }
@@ -2003,9 +2018,27 @@ function addYtVideo(){
   if(!url){alert('URL을 입력하세요');return;}
   if(!extractYtId(url)){alert('올바른 YouTube URL이 아닙니다');return;}
   const id='yt_'+Date.now();
-  dataRef.child('homeVideos/'+id).set({url,title:title||'',addedAt:Date.now()});
+  const keys=getYtSortedKeys();
+  const maxOrder=keys.length?Math.max(...keys.map(k=>(appData.homeVideos[k].order!=null?appData.homeVideos[k].order:appData.homeVideos[k].addedAt||0)))+1:0;
+  dataRef.child('homeVideos/'+id).set({url,title:title||'',addedAt:Date.now(),order:maxOrder});
   document.getElementById('ytUrlInput').value='';
   document.getElementById('ytTitleInput').value='';
+}
+function moveYtVideo(id,dir){
+  if(!isAdmin)return;
+  const keys=getYtSortedKeys();
+  const idx=keys.indexOf(id);
+  const target=idx+dir;
+  if(target<0||target>=keys.length)return;
+  const updates={};
+  keys.forEach((k,i)=>{
+    let newOrder=i;
+    if(i===idx)newOrder=target;
+    else if(dir===-1&&i===target)newOrder=idx;
+    else if(dir===1&&i===target)newOrder=idx;
+    updates['homeVideos/'+k+'/order']=newOrder;
+  });
+  dataRef.update(updates);
 }
 function editYtTitle(id){
   if(!isAdmin)return;
