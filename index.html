@@ -80,13 +80,13 @@ input:focus,select:focus{border-color:#3b82f6;}
 @media(max-width:600px){.home-grid{grid-template-columns:1fr;}}
 .home-section{margin-bottom:0;}
 .home-section-title{font-size:14px;font-weight:700;color:#94a3b8;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
-.dash-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
-.dash-card{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 10px;text-align:center;}
-.dash-card.dash-wide{text-align:left;padding:8px 12px;}
-.dash-card .dash-label{font-size:10px;color:#64748b;margin-bottom:2px;}
-.dash-card .dash-value{font-size:18px;font-weight:800;}
-.dash-card .dash-value span{font-size:10px;color:#64748b;font-weight:400;}
-.dash-card .dash-small{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.dash-card{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px 14px;text-align:center;}
+.dash-card.dash-wide{text-align:left;padding:12px 14px;}
+.dash-card .dash-label{font-size:13px;color:#94a3b8;margin-bottom:4px;}
+.dash-card .dash-value{font-size:22px;font-weight:800;}
+.dash-card .dash-value span{font-size:12px;color:#64748b;font-weight:400;}
+.dash-card .dash-small{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 @media(max-width:500px){.dash-grid{grid-template-columns:1fr 1fr;}}
 /* 공지사항 */
 .notice-list{display:flex;flex-direction:column;gap:8px;}
@@ -1340,10 +1340,10 @@ function renderDashboard(){
   el.innerHTML=`
     <div class="dash-card"><div class="dash-label">멤버</div><div class="dash-value" style="color:#60a5fa;">${mCount}<span>명</span></div></div>
     <div class="dash-card"><div class="dash-label">이벤트</div><div class="dash-value" style="color:#a78bfa;">${totalEvents}<span>회</span></div></div>
-    <div class="dash-card"><div class="dash-label">🍗 치킨왕</div><div style="font-size:13px;font-weight:700;color:#fbbf24;">${chickenName}</div></div>
-    <div class="dash-card"><div class="dash-label">⚡ 효율왕</div><div style="font-size:13px;font-weight:700;color:#a78bfa;">${effName}</div></div>
-    <div class="dash-card"><div class="dash-label">🔫 킬왕</div><div style="font-size:13px;font-weight:700;color:#f87171;">${killName}</div></div>
-    <div class="dash-card"><div class="dash-label">💥 딜왕</div><div style="font-size:13px;font-weight:700;color:#fb923c;">${dmgName}</div></div>
+    <div class="dash-card"><div class="dash-label">🍗 치킨왕</div><div style="font-size:15px;font-weight:700;color:#fbbf24;">${chickenName}</div></div>
+    <div class="dash-card"><div class="dash-label">⚡ 효율왕</div><div style="font-size:15px;font-weight:700;color:#a78bfa;">${effName}</div></div>
+    <div class="dash-card"><div class="dash-label">🔫 킬왕</div><div style="font-size:15px;font-weight:700;color:#f87171;">${killName}</div></div>
+    <div class="dash-card"><div class="dash-label">💥 딜왕</div><div style="font-size:15px;font-weight:700;color:#fb923c;">${dmgName}</div></div>
   `;
 }
 
