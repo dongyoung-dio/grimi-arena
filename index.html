@@ -145,10 +145,16 @@ input:focus,select:focus{border-color:#3b82f6;}
 .map-modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
 .map-modal-overlay.active{opacity:1;pointer-events:auto;}
 .map-modal-content{position:relative;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;align-items:center;}
-.map-modal-content img{max-width:95vw;max-height:80vh;object-fit:contain;border-radius:8px;}
+.map-modal-img-wrap{overflow:hidden;border-radius:8px;max-width:95vw;max-height:75vh;position:relative;cursor:grab;touch-action:none;}
+.map-modal-img-wrap:active{cursor:grabbing;}
+.map-modal-img-wrap img{display:block;max-width:95vw;max-height:75vh;object-fit:contain;transform-origin:center center;transition:none;image-rendering:auto;}
 .map-modal-title{color:#fff;font-size:16px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
 .map-modal-close{position:absolute;top:-10px;right:-10px;width:32px;height:32px;border-radius:50%;background:#1e293b;border:1px solid #475569;color:#e2e8f0;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1;}
 .map-modal-close:hover{background:#334155;}
+.map-zoom-controls{display:flex;gap:6px;margin-top:8px;align-items:center;}
+.map-zoom-btn{width:34px;height:34px;border-radius:8px;background:#1e293b;border:1px solid #475569;color:#e2e8f0;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.map-zoom-btn:hover{border-color:#60a5fa;color:#60a5fa;}
+.map-zoom-level{font-size:12px;color:#94a3b8;min-width:40px;text-align:center;}
 .map-modal-links{margin-top:8px;display:flex;gap:12px;}
 .map-modal-links a{font-size:12px;color:#60a5fa;text-decoration:none;}
 .map-modal-links a:hover{text-decoration:underline;}
@@ -332,7 +338,7 @@ input:focus,select:focus{border-color:#3b82f6;}
 .member-table th{font-size:13px;color:#64748b;font-weight:600;padding:10px;text-align:left;border-bottom:2px solid #334155;}
 .member-table td{padding:10px;border-bottom:1px solid #0f172a;vertical-align:middle;font-size:15px;}
 .member-table tr:hover td{background:rgba(51,65,85,.4);}
-.m-name{font-weight:700;font-size:16px;}.m-score{color:#fbbf24;font-weight:700;font-size:15px;}
+.m-name{font-weight:700;font-size:16px;}.m-name-edit{cursor:pointer;border-bottom:1px dashed #475569;padding-bottom:1px;transition:border-color .15s;}.m-name-edit:hover{border-color:#60a5fa;}.m-name-input-wrap{display:inline-flex;align-items:center;gap:3px;}.m-name-input{width:90px;padding:3px 6px;background:#0f172a;border:1px solid #3b82f6;border-radius:5px;color:#e2e8f0;font-size:13px;font-weight:600;outline:none;}.m-name-save{padding:3px 7px;background:#3b82f6;border:none;border-radius:5px;color:#fff;font-size:11px;cursor:pointer;font-weight:600;}.m-name-save:hover{background:#2563eb;}.m-name-cancel{padding:3px 6px;background:#334155;border:none;border-radius:5px;color:#94a3b8;font-size:11px;cursor:pointer;}.m-score{color:#fbbf24;font-weight:700;font-size:15px;}
 .m-select{padding:5px 8px;font-size:13px;border:1px solid #334155;border-radius:6px;background:#0f172a;color:#e2e8f0;cursor:pointer;}
 .m-delete{background:none;border:none;color:#475569;cursor:pointer;font-size:18px;padding:4px 8px;border-radius:6px;}
 .m-delete:hover{background:#ef4444;color:#fff;}
@@ -1063,6 +1069,12 @@ input:focus,select:focus{border-color:#3b82f6;}
               <button class="map-modal-close" onclick="closeMapModal()">✕</button>
               <div class="map-modal-title" id="mapModalTitle"></div>
               <div id="mapModalBody"></div>
+              <div class="map-zoom-controls" id="mapZoomControls" style="display:none;">
+                <button class="map-zoom-btn" onclick="mapZoom(-1)">−</button>
+                <span class="map-zoom-level" id="mapZoomLevel">100%</span>
+                <button class="map-zoom-btn" onclick="mapZoom(1)">+</button>
+                <button class="map-zoom-btn" onclick="mapZoomReset()" style="font-size:12px;width:auto;padding:0 10px;">초기화</button>
+              </div>
               <div class="map-modal-links" id="mapModalLinks"></div>
             </div>
           </div>
@@ -1463,6 +1475,24 @@ function saveAllPubgNicks(){
   if(!confirm(count+'명의 PUBG 닉네임을 저장하시겠습니까?'))return;
   dataRef.update(updates);
   alert(count+'명 저장 완료');
+}
+function startEditName(id,oldName){
+  if(!isAdmin)return;
+  const el=document.getElementById('mname_'+id);if(!el)return;
+  const td=el.closest('td');
+  td.innerHTML=`<span class="m-name-input-wrap"><input class="m-name-input" id="mnameinput_${id}" value="${oldName}" maxlength="10" onkeydown="if(event.key==='Enter')saveMemberName('${id}');if(event.key==='Escape')renderMembers();"><button class="m-name-save" onclick="saveMemberName('${id}')">저장</button><button class="m-name-cancel" onclick="renderMembers()">취소</button></span>`;
+  const inp=document.getElementById('mnameinput_'+id);inp.focus();inp.select();
+}
+function saveMemberName(id){
+  if(!isAdmin)return;
+  const inp=document.getElementById('mnameinput_'+id);if(!inp)return;
+  const newName=inp.value.trim();
+  if(!newName){alert('이름을 입력해주세요.');return;}
+  const members=appData.members||{};
+  const oldName=members[id]?.name||'';
+  if(newName===oldName){renderMembers();return;}
+  if(!confirm(`"${oldName}" → "${newName}" (으)로 이름을 변경하시겠습니까?`))return;
+  dataRef.child('members/'+id+'/name').set(newName,()=>{alert('이름 변경 완료');});
 }
 function resetPin(id,name){if(!isAdmin||!confirm(name+' PIN 초기화?'))return;dataRef.child('members/'+id+'/pin').set('0000');}
 
@@ -2220,27 +2250,62 @@ function renderMapGrid(){
   }).join('');
 }
 
+let mapZoomScale=1,mapPanX=0,mapPanY=0,mapDragging=false,mapDragStart={x:0,y:0},mapPanStart={x:0,y:0};
 function openMapModal(mapId){
   const m=MAP_DATA.find(d=>d.id===mapId);if(!m)return;
   const overlay=document.getElementById('mapModalOverlay');
   document.getElementById('mapModalTitle').textContent=m.name+' ('+m.size+')';
   let bodyH='';
   if(m.img){
-    bodyH=`<img src="${m.img}" alt="${m.name} 맵" onerror="this.outerHTML='<div class=\\'map-modal-noimg\\'>이미지 파일이 아직 없습니다<br><span style=\\'font-size:12px;color:#64748b;\\'>${m.img} 파일을 추가해주세요</span></div>'">`;
+    bodyH=`<div class="map-modal-img-wrap" id="mapImgWrap"><img id="mapModalImg" src="${m.img}" alt="${m.name} 맵" draggable="false" onerror="this.parentElement.outerHTML='<div class=\\'map-modal-noimg\\'>이미지 파일이 아직 없습니다</div>'"></div>`;
+    document.getElementById('mapZoomControls').style.display='flex';
   } else {
     bodyH='<div class="map-modal-noimg">이미지가 등록되지 않은 맵입니다</div>';
+    document.getElementById('mapZoomControls').style.display='none';
   }
   document.getElementById('mapModalBody').innerHTML=bodyH;
+  mapZoomScale=1;mapPanX=0;mapPanY=0;
+  document.getElementById('mapZoomLevel').textContent='100%';
   let linksH='';
   if(m.inven)linksH+=`<a href="${m.inven}" target="_blank">인벤 맵 정보 →</a>`;
   document.getElementById('mapModalLinks').innerHTML=linksH;
   overlay.classList.add('active');
   document.body.style.overflow='hidden';
+  // 드래그/터치 이벤트
+  setTimeout(()=>{
+    const wrap=document.getElementById('mapImgWrap');if(!wrap)return;
+    wrap.addEventListener('pointerdown',mapPointerDown);
+    wrap.addEventListener('pointermove',mapPointerMove);
+    wrap.addEventListener('pointerup',mapPointerUp);
+    wrap.addEventListener('pointerleave',mapPointerUp);
+    wrap.addEventListener('wheel',mapWheel,{passive:false});
+  },50);
 }
+function mapApplyTransform(){
+  const img=document.getElementById('mapModalImg');if(!img)return;
+  img.style.transform=`scale(${mapZoomScale}) translate(${mapPanX/mapZoomScale}px,${mapPanY/mapZoomScale}px)`;
+}
+function mapZoom(dir){
+  const steps=[1,1.5,2,2.5,3,4,5];
+  let idx=steps.indexOf(mapZoomScale);
+  if(idx===-1){idx=steps.findIndex(s=>s>=mapZoomScale);if(idx===-1)idx=steps.length-1;}
+  idx+=dir;
+  if(idx<0)idx=0;if(idx>=steps.length)idx=steps.length-1;
+  mapZoomScale=steps[idx];
+  if(mapZoomScale<=1){mapPanX=0;mapPanY=0;}
+  mapApplyTransform();
+  document.getElementById('mapZoomLevel').textContent=Math.round(mapZoomScale*100)+'%';
+}
+function mapZoomReset(){mapZoomScale=1;mapPanX=0;mapPanY=0;mapApplyTransform();document.getElementById('mapZoomLevel').textContent='100%';}
+function mapWheel(e){e.preventDefault();mapZoom(e.deltaY<0?1:-1);}
+function mapPointerDown(e){if(mapZoomScale<=1)return;mapDragging=true;mapDragStart={x:e.clientX,y:e.clientY};mapPanStart={x:mapPanX,y:mapPanY};e.currentTarget.setPointerCapture(e.pointerId);}
+function mapPointerMove(e){if(!mapDragging)return;mapPanX=mapPanStart.x+(e.clientX-mapDragStart.x);mapPanY=mapPanStart.y+(e.clientY-mapDragStart.y);mapApplyTransform();}
+function mapPointerUp(){mapDragging=false;}
 
 function closeMapModal(){
   document.getElementById('mapModalOverlay').classList.remove('active');
   document.body.style.overflow='';
+  mapZoomScale=1;mapPanX=0;mapPanY=0;
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMapModal();});
 
@@ -2745,7 +2810,7 @@ function renderMembers(){
   const onlineIds=getOnlineIds();
   let h=`<table class="member-table"><thead><tr>${isAdmin?'<th style="width:32px;"><input type="checkbox" onchange="bulkSelectAll(this.checked)" style="cursor:pointer;"></th>':''}<th>이름</th>${isAdmin?'<th>PUBG닉 <button onclick="saveAllPubgNicks()" style="padding:2px 8px;background:#3b82f6;border:none;border-radius:4px;color:#fff;font-size:10px;cursor:pointer;margin-left:4px;">전체저장</button></th>':''}<th>티어</th><th>등급</th><th>점수</th>${isAdmin?'<th>역할</th><th>PIN</th><th>숨김</th><th></th>':''}</tr></thead><tbody>`;
   filtered.forEach(id=>{const m=members[id];const sc=mScore(m);const isOnline=onlineIds.has(id);const checked=bulkSelected.has(id);
-    h+=`<tr><td>${isAdmin?`<input type="checkbox" ${checked?'checked':''} onchange="toggleBulkSelect('${id}',this.checked)" style="cursor:pointer;">`:''}</td><td><span class="m-name">${isOnline?'<span style="display:inline-block;width:8px;height:8px;background:#3b82f6;border-radius:50%;margin-right:5px;box-shadow:0 0 6px #3b82f6;"></span>':''}${m.name}</span> ${m.role==='admin'?'<span class="badge-admin" style="font-size:10px;">관리자</span>':''} ${m.hidden?'<span style="font-size:10px;color:#64748b;background:#1e293b;padding:2px 6px;border-radius:4px;">숨김</span>':''}</td>
+    h+=`<tr><td>${isAdmin?`<input type="checkbox" ${checked?'checked':''} onchange="toggleBulkSelect('${id}',this.checked)" style="cursor:pointer;">`:''}</td><td>${isAdmin?`<span class="m-name m-name-edit" onclick="startEditName('${id}','${m.name.replace(/'/g,"\\&#39;")}')" title="클릭하여 이름 수정" id="mname_${id}">${isOnline?'<span style="display:inline-block;width:8px;height:8px;background:#3b82f6;border-radius:50%;margin-right:5px;box-shadow:0 0 6px #3b82f6;"></span>':''}${m.name}</span>`:`<span class="m-name">${isOnline?'<span style="display:inline-block;width:8px;height:8px;background:#3b82f6;border-radius:50%;margin-right:5px;box-shadow:0 0 6px #3b82f6;"></span>':''}${m.name}</span>`} ${m.role==='admin'?'<span class="badge-admin" style="font-size:10px;">관리자</span>':''} ${m.hidden?'<span style="font-size:10px;color:#64748b;background:#1e293b;padding:2px 6px;border-radius:4px;">숨김</span>':''}</td>
     ${isAdmin?`<td><div style="display:flex;gap:3px;align-items:center;"><input type="text" id="pnick_${id}" value="${m.pubgNick||''}" placeholder="-" style="width:90px;padding:4px 6px;background:#0f172a;border:1px solid #334155;border-radius:5px;color:#e2e8f0;font-size:12px;"><button onclick="savePubgNick('${id}',document.getElementById('pnick_${id}').value)" style="padding:4px 6px;background:#334155;border:none;border-radius:5px;color:#94a3b8;font-size:10px;cursor:pointer;">저장</button></div></td>`:''}
     <td>${isAdmin?`<select class="m-select" onchange="changeTier('${id}',this.value)">${Array.from({length:mt},(_,i)=>i+1).map(t=>`<option value="${t}" ${t===(m.tier||4)?'selected':''}>${t}T</option>`).join('')}</select>`:`<span class="tier-badge tier-${m.tier||4}">${m.tier||4}T</span>`}</td>
     <td>${isAdmin?`<select class="m-select" onchange="changeSubTier('${id}',this.value)"><option value="upper" ${m.subTier==='upper'?'selected':''}>상</option><option value="mid" ${(!m.subTier||m.subTier==='mid')?'selected':''}>중</option><option value="lower" ${m.subTier==='lower'?'selected':''}>하</option></select>`:`${SL[m.subTier||'mid']}`}</td>
