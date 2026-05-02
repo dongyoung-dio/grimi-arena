@@ -1365,7 +1365,7 @@ function updateOnlineDisplay(){const total=Object.keys(presenceData).length;cons
 function init(){
   dataRef.child('members').on('value',snap=>{loginMembers=snap.val()||{};if(!document.getElementById('loginScreen').classList.contains('hidden'))renderLoginList(loginMembers);});
   const saved=localStorage.getItem('grimi_kill_user');
-  if(saved){const u=JSON.parse(saved);dataRef.child('members/'+u.id).once('value').then(snap=>{if(snap.exists()){const m=snap.val();if(m.pin&&m.pin!=='0000')enterApp(u.id,m);}});}
+  if(saved){const u=JSON.parse(saved);dataRef.child('members/'+u.id).once('value').then(snap=>{if(snap.exists()){const m=snap.val();if(m.pinSet)enterApp(u.id,m);}});}
 }
 
 // 로그인 (그리드 정렬, 아바타)
@@ -1388,7 +1388,7 @@ function selectMember(id){
   const m=loginMembers[id];if(!m)return;pendingLoginId=id;pendingLoginData=m;
   document.getElementById('loginScreen').classList.add('hidden');document.getElementById('pinScreen').classList.remove('hidden');
   document.getElementById('pinUserName').textContent=m.name;
-  const isFirst=!m.pin||m.pin==='0000';
+  const isFirst=!m.pinSet;
   document.getElementById('pinFirstBadge').classList.toggle('hidden',!isFirst);
   document.getElementById('pinEnterArea').classList.toggle('hidden',isFirst);
   document.getElementById('pinSetArea').classList.toggle('hidden',!isFirst);
@@ -1397,7 +1397,7 @@ function selectMember(id){
   else{setupPinInputs('pinEnterInputs',true,()=>{submitPin();});}
 }
 function submitPin(){const pin=getPinValue('pinEnterInputs');if(pin.length!==4){document.getElementById('pinError').textContent='4자리를 입력하세요';return;}if(pin!==pendingLoginData.pin){document.getElementById('pinError').textContent='비밀번호가 틀렸습니다';setupPinInputs('pinEnterInputs',true,()=>{submitPin();});return;}enterApp(pendingLoginId,pendingLoginData);}
-function submitNewPin(){const p1=getPinValue('pinNewInputs'),p2=getPinValue('pinConfirmInputs');if(p1.length!==4){document.getElementById('pinSetError').textContent='4자리를 입력하세요';return;}if(p2.length!==4)return;if(p1!==p2){document.getElementById('pinSetError').textContent='비밀번호가 일치하지 않습니다';setupPinInputs('pinConfirmInputs',true,()=>{submitNewPin();});return;}dataRef.child('members/'+pendingLoginId+'/pin').set(p1).then(()=>{pendingLoginData.pin=p1;enterApp(pendingLoginId,pendingLoginData);});}
+function submitNewPin(){const p1=getPinValue('pinNewInputs'),p2=getPinValue('pinConfirmInputs');if(p1.length!==4){document.getElementById('pinSetError').textContent='4자리를 입력하세요';return;}if(p2.length!==4)return;if(p1!==p2){document.getElementById('pinSetError').textContent='비밀번호가 일치하지 않습니다';setupPinInputs('pinConfirmInputs',true,()=>{submitNewPin();});return;}dataRef.child('members/'+pendingLoginId).update({pin:p1,pinSet:true}).then(()=>{pendingLoginData.pin=p1;pendingLoginData.pinSet=true;enterApp(pendingLoginId,pendingLoginData);});}
 function backToLogin(){document.getElementById('pinScreen').classList.add('hidden');document.getElementById('loginScreen').classList.remove('hidden');pendingLoginId=null;pendingLoginData=null;}
 
 function enterAsGuest(){isGuest=true;isAdmin=false;currentUser={id:'guest',name:'게스트',role:'guest'};document.body.classList.add('guest-mode');
@@ -1494,7 +1494,7 @@ function saveMemberName(id){
   if(!confirm(`"${oldName}" → "${newName}" (으)로 이름을 변경하시겠습니까?`))return;
   dataRef.child('members/'+id+'/name').set(newName,()=>{alert('이름 변경 완료');});
 }
-function resetPin(id,name){if(!isAdmin||!confirm(name+' PIN 초기화?'))return;dataRef.child('members/'+id+'/pin').set('0000');}
+function resetPin(id,name){if(!isAdmin||!confirm(name+' PIN 초기화?'))return;dataRef.child('members/'+id).update({pin:'0000',pinSet:null});}
 
 // 참가자
 function toggleParticipant(id){if(selectedParticipants.has(id))selectedParticipants.delete(id);else selectedParticipants.add(id);renderParticipants();}
