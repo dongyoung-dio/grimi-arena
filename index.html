@@ -3606,8 +3606,8 @@ const GUIDE_TAB_MAP={home:'home',game:'game',tier:'tier',setup:'setup',ranking:'
 let currentGuideTab='home';
 
 function openGuide(){
-  const activeTab=document.querySelector('.tab.active');
-  const tabKey=activeTab?activeTab.dataset.tab:'game';
+  const activeTab=document.querySelector('.tabs > .tab.active');
+  const tabKey=activeTab?activeTab.dataset.tab:'home';
   currentGuideTab=GUIDE_TAB_MAP[tabKey]||'home';
   renderGuide();
   document.getElementById('guideModal').classList.remove('hidden');
