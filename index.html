@@ -510,6 +510,412 @@ input:focus,select:focus{border-color:#3b82f6;}
   .rank-dash-item{min-width:auto;}
   .guide-modal-box{max-width:100%;max-height:90vh;}
 }
+
+/* ===== 빙고 게임 CSS (bg- prefix) ===== */
+.bg-lobby {
+  max-width: 420px;
+  margin: 20px auto;
+  text-align: center;
+}
+.bg-lobby h1 {
+  font-size: 38px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+.bg-lobby p {
+  color: #94a3b8;
+  font-size: 14px;
+  margin-bottom: 32px;
+}
+.bg-lobby-box {
+  background: #1e293b;
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 16px;
+  border: 1px solid #334155;
+}
+.bg-lobby-box h2 {
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: #cbd5e1;
+}
+.bg-lobby input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #334155;
+  border-radius: 10px;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 6px;
+  outline: none;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.bg-lobby input:focus { border-color: #3b82f6; }
+.bg-lobby input::placeholder { letter-spacing: 2px; font-size: 14px; color: #475569; }
+.bg-lobby .btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.bg-btn-create {
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  color: white;
+  margin-bottom: 8px;
+}
+.bg-btn-create:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(59,130,246,0.4); }
+.bg-btn-join {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+.bg-btn-join:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(16,185,129,0.4); }
+.bg-btn-join:disabled, .bg-btn-create:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.bg-error-msg {
+  color: #f87171;
+  font-size: 13px;
+  margin-top: 8px;
+}
+.bg-or-divider {
+  color: #475569;
+  font-size: 13px;
+  margin: 20px 0;
+}
+
+/* ===== 게임 화면 ===== */
+.bg-game { display: none; }
+
+.bg-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.bg-header h1 {
+  font-size: 34px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 4px;
+}
+.bg-room-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #1e293b;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 8px;
+  border: 1px solid #334155;
+}
+.bg-room-code {
+  font-weight: 800;
+  color: #fbbf24;
+  letter-spacing: 3px;
+  font-size: 15px;
+}
+.bg-copy-btn {
+  background: none;
+  border: 1px solid #475569;
+  color: #94a3b8;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.bg-copy-btn:hover { border-color: #60a5fa; color: #60a5fa; }
+.bg-online-count {
+  font-size: 12px;
+  color: #64748b;
+}
+.bg-online-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #10b981;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.bg-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.bg-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.bg-btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  color: white;
+}
+.bg-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(59,130,246,0.4); }
+.bg-btn-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+.bg-btn-danger:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(239,68,68,0.4); }
+.bg-btn-back {
+  background: #334155;
+  color: #94a3b8;
+}
+.bg-btn-back:hover { background: #475569; }
+
+/* 스코어보드 */
+.bg-scoreboard {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.bg-score-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #1e293b;
+  border: 1px solid #334155;
+  transition: all 0.3s;
+}
+.bg-score-chip.has-bingo {
+  border-color: #10b981;
+  box-shadow: 0 0 10px rgba(16,185,129,0.3);
+}
+.bg-score-chip .lines { color: #fbbf24; font-weight: 800; }
+
+/* 팀 그리드 */
+.bg-teams {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+@media (max-width: 900px) { .bg-teams { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .bg-teams { grid-template-columns: 1fr; max-width: 400px; } }
+
+.bg-team-card {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 14px;
+  border: 2px solid #334155;
+  transition: all 0.3s;
+}
+.bg-team-card.has-bingo {
+  border-color: #10b981;
+  box-shadow: 0 0 25px rgba(16,185,129,0.25);
+}
+
+.bg-team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.bg-team-name { font-size: 17px; font-weight: 700; }
+.bg-team-score { font-size: 13px; color: #64748b; }
+.bg-team-score strong { color: #fbbf24; }
+
+.bg-bingo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+.bg-bingo-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s;
+  background: #334155;
+  color: #e2e8f0;
+  border: 2px solid transparent;
+}
+.bg-bingo-cell:hover { border-color: #60a5fa; transform: scale(1.05); }
+.bg-bingo-cell:active { transform: scale(0.95); }
+.bg-bingo-cell.marked {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #1e293b;
+  border-color: #fbbf24;
+  box-shadow: 0 0 12px rgba(251,191,36,0.4);
+}
+.bg-bingo-cell.in-bingo-line {
+  box-shadow: 0 0 16px rgba(16,185,129,0.6);
+  border-color: #10b981;
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.bg-bingo-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-left: 6px;
+  animation: bg-pulse 1s infinite;
+}
+@keyframes bg-pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+
+.bg-team-card:nth-child(1) .bg-team-name { color: #60a5fa; }
+.bg-team-card:nth-child(2) .bg-team-name { color: #f87171; }
+.bg-team-card:nth-child(3) .bg-team-name { color: #34d399; }
+.bg-team-card:nth-child(4) .bg-team-name { color: #fb923c; }
+.bg-team-card:nth-child(5) .bg-team-name { color: #a78bfa; }
+.bg-team-card:nth-child(6) .bg-team-name { color: #f472b6; }
+
+.bg-footer {
+  text-align: center;
+  margin-top: 20px;
+  color: #475569;
+  font-size: 12px;
+}
+
+/* 위험 버튼 영역 (우측 하단 고정) */
+.bg-danger-zone {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 100;
+}
+.bg-btn-danger-small {
+  padding: 8px 16px;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #1e293b;
+  color: #94a3b8;
+  transition: all 0.2s;
+}
+.bg-btn-danger-small:hover {
+  border-color: #ef4444;
+  color: #f87171;
+}
+
+/* 커스텀 모달 */
+.bg-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+.bg-modal-overlay.active { display: flex; }
+.bg-modal-box {
+  background: #1e293b;
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 360px;
+  width: 90%;
+  border: 1px solid #334155;
+  text-align: center;
+}
+.bg-modal-box h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: #f87171;
+}
+.bg-modal-box p {
+  font-size: 14px;
+  color: #94a3b8;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+.bg-modal-code-input {
+  width: 120px;
+  padding: 10px;
+  border: 2px solid #334155;
+  border-radius: 8px;
+  background: #0f172a;
+  color: #fbbf24;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 4px;
+  outline: none;
+  margin-bottom: 16px;
+}
+.bg-modal-code-input:focus { border-color: #ef4444; }
+.bg-modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.bg-modal-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.bg-modal-btn-cancel {
+  background: #334155;
+  color: #94a3b8;
+}
+.bg-modal-btn-confirm {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+.bg-modal-btn-confirm:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.bg-loading {
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+}
+.bg-spinner {
+  width: 32px; height: 32px;
+  border: 3px solid #334155;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: bg-spin 0.8s linear infinite;
+  margin: 0 auto 12px;
+}
+@keyframes bg-spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -746,7 +1152,71 @@ input:focus,select:focus{border-color:#3b82f6;}
       <div class="card"><div class="hist-title">누적 기록 <span class="hist-badge" id="histCountBadge">0회</span></div><div id="historyArea"><p style="color:#64748b;font-size:14px;">아직 완료된 이벤트가 없습니다.</p></div></div>
     </div>
     <div id="tab-bingo" class="hidden">
-      <div class="card" style="padding:0;overflow:hidden;"><iframe id="bingoFrame" style="width:100%;height:80vh;border:none;border-radius:12px;background:#0f172a;"></iframe></div>
+      <!-- ===== 빙고 로비 화면 ===== -->
+      <div class="bg-lobby" id="bgLobby">
+        <h1>GRIMI BINGO GAME</h1>
+        <p>실시간으로 같은 빙고판을 공유하세요</p>
+
+        <div class="bg-lobby-box">
+          <h2>새 게임 만들기</h2>
+          <button class="btn bg-btn-create" onclick="bgCreateRoom()">방 만들기</button>
+        </div>
+
+        <div class="bg-or-divider">— 또는 —</div>
+
+        <div class="bg-lobby-box">
+          <h2>기존 방에 참가하기</h2>
+          <input type="text" id="bgRoomInput" placeholder="방 코드 입력" maxlength="6"
+                 oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                 onkeydown="if(event.key==='Enter')bgJoinRoom()">
+          <button class="btn bg-btn-join" id="bgJoinBtn" onclick="bgJoinRoom()" disabled>참가하기</button>
+          <div class="bg-error-msg" id="bgErrorMsg"></div>
+        </div>
+      </div>
+
+      <!-- ===== 빙고 게임 화면 ===== -->
+      <div class="bg-game" id="bgGame">
+        <div class="bg-header">
+          <h1>GRIMI BINGO GAME</h1>
+          <div class="bg-room-info">
+            방 코드 : <span class="bg-room-code" id="bgDisplayCode"></span>
+            <button class="bg-copy-btn" onclick="bgCopyCode()">복사</button>
+          </div>
+          <div class="bg-online-count">
+            <span class="bg-online-dot"></span><span id="bgOnlineCount">1</span>명 접속 중
+          </div>
+        </div>
+
+        <div class="bg-controls">
+          <button class="btn bg-btn-primary bg-guest-hide" id="bgNewGameBtn" onclick="bgTryNewGame()">새 게임 (랜덤 재생성)</button>
+          <button class="btn bg-btn-back" onclick="bgLeaveRoom()">나가기</button>
+        </div>
+
+        <div class="bg-scoreboard" id="bgScoreboard"></div>
+        <div class="bg-teams" id="bgTeamsContainer">
+          <div class="bg-loading"><div class="bg-spinner"></div>로딩 중...</div>
+        </div>
+        <div class="bg-footer">같은 방 코드로 접속하면 실시간으로 동일한 빙고판을 공유합니다</div>
+
+        <!-- 위험 버튼 (우측 하단) -->
+        <div class="bg-danger-zone" id="bgDangerZone" style="display:none;">
+          <button class="bg-btn-danger-small" id="bgResetBtn" onclick="bgShowModal('reset')">전체 표시 초기화</button>
+        </div>
+
+        <!-- 확인 모달 -->
+        <div class="bg-modal-overlay" id="bgConfirmModal">
+          <div class="bg-modal-box">
+            <h3 id="bgModalTitle">정말 초기화할까요?</h3>
+            <p id="bgModalDesc">실수 방지를 위해 아래에 <strong>1234</strong>를 입력해주세요.</p>
+            <input type="text" class="bg-modal-code-input" id="bgModalCodeInput" maxlength="4" placeholder="····"
+                   oninput="bgCheckModalCode()">
+            <div class="bg-modal-buttons">
+              <button class="bg-modal-btn bg-modal-btn-cancel" onclick="bgCloseModal()">취소</button>
+              <button class="bg-modal-btn bg-modal-btn-confirm" id="bgModalConfirmBtn" disabled onclick="bgExecuteModalAction()">확인</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div id="tab-minigame" class="hidden">
       <div style="display:flex;gap:8px;margin-bottom:16px;">
@@ -945,7 +1415,7 @@ function enterApp(id,memberData){
   dataRef.on('value',snap=>{appData=snap.val()||{};if(appData.members&&appData.members[id]){currentUser={id,...appData.members[id]};isAdmin=appData.members[id].role==='admin';document.getElementById('userAvatarTop').textContent=appData.members[id].avatar||appData.members[id].name.charAt(0);}renderAll();if(firstLoad){firstLoad=false;ensureDefaultNotice();ensureDefaultNews();ensureDefaultPubgNicks();switchTab('home');}});
 }
 function logout(){localStorage.removeItem('grimi_kill_user');isGuest=false;location.reload();}
-function switchTab(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));['home','game','tier','members','setup','ranking','bingo','minigame'].forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});window.scrollTo(0,0);if(tab==='home')renderHome();if(tab==='minigame')drawMarbleBoard();if(tab==='bingo'){const f=document.getElementById('bingoFrame');if(!f.getAttribute('src'))f.src='bingo.html'+(isGuest?'?guest=1':'');}}
+function switchTab(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));['home','game','tier','members','setup','ranking','bingo','minigame'].forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});window.scrollTo(0,0);if(tab==='home')renderHome();if(tab==='minigame')drawMarbleBoard();}
 function switchMiniGame(mg){document.querySelectorAll('.mini-tab').forEach(t=>t.classList.toggle('active',t.dataset.mg===mg));['plinko','ladder','snail'].forEach(g=>{const el=document.getElementById('mg-'+g);if(el)el.classList.toggle('hidden',g!==mg);});if(mg==='plinko')drawMarbleBoard();}
 
 // 프로필
@@ -3161,6 +3631,354 @@ function stopStarfield(){if(starfieldAnim){cancelAnimationFrame(starfieldAnim);s
   checkUpdate();
   setInterval(checkUpdate,5*60*1000);
 })();
+
+// ============================================================
+// ===== 빙고 게임 스크립트 (bg- prefix) =====
+// ============================================================
+
+// 상수
+const BG_TEAM_COUNT = 6;
+const BG_GRID_SIZE = 5;
+const BG_NUM_RANGE = 99;
+const BG_TEAM_NAMES = ['1팀','2팀','3팀','4팀','5팀','6팀'];
+const BG_TEAM_COLORS = ['#60a5fa','#f87171','#34d399','#fb923c','#a78bfa','#f472b6'];
+
+// 변수
+let bgCurrentRoom = null;
+let bgRoomRef = null;
+let bgPresenceRef = null;
+let bgMyPresenceRef = null;
+let bgIsCreator = false;
+let bgCurrentModalAction = null;
+let bgConfirmCode = '';
+
+// ===== 로비 =====
+document.getElementById('bgRoomInput').addEventListener('input', function() {
+  document.getElementById('bgJoinBtn').disabled = this.value.length < 4;
+  document.getElementById('bgErrorMsg').textContent = '';
+});
+
+function bgGenerateRoomCode() {
+  const chars = '0123456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function bgGetRandomNumbers(count, max) {
+  const pool = [];
+  for (let i = 1; i <= max; i++) pool.push(i);
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, count);
+}
+
+function bgGenerateTeamsData() {
+  const teamsData = {};
+  for (let t = 0; t < BG_TEAM_COUNT; t++) {
+    const nums = bgGetRandomNumbers(BG_GRID_SIZE * BG_GRID_SIZE, BG_NUM_RANGE);
+    const grid = {};
+    for (let r = 0; r < BG_GRID_SIZE; r++) {
+      for (let c = 0; c < BG_GRID_SIZE; c++) {
+        grid[r + '_' + c] = { value: nums[r * BG_GRID_SIZE + c], marked: false };
+      }
+    }
+    teamsData['team_' + t] = grid;
+  }
+  return teamsData;
+}
+
+async function bgCreateRoom() {
+  const code = bgGenerateRoomCode();
+  const teamsData = bgGenerateTeamsData();
+  await db.ref('rooms/' + code).set({
+    created: Date.now(),
+    creatorId: currentUser.id,
+    teams: teamsData
+  });
+  bgEnterRoom(code, true);
+}
+
+async function bgJoinRoom() {
+  const code = document.getElementById('bgRoomInput').value.trim();
+  if (code.length < 4) return;
+  const snapshot = await db.ref('rooms/' + code).once('value');
+  if (!snapshot.exists()) {
+    document.getElementById('bgErrorMsg').textContent = '존재하지 않는 방 코드입니다';
+    return;
+  }
+  bgEnterRoom(code, false);
+}
+
+function bgEnterRoom(code, isCreator) {
+  bgCurrentRoom = code;
+  bgIsCreator = isCreator;
+  bgRoomRef = db.ref('rooms/' + code + '/teams');
+
+  document.getElementById('bgLobby').style.display = 'none';
+  document.getElementById('bgGame').style.display = 'block';
+  document.getElementById('bgDangerZone').style.display = 'flex';
+  document.getElementById('bgDisplayCode').textContent = code;
+
+  bgUpdateControlButtons();
+
+  // 접속자 수 (presence)
+  bgPresenceRef = db.ref('rooms/' + code + '/presence');
+  bgMyPresenceRef = bgPresenceRef.push();
+  bgMyPresenceRef.set(true);
+  bgMyPresenceRef.onDisconnect().remove();
+
+  bgPresenceRef.on('value', snap => {
+    const count = snap.exists() ? Object.keys(snap.val()).length : 1;
+    document.getElementById('bgOnlineCount').textContent = count;
+  });
+
+  // 실시간 데이터 리스닝
+  bgRoomRef.on('value', snap => {
+    if (!snap.exists()) return;
+    bgRenderFromData(snap.val());
+  });
+}
+
+function bgLeaveRoom() {
+  if (bgMyPresenceRef) bgMyPresenceRef.remove();
+  if (bgRoomRef) bgRoomRef.off();
+  if (bgPresenceRef) bgPresenceRef.off();
+  bgCurrentRoom = null;
+  bgRoomRef = null;
+  bgIsCreator = false;
+
+  document.getElementById('bgLobby').style.display = 'block';
+  document.getElementById('bgGame').style.display = 'none';
+  document.getElementById('bgDangerZone').style.display = 'none';
+  document.getElementById('bgRoomInput').value = '';
+  document.getElementById('bgErrorMsg').textContent = '';
+}
+
+function bgCopyCode() {
+  navigator.clipboard.writeText(bgCurrentRoom).then(() => {
+    const btn = document.querySelector('.bg-copy-btn');
+    btn.textContent = '복사됨!';
+    setTimeout(() => btn.textContent = '복사', 1500);
+  });
+}
+
+// ===== 게임 액션 =====
+function bgHasAnyMarked() {
+  return bgRoomRef.once('value').then(snap => {
+    const data = snap.val();
+    if (!data) return false;
+    for (let t = 0; t < BG_TEAM_COUNT; t++) {
+      const team = data['team_' + t];
+      if (!team) continue;
+      for (let r = 0; r < BG_GRID_SIZE; r++) {
+        for (let c = 0; c < BG_GRID_SIZE; c++) {
+          if (team[r + '_' + c] && team[r + '_' + c].marked) return true;
+        }
+      }
+    }
+    return false;
+  });
+}
+
+function bgTryNewGame() {
+  if (isGuest) return;
+  if (!bgIsCreator) {
+    alert('방 생성자만 새 게임을 시작할 수 있습니다.');
+    return;
+  }
+  bgHasAnyMarked().then(anyMarked => {
+    if (anyMarked) {
+      bgShowModal('newGame');
+    } else {
+      bgRoomRef.set(bgGenerateTeamsData());
+    }
+  });
+}
+
+function bgToggleCell(teamIdx, row, col) {
+  if (isGuest) return;
+  const path = 'team_' + teamIdx + '/' + row + '_' + col + '/marked';
+  bgRoomRef.child(path).once('value').then(snap => {
+    bgRoomRef.child(path).set(!snap.val());
+  });
+}
+
+function bgUpdateControlButtons() {
+  const newGameBtn = document.getElementById('bgNewGameBtn');
+  const resetBtn = document.getElementById('bgResetBtn');
+  if (bgIsCreator && !isGuest) {
+    if (newGameBtn) newGameBtn.style.display = 'inline-block';
+    if (resetBtn) resetBtn.style.display = 'block';
+  } else {
+    if (newGameBtn) newGameBtn.style.display = 'none';
+    if (resetBtn) resetBtn.style.display = 'none';
+  }
+}
+
+// ===== 모달 시스템 =====
+function bgGenerateConfirmCode() {
+  return String(Math.floor(1000 + Math.random() * 9000));
+}
+
+function bgShowModal(action) {
+  if (isGuest) return;
+  if (action === 'reset' && !bgIsCreator) return;
+
+  bgCurrentModalAction = action;
+  bgConfirmCode = bgGenerateConfirmCode();
+
+  const modal = document.getElementById('bgConfirmModal');
+  const title = document.getElementById('bgModalTitle');
+  const desc = document.getElementById('bgModalDesc');
+  const input = document.getElementById('bgModalCodeInput');
+  const btn = document.getElementById('bgModalConfirmBtn');
+
+  if (action === 'newGame') {
+    title.textContent = '새 게임을 시작할까요?';
+    desc.innerHTML = '현재 빙고판이 모두 사라집니다.<br>실수 방지를 위해 아래에 <strong>' + bgConfirmCode + '</strong>를 입력해주세요.';
+  } else if (action === 'reset') {
+    title.textContent = '전체 표시를 초기화할까요?';
+    desc.innerHTML = '모든 팀의 체크 표시가 해제됩니다.<br>실수 방지를 위해 아래에 <strong>' + bgConfirmCode + '</strong>를 입력해주세요.';
+  }
+
+  input.value = '';
+  btn.disabled = true;
+  modal.classList.add('active');
+  setTimeout(() => input.focus(), 100);
+}
+
+function bgCloseModal() {
+  document.getElementById('bgConfirmModal').classList.remove('active');
+  bgCurrentModalAction = null;
+}
+
+function bgCheckModalCode() {
+  const input = document.getElementById('bgModalCodeInput').value;
+  document.getElementById('bgModalConfirmBtn').disabled = (input !== bgConfirmCode);
+}
+
+function bgExecuteModalAction() {
+  if (isGuest || !bgIsCreator) return;
+
+  if (bgCurrentModalAction === 'newGame') {
+    bgRoomRef.set(bgGenerateTeamsData());
+  } else if (bgCurrentModalAction === 'reset') {
+    const updates = {};
+    for (let t = 0; t < BG_TEAM_COUNT; t++) {
+      for (let r = 0; r < BG_GRID_SIZE; r++) {
+        for (let c = 0; c < BG_GRID_SIZE; c++) {
+          updates['team_' + t + '/' + r + '_' + c + '/marked'] = false;
+        }
+      }
+    }
+    bgRoomRef.update(updates);
+  }
+  bgCloseModal();
+}
+
+// ===== 렌더링 =====
+function bgGetBingoInfo(markedGrid) {
+  let lines = 0;
+  const bingoSet = new Set();
+
+  for (let r = 0; r < BG_GRID_SIZE; r++) {
+    let ok = true;
+    for (let c = 0; c < BG_GRID_SIZE; c++) { if (!markedGrid[r][c]) { ok = false; break; } }
+    if (ok) { lines++; for (let c = 0; c < BG_GRID_SIZE; c++) bingoSet.add(r+','+c); }
+  }
+  for (let c = 0; c < BG_GRID_SIZE; c++) {
+    let ok = true;
+    for (let r = 0; r < BG_GRID_SIZE; r++) { if (!markedGrid[r][c]) { ok = false; break; } }
+    if (ok) { lines++; for (let r = 0; r < BG_GRID_SIZE; r++) bingoSet.add(r+','+c); }
+  }
+  let d1 = true, d2 = true;
+  for (let i = 0; i < BG_GRID_SIZE; i++) {
+    if (!markedGrid[i][i]) d1 = false;
+    if (!markedGrid[i][BG_GRID_SIZE-1-i]) d2 = false;
+  }
+  if (d1) { lines++; for (let i = 0; i < BG_GRID_SIZE; i++) bingoSet.add(i+','+i); }
+  if (d2) { lines++; for (let i = 0; i < BG_GRID_SIZE; i++) bingoSet.add(i+','+(BG_GRID_SIZE-1-i)); }
+
+  return { lines, bingoSet };
+}
+
+function bgRenderFromData(teamsData) {
+  const container = document.getElementById('bgTeamsContainer');
+  const sb = document.getElementById('bgScoreboard');
+  container.innerHTML = '';
+  sb.innerHTML = '';
+
+  for (let t = 0; t < BG_TEAM_COUNT; t++) {
+    const teamData = teamsData['team_' + t];
+    if (!teamData) continue;
+
+    const values = [], marked = [];
+    for (let r = 0; r < BG_GRID_SIZE; r++) {
+      values[r] = [];
+      marked[r] = [];
+      for (let c = 0; c < BG_GRID_SIZE; c++) {
+        const cell = teamData[r + '_' + c];
+        values[r][c] = cell.value;
+        marked[r][c] = !!cell.marked;
+      }
+    }
+
+    const { lines, bingoSet } = bgGetBingoInfo(marked);
+    const markedCount = marked.flat().filter(v => v).length;
+
+    // 스코어 칩
+    const chip = document.createElement('div');
+    chip.className = 'bg-score-chip' + (lines > 0 ? ' has-bingo' : '');
+    chip.innerHTML = `<span style="color:${BG_TEAM_COLORS[t]}">${BG_TEAM_NAMES[t]}</span> <span class="lines">${lines}줄</span>`;
+    sb.appendChild(chip);
+
+    // 팀 카드
+    const card = document.createElement('div');
+    card.className = 'bg-team-card' + (lines > 0 ? ' has-bingo' : '');
+
+    let html = `
+      <div class="bg-team-header">
+        <div>
+          <span class="bg-team-name">${BG_TEAM_NAMES[t]}</span>
+          ${lines > 0 ? `<span class="bg-bingo-badge">${lines} BINGO!</span>` : ''}
+        </div>
+        <span class="bg-team-score">체크 <strong>${markedCount}</strong>/25</span>
+      </div>
+      <div class="bg-bingo-grid">
+    `;
+
+    for (let r = 0; r < BG_GRID_SIZE; r++) {
+      for (let c = 0; c < BG_GRID_SIZE; c++) {
+        const isMarked = marked[r][c];
+        const inBingo = bingoSet.has(r+','+c);
+        let cls = 'bg-bingo-cell';
+        if (isMarked && inBingo) cls += ' marked in-bingo-line';
+        else if (isMarked) cls += ' marked';
+        html += `<div class="${cls}" onclick="bgToggleCell(${t},${r},${c})">${values[r][c]}</div>`;
+      }
+    }
+
+    html += '</div>';
+    card.innerHTML = html;
+    container.appendChild(card);
+  }
+}
+
+function bgInitTab() {
+  // 빙고 탭 초기화 로직
+}
+
+// switchTab 함수 수정 (기존 코드에서 빙고 탭 분기 처리)
+const bgOriginalSwitchTab = window.switchTab;
+window.switchTab = function(tabName) {
+  if (tabName === 'bingo') {
+    bgInitTab();
+  }
+  return bgOriginalSwitchTab.call(this, tabName);
+};
 </script>
 </body>
 </html>
