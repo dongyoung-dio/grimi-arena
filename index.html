@@ -3774,7 +3774,9 @@ async function bgJoinRoom() {
     document.getElementById('bgErrorMsg').textContent = '존재하지 않는 방 코드입니다';
     return;
   }
-  bgEnterRoom(code, false);
+  const roomData = snapshot.val();
+  const amICreator = currentUser && roomData.creatorId === currentUser.id;
+  bgEnterRoom(code, amICreator);
 }
 
 function bgEnterRoom(code, isCreator) {
@@ -3850,8 +3852,8 @@ function bgHasAnyMarked() {
 
 function bgTryNewGame() {
   if (isGuest) return;
-  if (!bgIsCreator) {
-    alert('방 생성자만 새 게임을 시작할 수 있습니다.');
+  if (!bgIsCreator && !isAdmin) {
+    alert('방장 또는 관리자만 새 게임을 시작할 수 있습니다.');
     return;
   }
   bgHasAnyMarked().then(anyMarked => {
@@ -3874,7 +3876,8 @@ function bgToggleCell(teamIdx, row, col) {
 function bgUpdateControlButtons() {
   const newGameBtn = document.getElementById('bgNewGameBtn');
   const resetBtn = document.getElementById('bgResetBtn');
-  if (bgIsCreator && !isGuest) {
+  const canControl = (bgIsCreator || isAdmin) && !isGuest;
+  if (canControl) {
     if (newGameBtn) newGameBtn.style.display = 'inline-block';
     if (resetBtn) resetBtn.style.display = 'block';
   } else {
@@ -3890,7 +3893,7 @@ function bgGenerateConfirmCode() {
 
 function bgShowModal(action) {
   if (isGuest) return;
-  if (action === 'reset' && !bgIsCreator) return;
+  if (action === 'reset' && !bgIsCreator && !isAdmin) return;
 
   bgCurrentModalAction = action;
   bgConfirmCode = bgGenerateConfirmCode();
@@ -3926,7 +3929,7 @@ function bgCheckModalCode() {
 }
 
 function bgExecuteModalAction() {
-  if (isGuest || !bgIsCreator) return;
+  if (isGuest || (!bgIsCreator && !isAdmin)) return;
 
   if (bgCurrentModalAction === 'newGame') {
     bgRoomRef.set(bgGenerateTeamsData());
