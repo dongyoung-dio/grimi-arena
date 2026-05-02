@@ -1373,7 +1373,7 @@ function updateOnlineDisplay(){const total=Object.keys(presenceData).length;cons
 function init(){
   dataRef.child('members').on('value',snap=>{loginMembers=snap.val()||{};if(!document.getElementById('loginScreen').classList.contains('hidden'))renderLoginList(loginMembers);});
   const saved=localStorage.getItem('grimi_kill_user');
-  if(saved){const u=JSON.parse(saved);dataRef.child('members/'+u.id).once('value').then(snap=>{if(snap.exists()){const m=snap.val();if(m.pinSet)enterApp(u.id,m);}});}
+  if(saved){const u=JSON.parse(saved);dataRef.child('members/'+u.id).once('value').then(snap=>{if(snap.exists()){const m=snap.val();if(m.pinSet||(m.pin&&m.pin!=='0000'))enterApp(u.id,m);}});}
 }
 
 // 로그인 (그리드 정렬, 아바타)
@@ -1396,7 +1396,7 @@ function selectMember(id){
   const m=loginMembers[id];if(!m)return;pendingLoginId=id;pendingLoginData=m;
   document.getElementById('loginScreen').classList.add('hidden');document.getElementById('pinScreen').classList.remove('hidden');
   document.getElementById('pinUserName').textContent=m.name;
-  const isFirst=!m.pinSet;
+  const isFirst=!m.pinSet&&(!m.pin||m.pin==='0000');
   document.getElementById('pinFirstBadge').classList.toggle('hidden',!isFirst);
   document.getElementById('pinEnterArea').classList.toggle('hidden',isFirst);
   document.getElementById('pinSetArea').classList.toggle('hidden',!isFirst);
