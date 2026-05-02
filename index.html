@@ -2482,12 +2482,17 @@ function getYtSortedKeys(){
     return oa-ob;
   });
 }
+let ytLastHash='';
 function renderYouTube(){
   const area=document.getElementById('ytPlayerArea');if(!area)return;
   const videos=appData.homeVideos||{};
   const keys=getYtSortedKeys();
-  if(!keys.length){area.innerHTML='<div class="yt-empty">등록된 영상이 없습니다.</div>';return;}
+  if(!keys.length){ytLastHash='';area.innerHTML='<div class="yt-empty">등록된 영상이 없습니다.</div>';return;}
   ytSlideIdx=Math.min(ytSlideIdx,keys.length-1);
+  // 영상 데이터가 안 바뀌었으면 iframe 재생성 스킵
+  const newHash=keys.map(k=>k+'_'+(videos[k].url||'')+'_'+(videos[k].title||'')+'_'+(videos[k].order||0)).join('|')+'_idx'+ytSlideIdx;
+  if(newHash===ytLastHash)return;
+  ytLastHash=newHash;
   let h='<div class="yt-slide-wrap">';
   h+='<div class="yt-slide-inner" id="ytSlideInner" style="transform:translateX(-'+ytSlideIdx*100+'%)">';
   keys.forEach(k=>{
@@ -2522,9 +2527,9 @@ function ytSlide(dir){
   const cnt=Object.keys(videos).length;
   if(cnt<=1)return;
   ytSlideIdx=(ytSlideIdx+dir+cnt)%cnt;
-  renderYouTube();
+  ytLastHash='';renderYouTube();
 }
-function ytSlideTo(idx){ytSlideIdx=idx;renderYouTube();}
+function ytSlideTo(idx){ytSlideIdx=idx;ytLastHash='';renderYouTube();}
 
 let ytAdminOpen=false;
 function renderYtAdmin(){
