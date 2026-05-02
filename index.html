@@ -1421,7 +1421,7 @@ function enterApp(id,memberData){
   document.getElementById('roleBadge').innerHTML=isAdmin?'<span class="badge-admin">관리자</span>':'<span class="badge-member">일반</span>';
   if(!isAdmin)document.querySelectorAll('.tab[data-tab="members"],.tab[data-tab="setup"]').forEach(el=>el.style.display='none');
   else document.querySelectorAll('.tab[data-tab="members"],.tab[data-tab="setup"]').forEach(el=>el.style.display='');
-  const presRef=dataRef.child('presence');const myRef=presRef.push();myRef.set({name:memberData.name,id:id,type:'member'});myRef.onDisconnect().remove();
+  const presRef=dataRef.child('presence');const myRef=presRef.child(id);myRef.set({name:memberData.name,id:id,type:'member'});myRef.onDisconnect().remove();
   presRef.on('value',s=>{presenceData=s.exists()?s.val():{};updateOnlineDisplay();});
   let firstLoad=true;
   dataRef.on('value',snap=>{appData=snap.val()||{};if(appData.members&&appData.members[id]){currentUser={id,...appData.members[id]};isAdmin=appData.members[id].role==='admin';document.getElementById('userAvatarTop').textContent=appData.members[id].avatar||appData.members[id].name.charAt(0);}renderAll();if(firstLoad){firstLoad=false;ensureDefaultNotice();ensureDefaultNews();ensureDefaultPubgNicks();switchTab('home');}});
