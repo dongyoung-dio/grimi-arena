@@ -2432,25 +2432,23 @@ function renderNews(){
     if(n.cat==='map'&&n.weeks){
       h+=`<div style="font-size:11px;color:#64748b;margin:6px 0 4px;">※ 매주 수요일 11:00 맵 교체</div>`;
       h+=`<div style="font-size:12px;font-weight:700;color:#60a5fa;margin-bottom:3px;">◇ 일반 매치</div>`;
-      h+=`<table style="width:100%;border-collapse:collapse;font-size:11px;"><thead><tr style="border-bottom:1px solid #334155;">`;
-      h+=`<th style="padding:4px 6px;text-align:left;color:#64748b;font-weight:600;width:50px;">주차</th>`;
-      h+=`<th style="padding:4px 6px;text-align:left;color:#64748b;font-weight:600;width:110px;">기간</th>`;
-      h+=`<th style="padding:4px 6px;text-align:left;color:#64748b;font-weight:600;">고정</th>`;
-      h+=`<th style="padding:4px 6px;text-align:left;color:#64748b;font-weight:600;">로테이션</th>`;
-      h+=`</tr></thead><tbody>`;
       const weeks=Array.isArray(n.weeks)?n.weeks:Object.values(n.weeks);
+      h+=`<div style="display:flex;flex-direction:column;gap:4px;">`;
       weeks.forEach((w,i)=>{
         const isCurrent=today>=w.from&&today<w.to;
-        const bg=isCurrent?'background:rgba(59,130,246,.08);':'';
+        const bg=isCurrent?'background:rgba(59,130,246,.1);border-color:#3b82f650;':'';
         const dateLabel=(w.from||'').slice(5).replace('-','/')+' ~ '+(w.to||'').slice(5).replace('-','/');
-        h+=`<tr style="border-bottom:1px solid rgba(51,65,85,.4);${bg}">`;
-        h+=`<td style="padding:4px 6px;font-weight:600;${isCurrent?'color:#fbbf24;':'color:#94a3b8;'}">${isCurrent?'◀ ':''}${i+1}주차</td>`;
-        h+=`<td style="padding:4px 6px;color:#94a3b8;">${dateLabel}</td>`;
-        h+=`<td style="padding:4px 6px;">${(w.fixed||['에란겔','테이고','사녹']).join(', ')}</td>`;
-        h+=`<td style="padding:4px 6px;color:#10b981;">${(Array.isArray(w.rotation)?w.rotation:Object.values(w.rotation||{})).join(', ')}</td>`;
-        h+=`</tr>`;
+        const fixed=(w.fixed||['에란겔','테이고','사녹']).join(' · ');
+        const rot=(Array.isArray(w.rotation)?w.rotation:Object.values(w.rotation||{})).join(' · ');
+        h+=`<div style="padding:6px 8px;border-radius:6px;background:#0f172a;border:1px solid #334155;${bg}">`;
+        h+=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">`;
+        h+=`<span style="font-size:11px;font-weight:700;${isCurrent?'color:#fbbf24;':'color:#94a3b8;'}">${isCurrent?'◀ ':''}${i+1}주차</span>`;
+        h+=`<span style="font-size:10px;color:#64748b;">${dateLabel}</span>`;
+        h+=`</div>`;
+        h+=`<div style="font-size:11px;white-space:nowrap;overflow-x:auto;"><span style="color:#94a3b8;">고정</span> <span style="color:#e2e8f0;">${fixed}</span> <span style="color:#64748b;margin:0 4px;">|</span> <span style="color:#94a3b8;">로테</span> <span style="color:#10b981;">${rot}</span></div>`;
+        h+=`</div>`;
       });
-      h+=`</tbody></table>`;
+      h+=`</div>`;
       if(n.ranked){
         h+=`<div style="font-size:12px;font-weight:700;color:#f59e0b;margin:8px 0 3px;">◇ 경쟁전</div>`;
         h+=`<div style="font-size:11px;color:#94a3b8;background:#0f172a;border:1px solid #334155;border-radius:5px;padding:5px 8px;">${escHtml(n.ranked)}</div>`;
