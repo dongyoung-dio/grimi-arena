@@ -223,7 +223,7 @@ input:focus,select:focus{border-color:#3b82f6;}
 .login-box h2{font-size:14px;margin-bottom:12px;color:#94a3b8;font-weight:500;letter-spacing:.5px;}
 .search-wrap{margin-bottom:16px;}
 .search-wrap input{width:100%;padding:12px 16px;border-radius:10px;font-size:14px;background:rgba(15,23,42,.6);border:1px solid #334155;}
-.member-scroll{max-height:280px;overflow-y:auto;padding:2px;}
+.member-scroll{max-height:280px;overflow-y:auto;padding:2px;scrollbar-width:none;-ms-overflow-style:none;}.member-scroll::-webkit-scrollbar{display:none;}
 .login-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 @media(max-width:400px){.login-grid{grid-template-columns:repeat(2,1fr);}}
 .login-chip{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;cursor:pointer;transition:all .15s;background:rgba(51,65,85,.5);border:1px solid transparent;}
@@ -487,14 +487,22 @@ input:focus,select:focus{border-color:#3b82f6;}
 .profile-avatar-big{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 12px;background:#334155;}
 
 /* 가이드 모달 */
-.guide-modal-box{background:#1e293b;border-radius:16px;padding:0;border:1px solid #334155;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column;}
+.guide-modal-box{background:#1e293b;border-radius:16px;padding:0;border:1px solid #334155;max-width:680px;width:95%;max-height:85vh;display:flex;flex-direction:column;}
 .guide-header{padding:18px 24px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
 .guide-header h2{font-size:18px;font-weight:800;margin:0;}
-.guide-tabs{display:flex;gap:4px;padding:10px 24px;border-bottom:1px solid #334155;overflow-x:auto;flex-shrink:0;}
+.guide-tabs-wrap{position:relative;flex-shrink:0;border-bottom:1px solid #334155;}
+.guide-tabs-wrap::after{content:'';position:absolute;right:0;top:0;bottom:1px;width:32px;background:linear-gradient(to right,transparent,#1e293b);pointer-events:none;z-index:1;}
+.guide-tabs{display:flex;gap:4px;padding:10px 24px;overflow-x:auto;scrollbar-width:thin;scrollbar-color:#475569 transparent;}
+.guide-tabs::-webkit-scrollbar{height:4px;}
+.guide-tabs::-webkit-scrollbar-track{background:transparent;}
+.guide-tabs::-webkit-scrollbar-thumb{background:#475569;border-radius:4px;}
 .guide-tab{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:#0f172a;color:#64748b;border:1px solid #334155;white-space:nowrap;transition:all .15s;}
 .guide-tab:hover{color:#94a3b8;border-color:#60a5fa;}
 .guide-tab.active{background:#3b82f6;color:#fff;border-color:#3b82f6;}
-.guide-body{padding:20px 24px;overflow-y:auto;flex:1;font-size:14px;line-height:1.7;color:#cbd5e1;}
+.guide-body{padding:20px 24px;overflow-y:auto;flex:1;font-size:14px;line-height:1.7;color:#cbd5e1;scrollbar-width:thin;scrollbar-color:#475569 transparent;}
+.guide-body::-webkit-scrollbar{width:6px;}
+.guide-body::-webkit-scrollbar-track{background:transparent;}
+.guide-body::-webkit-scrollbar-thumb{background:#475569;border-radius:4px;}
 .guide-body h3{font-size:16px;font-weight:800;color:#e2e8f0;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid #334155;}
 .guide-body h3:first-child{margin-top:0;}
 .guide-body p{margin:6px 0;}
@@ -1004,7 +1012,7 @@ input:focus,select:focus{border-color:#3b82f6;}
 <div id="guideModal" class="modal-overlay hidden" onclick="if(event.target===this)closeGuide()">
   <div class="guide-modal-box">
     <div class="guide-header"><h2>📖 GRIMI ARENA 가이드</h2><button class="modal-close" onclick="closeGuide()">✕</button></div>
-    <div class="guide-tabs" id="guideTabs"></div>
+    <div class="guide-tabs-wrap"><div class="guide-tabs" id="guideTabs"></div></div>
     <div class="guide-body" id="guideBody"></div>
   </div>
 </div>
@@ -3412,8 +3420,8 @@ function endSnailRace(){
 // 가이드
 const GUIDE_DATA={
   home:{title:'홈',content:`
-<h3>클랜 현황</h3>
-<p>총 멤버 수, 누적 이벤트 횟수, 현재 진행 상태, 접속자 수, 최근 우승팀을 한눈에 볼 수 있습니다.</p>
+<h3>대시보드</h3>
+<p>멤버 수, 누적 이벤트 횟수, 치킨왕(🍗), 효율왕(⚡), 킬왕(🔫), 딜왕(💥) 등 역대 기록을 한눈에 볼 수 있습니다.</p>
 
 <h3>공지사항</h3>
 <p><span class="g-label g-admin">관리자</span> "+ 작성" 버튼으로 공지를 등록할 수 있습니다.</p>
@@ -3423,12 +3431,23 @@ const GUIDE_DATA={
 <h3>전적검색</h3>
 <p>PUBG 닉네임을 입력하고 검색하면 K/D, 승률, 평균 딜량 등이 바로 표시됩니다.</p>
 <p>플랫폼(Steam/카카오)을 선택하고 검색하세요. 모드별(스쿼드/듀오/솔로) 전환도 가능합니다.</p>
-<p>아래 멤버 칩을 클릭하면 해당 멤버 전적이 바로 조회됩니다.</p>
+<p>아래 멤버 칩을 클릭하면 해당 멤버 전적이 바로 조회됩니다. 칩은 랜덤 미리보기 상태에서 "외 N명 ▼" 버튼으로 펼칠 수 있고, 이름 검색도 가능합니다.</p>
 <p>"dak.gg 더보기"를 누르면 상세 전적 페이지로 이동합니다.</p>
+
+<h3>맵 정보</h3>
+<p>PUBG 맵 목록이 카드 형태로 표시됩니다.</p>
+<p>이미지가 있는 맵(에란겔, 미라마, 테이고, 비켄디, 데스턴, 론도)은 클릭하면 맵 이미지 모달이 열립니다.</p>
+<p>모달에서 <b>+/− 버튼</b> 또는 <b>마우스 휠</b>로 확대/축소할 수 있고, 확대 상태에서 드래그로 이동이 가능합니다.</p>
+<p>이미지가 없는 맵은 클릭 시 인벤 맵 정보 페이지로 바로 이동합니다.</p>
+
+<h3>카배 소식</h3>
+<p><span class="g-label g-admin">관리자</span> 카배(카스텀 배틀) 소식을 등록할 수 있습니다.</p>
+<p>맵 로테이션, 업데이트, 패치 등 카테고리별로 소식을 관리합니다.</p>
 
 <h3>영상</h3>
 <p><span class="g-label g-admin">관리자</span> YouTube URL을 등록하면 임베드 플레이어로 표시됩니다.</p>
-<p>여러 영상을 등록하면 좌우 화살표로 슬라이드 전환이 가능합니다.</p>
+<p>여러 영상을 등록하면 좌측 플레이리스트에서 클릭하여 전환합니다.</p>
+<p><span class="g-label g-admin">관리자</span> 제목 수정, ▲▼ 순서 변경, 삭제가 가능합니다.</p>
 `},
   tier:{title:'티어표',content:`
 <h3>티어 구조</h3>
@@ -3505,9 +3524,10 @@ const GUIDE_DATA={
 <p>6팀이 각자 다른 5×5 빙고판(1~99 랜덤 숫자)을 가지고 동시에 진행하는 실시간 멀티 빙고입니다.</p>
 
 <h3>방 만들기 / 참가</h3>
-<p><b>방 만들기</b> : 새 방을 생성하면 6자리 숫자 방 코드가 나옵니다.</p>
+<p><b>방 만들기</b> : 새 방을 생성하면 6자리 숫자 방 코드가 나옵니다. 방을 만든 사람이 방장이 됩니다.</p>
 <p><b>참가하기</b> : 방 코드를 입력하면 같은 빙고판을 실시간으로 공유합니다.</p>
 <p>방 코드는 상단에서 "복사" 버튼으로 바로 공유 가능합니다.</p>
+<p>방장은 나갔다가 같은 코드로 다시 들어와도 권한이 유지됩니다.</p>
 
 <h3>게임 진행</h3>
 <p>각 팀 빙고판의 숫자를 클릭하면 체크됩니다. 모든 접속자에게 실시간 반영됩니다.</p>
@@ -3515,6 +3535,7 @@ const GUIDE_DATA={
 <p>상단 스코어보드에서 각 팀의 빙고 줄 수를 한눈에 확인할 수 있습니다.</p>
 
 <h3>관리 기능</h3>
+<p><span class="g-label g-admin">방장 / 관리자</span> 새 게임, 전체 초기화 권한이 있습니다. 일반 참가자는 버튼이 보이지 않습니다.</p>
 <p><b>새 게임</b> : 모든 팀의 빙고판을 새로운 랜덤 숫자로 재생성합니다.</p>
 <p><b>전체 표시 초기화</b> : 빙고판은 유지하고 체크만 모두 해제합니다.</p>
 <div class="g-warn">⚠️ 새 게임/초기화는 실수 방지를 위해 4자리 확인 코드를 입력해야 합니다.</div>
@@ -3547,13 +3568,22 @@ const GUIDE_DATA={
 <p><span class="g-label g-admin">관리자 전용</span></p>
 
 <h3>멤버 추가</h3>
-<p>이름 + 티어 + 등급 선택 → "+ 추가"</p>
-<p>초기 PIN은 0000이며, 첫 로그인 시 새 PIN을 설정해야 합니다.</p>
+<p>이름 + PUBG 닉네임(선택) + 티어 + 등급 선택 → "+ 추가"</p>
+<p>첫 로그인 시 새 PIN을 설정해야 합니다. PIN 설정 전까지는 자동 로그인이 되지 않습니다.</p>
+
+<h3>검색</h3>
+<p>상단 검색창에서 이름으로 멤버를 필터링할 수 있습니다.</p>
 
 <h3>멤버 테이블</h3>
-<p>티어/등급 변경, 역할(일반/관리자) 변경, PIN 초기화가 가능합니다.</p>
+<p><b>이름 수정</b> : 이름을 클릭하면 인라인 편집 모드로 전환됩니다. 수정 후 "저장" 또는 Enter로 확인합니다.</p>
+<p><b>PUBG 닉네임</b> : 각 멤버별 개별 저장 또는 상단 "전체저장" 버튼으로 일괄 저장이 가능합니다.</p>
+<p><b>티어/등급</b> : 드롭다운으로 변경, 역할(일반/관리자) 변경, PIN 초기화가 가능합니다.</p>
 <p><b>숨김</b> : 로그인 목록에서 안 보이게 합니다 (데이터는 유지).</p>
 <p><b>접속 표시</b> : 현재 접속 중인 멤버는 이름 옆에 파란 점(●)이 표시됩니다.</p>
+
+<h3>일괄 적용</h3>
+<p>체크박스로 여러 멤버를 선택한 후, 상단에서 티어/등급을 한번에 변경할 수 있습니다.</p>
+<p>"전체선택/전체해제" 버튼으로 빠르게 선택 가능합니다.</p>
 <div class="g-warn">⚠️ 멤버 삭제는 영구 삭제입니다. 탈퇴자는 "숨김" 처리를 권장합니다.</div>
 `}
 };
