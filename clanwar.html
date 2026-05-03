@@ -176,7 +176,7 @@ input:focus,select:focus{border-color:#3b82f6;}
 
 /* 라운드별 순위 */
 .round-rank-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-top:20px;}
-.round-rank-card{background:#1e293b;border-radius:12px;border:1px solid #334155;overflow:hidden;min-width:0;}
+.round-rank-card{background:#1e293b;border-radius:12px;border:1px solid #334155;overflow:visible;min-width:0;}
 .round-rank-head{padding:12px 16px;background:#334155;font-weight:800;font-size:14px;display:flex;align-items:center;gap:8px;}
 .round-rank-head .rr-round{color:#60a5fa;}
 .round-rank-head .rr-map{color:#94a3b8;font-weight:600;font-size:13px;}
@@ -397,6 +397,7 @@ input:focus,select:focus{border-color:#3b82f6;}
       <div class="setup-card"><h3 style="justify-content:space-between;">팀 관리 <button class="btn btn-xs btn-red" onclick="removeAllTeams()">전체 삭제</button></h3>
         <div class="setup-row">
           <select id="newTeamClan" style="width:120px;"><option value="">클랜 선택</option></select>
+          <input id="newTeamSlot" type="text" placeholder="슬롯 (예: 1, 2)" style="width:100px;">
           <button class="btn btn-sm btn-blue" onclick="addTeam()">+ 팀 추가</button>
         </div>
         <div id="teamListArea" class="item-list"></div>
@@ -683,7 +684,7 @@ function renderRoundRanks(){
       const placePts=rd?rd.placePts:0;
       const roundTotal=kills+placePts;
       return {name:s.name,clan:s.clan,kills,placePts,roundTotal};
-    }).filter(x=>x.roundTotal>0).sort((a,b)=>b.roundTotal-a.roundTotal||(b.kills-a.kills));
+    }).sort((a,b)=>b.roundTotal-a.roundTotal||(b.kills-a.kills));
     if(!ranked.length) return;
     let rows='';
     ranked.forEach((t,j)=>{
@@ -817,17 +818,27 @@ function updateTeamClanSelect(){
 function addTeam(){
   const clan=document.getElementById('newTeamClan').value;
   if(!clan){toast('클랜을 선택하세요');return;}
-  // 해당 클랜의 기존 팀 수 파악해서 다음 번호 자동 부여
+  const slotInput=document.getElementById('newTeamSlot');
+  const slotVal=slotInput.value.trim();
   const teams=appData.teams||{};
-  let maxNum=0;
-  Object.values(teams).forEach(t=>{
-    if(t.clan===clan){
-      const m=t.name.match(new RegExp('^'+clan+'-(\\d+)$'));
-      if(m) maxNum=Math.max(maxNum,Number(m[1]));
-    }
-  });
-  const name=clan+'-'+(maxNum+1);
+  let name;
+  if(slotVal){
+    name=clan+'-'+slotVal;
+    // 중복 체크
+    const dup=Object.values(teams).find(t=>t.name===name);
+    if(dup){toast(name+' 이미 존재합니다');return;}
+  } else {
+    let maxNum=0;
+    Object.values(teams).forEach(t=>{
+      if(t.clan===clan){
+        const m=t.name.match(new RegExp('^'+clan+'-(\\d+)$'));
+        if(m) maxNum=Math.max(maxNum,Number(m[1]));
+      }
+    });
+    name=clan+'-'+(maxNum+1);
+  }
   ref.child('teams/'+ref.child('teams').push().key).set({name,clan});
+  slotInput.value='';
   toast(name+' 팀 추가');
 }
 function removeTeam(id){const t=appData.teams?.[id];showConfirm('팀 삭제',`${t?.name||''} 삭제?`,()=>{ref.child('teams/'+id).remove();ref.child('scores/'+id).remove();toast('삭제됨');});}
@@ -838,8 +849,16 @@ function renderTeamList(){
   if(!ids.length){area.innerHTML='<p style="color:#64748b;font-size:13px;">등록된 팀이 없습니다.</p>';return;}
   area.innerHTML=ids.map(id=>{const t=teams[id];
     const logo=getClanLogo(t.clan)?`<img src="${getClanLogo(t.clan)}" class="clan-logo-sm">`:`<span class="clan-avatar" style="background:${getClanColor(t.clan)};">${t.clan.charAt(0)}</span>`;
-    return `<div class="item-row">${logo}<span class="clan-tag" style="background:${getClanColor(t.clan)};font-size:11px;">${t.clan}</span><span class="item-name">${t.name}</span><button class="item-delete" onclick="removeTeam('${id}')">✕</button></div>`;
+    const slotNum=(t.slot!=null)?t.slot:'';
+    return `<div class="item-row">${logo}<span class="clan-tag" style="background:${getClanColor(t.clan)};font-size:11px;">${t.clan}</span><span class="item-name">${t.name}</span><input type="text" value="${slotNum}" placeholder="팀 #" style="width:60px;padding:4px 6px;font-size:13px;text-align:center;" id="slot_${id}"><button class="btn btn-xs btn-gray" onclick="saveTeamSlot('${id}')" style="padding:4px 8px;font-size:11px;">저장</button><button class="item-delete" onclick="removeTeam('${id}')">✕</button></div>`;
   }).join('');
+}
+function saveTeamSlot(tid){
+  const input=document.getElementById('slot_'+tid);
+  if(!input)return;
+  const val=input.value.trim();
+  ref.child('teams/'+tid+'/slot').set(val||null);
+  toast('슬롯 저장: '+(val||'없음'));
 }
 
 // Rounds
