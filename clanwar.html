@@ -685,7 +685,8 @@ function renderRoundRanks(){
       const roundTotal=kills+placePts;
       return {name:s.name,clan:s.clan,kills,placePts,roundTotal};
     }).sort((a,b)=>b.roundTotal-a.roundTotal||(b.kills-a.kills));
-    if(!ranked.length) return;
+    const hasAnyScore=ranked.some(x=>x.roundTotal>0);
+    if(!ranked.length||!hasAnyScore) return;
     let rows='';
     ranked.forEach((t,j)=>{
       const rank=j+1;
@@ -850,7 +851,7 @@ function renderTeamList(){
   area.innerHTML=ids.map(id=>{const t=teams[id];
     const logo=getClanLogo(t.clan)?`<img src="${getClanLogo(t.clan)}" class="clan-logo-sm">`:`<span class="clan-avatar" style="background:${getClanColor(t.clan)};">${t.clan.charAt(0)}</span>`;
     const slotNum=(t.slot!=null)?t.slot:'';
-    return `<div class="item-row">${logo}<span class="clan-tag" style="background:${getClanColor(t.clan)};font-size:11px;">${t.clan}</span><span class="item-name">${t.name}</span><input type="text" value="${slotNum}" placeholder="팀 #" style="width:60px;padding:4px 6px;font-size:13px;text-align:center;" id="slot_${id}"><button class="btn btn-xs btn-gray" onclick="saveTeamSlot('${id}')" style="padding:4px 8px;font-size:11px;">저장</button><button class="item-delete" onclick="removeTeam('${id}')">✕</button></div>`;
+    return `<div class="item-row">${logo}<span class="clan-tag" style="background:${getClanColor(t.clan)};font-size:11px;">${t.clan}</span><span class="item-name" style="min-width:auto;flex:none;">${t.name}</span><input type="text" value="${slotNum}" placeholder="#" style="width:38px;padding:3px 4px;font-size:12px;text-align:center;" id="slot_${id}"><button class="btn btn-xs btn-gray" onclick="saveTeamSlot('${id}')" style="padding:3px 6px;font-size:11px;">저장</button><span style="flex:1;"></span><button class="item-delete" onclick="removeTeam('${id}')">✕</button></div>`;
   }).join('');
 }
 function saveTeamSlot(tid){
