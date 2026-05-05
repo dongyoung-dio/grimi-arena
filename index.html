@@ -2226,21 +2226,36 @@ function renderDashboard(){
     hAll.forEach(ev=>{
       const ps=ev.playerScores||{};
       Object.entries(ps).forEach(([mid,p])=>{
+        if(!p||!p.name)return;
         if(p.rank===1){winCount[p.name]=(winCount[p.name]||0)+1;}
-        if(p.score&&p.target){
-          if(!effData[p.name])effData[p.name]={total:0,cnt:0};
-          effData[p.name].total+=(p.score/p.target);effData[p.name].cnt++;
+        if(p.score){
+          if(!effData[mid])effData[mid]={name:p.name,totalScore:0,cnt:0};
+          effData[mid].totalScore+=p.score;effData[mid].cnt++;
         }
-        killData[p.name]=(killData[p.name]||0)+(p.kills||0);
+        const kills=p.kills!=null?p.kills:Math.max(0,(p.score||0)-Math.floor((p.damage||0)/100));
+        killData[p.name]=(killData[p.name]||0)+kills;
         dmgData[p.name]=(dmgData[p.name]||0)+(p.damage||0);
       });
     });
+    function dashTop(obj,unit,showTied){
+      const sorted=Object.entries(obj).sort((a,b)=>b[1]-a[1]);
+      if(!sorted.length)return'-';
+      const topVal=sorted[0][1];const tied=sorted.filter(e=>e[1]===topVal);
+      if(tied.length<=1)return`${sorted[0][0]} <span style="color:#64748b;font-size:11px;">${sorted[0][1]}${unit}</span>`;
+      const others=tied.slice(1).map(e=>e[0]).join(', ');
+      return`<span title="동률: ${tied.map(e=>e[0]).join(', ')}" style="cursor:help;">${tied[0][0]} <span style="color:#64748b;font-size:11px;">${topVal}${unit} (+${tied.length-1}명)</span></span>`;
+    }
     const topWin=Object.entries(winCount).sort((a,b)=>b[1]-a[1])[0];
-    if(topWin)chickenName=`${topWin[0]} <span style="color:#64748b;font-size:11px;">${topWin[1]}회</span>`;
-    const topEff=Object.entries(effData).map(([n,d])=>({n,avg:d.total/d.cnt})).sort((a,b)=>b.avg-a.avg)[0];
-    if(topEff)effName=`${topEff.n} <span style="color:#64748b;font-size:11px;">${Math.round(topEff.avg*100)}%</span>`;
+    if(topWin){const topVal=topWin[1];const tied=Object.entries(winCount).filter(e=>e[1]===topVal);chickenName=tied.length<=1?`${topWin[0]} <span style="color:#64748b;font-size:11px;">${topWin[1]}회</span>`:`<span title="동률: ${tied.map(e=>e[0]).join(', ')}" style="cursor:help;">${topWin[0]} <span style="color:#64748b;font-size:11px;">${topVal}회 (+${tied.length-1}명)</span></span>`;}
+    const effList=Object.entries(effData).map(([mid,d])=>{
+      const m=members[mid];const curTarget=m?mScore(m):d.totalScore;
+      const avg=curTarget>0?(d.totalScore/(curTarget*d.cnt))*100:0;
+      return{n:d.name,avg};
+    }).sort((a,b)=>b.avg-a.avg);
+    const topEff=effList[0];
+    if(topEff)effName=`${topEff.n} <span style="color:#64748b;font-size:11px;">${Math.round(topEff.avg)}%</span>`;
     const topKill=Object.entries(killData).sort((a,b)=>b[1]-a[1])[0];
-    if(topKill)killName=`${topKill[0]} <span style="color:#64748b;font-size:11px;">${topKill[1]}킬</span>`;
+    if(topKill){const topVal=topKill[1];const tied=Object.entries(killData).filter(e=>e[1]===topVal);killName=tied.length<=1?`${topKill[0]} <span style="color:#64748b;font-size:11px;">${topVal}킬</span>`:`<span title="동률: ${tied.map(e=>e[0]).join(', ')}" style="cursor:help;">${topKill[0]} <span style="color:#64748b;font-size:11px;">${topVal}킬 (+${tied.length-1}명)</span></span>`;}
     const topDmg=Object.entries(dmgData).sort((a,b)=>b[1]-a[1])[0];
     if(topDmg)dmgName=`${topDmg[0]} <span style="color:#64748b;font-size:11px;">${topDmg[1]}</span>`;
   }
