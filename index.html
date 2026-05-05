@@ -30,6 +30,53 @@ input:focus,select:focus{border-color:#3b82f6;}
 .card:hover{border-color:rgba(96,165,250,.15);}
 .member-kick{font-size:11px;color:#64748b;cursor:pointer;margin-left:4px;opacity:.5;transition:all .15s;}
 .member-kick:hover{color:#ef4444;opacity:1;}
+.member-swap{font-size:12px;color:#64748b;cursor:pointer;margin-left:3px;opacity:.5;transition:all .15s;}
+.member-swap:hover{color:#10b981;opacity:1;}
+.swap-dropdown{position:absolute;background:#1e293b;border:1px solid #334155;border-radius:8px;z-index:1000;max-height:200px;overflow-y:auto;min-width:180px;box-shadow:0 4px 12px rgba(0,0,0,.5);}
+.swap-dropdown-item{padding:8px 12px;cursor:pointer;color:#e2e8f0;font-size:13px;transition:all .15s;border-bottom:1px solid #0f172a;}
+.swap-dropdown-item:hover{background:#334155;color:#60a5fa;}
+.swap-dropdown-item:last-child{border-bottom:none;}
+.event-end-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;}
+.event-end-modal{background:#1e293b;border-radius:16px;border:1px solid #334155;max-width:600px;width:100%;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;}
+.event-end-modal h3{font-size:18px;font-weight:700;color:#e2e8f0;margin-bottom:16px;}
+.event-end-step{display:none;}
+.event-end-step.active{display:flex;flex-direction:column;flex:1;overflow:hidden;}
+.event-end-step h3{padding:20px 24px 0;margin-bottom:4px;}
+.event-end-step>p{padding:0 24px;margin-bottom:12px;}
+.event-end-buttons{padding:16px 24px;border-top:1px solid #334155;background:#1e293b;flex-shrink:0;}
+.ranking-review-list{display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1;padding:0 24px 12px;}
+.ranking-review-item{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px;display:flex;align-items:center;justify-content:space-between;}
+.ranking-review-rank{font-size:18px;font-weight:800;min-width:40px;}
+.ranking-review-info{flex:1;margin:0 12px;}
+.ranking-review-name{font-size:14px;font-weight:700;color:#e2e8f0;}
+.ranking-review-members{font-size:12px;color:#64748b;margin-top:2px;}
+.ranking-review-pct{font-size:13px;font-weight:600;color:#94a3b8;}
+.ranking-review-buttons{display:flex;gap:6px;}
+.ranking-review-btn{padding:4px 8px;background:#334155;border:none;border-radius:6px;color:#e2e8f0;cursor:pointer;font-size:12px;transition:all .15s;}
+.ranking-review-btn:hover{background:#475569;color:#60a5fa;}
+.tier-review-list{display:flex;flex-direction:column;gap:8px;overflow-y:auto;flex:1;padding:0 24px 12px;}
+.tier-review-item{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px;display:flex;align-items:center;justify-content:space-between;}
+.tier-review-member{flex:1;}
+.tier-review-name{font-size:13px;font-weight:600;color:#e2e8f0;}
+.tier-review-current{font-size:12px;color:#64748b;margin-top:2px;}
+.tier-review-change{display:flex;align-items:center;gap:8px;}
+.tier-review-change-dir{font-size:16px;font-weight:700;min-width:24px;text-align:center;}
+.tier-review-change-old{font-size:12px;color:#64748b;}
+.tier-review-change-arrow{color:#64748b;font-size:11px;}
+.tier-review-change-new{font-size:13px;font-weight:700;color:#e2e8f0;}
+.tier-review-buttons{display:flex;gap:6px;}
+.tier-review-btn{padding:4px 8px;background:#334155;border:none;border-radius:6px;color:#e2e8f0;cursor:pointer;font-size:12px;transition:all .15s;}
+.tier-review-btn:hover{background:#475569;}
+.tier-review-up-btn{background:#10b981;color:#fff;}
+.tier-review-up-btn:hover{background:#059669;}
+.tier-review-down-btn{background:#ef4444;color:#fff;}
+.tier-review-down-btn:hover{background:#dc2626;}
+.event-end-buttons{display:flex;gap:10px;justify-content:center;padding-top:16px;border-top:1px solid #334155;}
+.event-end-btn{padding:10px 20px;border:none;border-radius:8px;font-weight:600;cursor:pointer;transition:all .2s;font-size:14px;}
+.event-end-btn-primary{background:linear-gradient(135deg,#10b981,#059669);color:#fff;}
+.event-end-btn-primary:hover{opacity:.9;}
+.event-end-btn-secondary{background:#334155;color:#94a3b8;}
+.event-end-btn-secondary:hover{background:#475569;color:#cbd5e1;}
 
 /* ===== 배경 효과 ===== */
 /* 로비 배경 래퍼 */
@@ -516,6 +563,18 @@ input:focus,select:focus{border-color:#3b82f6;}
 .guide-btn{background:none;border:1px solid #475569;color:#94a3b8;padding:6px 12px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;}
 .guide-btn:hover{background:#334155;color:#e2e8f0;border-color:#60a5fa;}
 
+/* 사이드 배너 */
+.side-banner{position:fixed;left:16px;top:50%;transform:translateY(-50%);z-index:20;display:flex;flex-direction:column;gap:10px;}
+.side-banner-btn{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:1px solid #334155;background:rgba(30,41,59,.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#e2e8f0;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.3);}
+.side-banner-btn:hover{transform:scale(1.05);border-color:#60a5fa;box-shadow:0 4px 20px rgba(96,165,250,.2);}
+.side-banner-btn .side-icon{font-size:20px;flex-shrink:0;}
+.side-banner-btn.discord{border-color:rgba(88,101,242,.4);}
+.side-banner-btn.discord:hover{border-color:#5865f2;background:rgba(88,101,242,.15);}
+.side-banner-btn.kakao{border-color:rgba(254,229,0,.3);}
+.side-banner-btn.kakao:hover{border-color:#fee500;background:rgba(254,229,0,.1);}
+@media(max-width:1600px){.side-banner{left:8px;}.side-banner-btn{padding:8px 10px;font-size:12px;}}
+@media(max-width:1440px){.side-banner-btn span:not(.side-icon){display:none;}.side-banner-btn{padding:10px;border-radius:50%;}}
+
 @media(max-width:600px){
   .teams-grid{grid-template-columns:1fr;}
   .top-bar{padding:10px 14px;}
@@ -524,6 +583,7 @@ input:focus,select:focus{border-color:#3b82f6;}
   .rank-dash-list{flex-direction:column;}
   .rank-dash-item{min-width:auto;}
   .guide-modal-box{max-width:100%;max-height:90vh;}
+  .side-banner{display:none;}
 }
 
 /* ===== 빙고 게임 CSS (bg- prefix) ===== */
@@ -1018,8 +1078,39 @@ input:focus,select:focus{border-color:#3b82f6;}
   </div>
 </div>
 
+<!-- 이벤트 종료 모달 (순위 검토 + 승급 검토) -->
+<div id="eventEndModal" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px;">
+  <div class="event-end-modal">
+    <!-- Step 1: 순위 검토 -->
+    <div class="event-end-step active" id="rankingReviewStep">
+      <h3>순위 검토</h3>
+      <p style="color:#94a3b8;font-size:13px;margin-bottom:12px;">달성률(%) 기준으로 정렬되었습니다. 필요시 순위를 조정하세요.</p>
+      <div class="ranking-review-list" id="rankingReviewList"></div>
+      <div class="event-end-buttons">
+        <button class="event-end-btn event-end-btn-secondary" onclick="cancelEventEnd()">취소</button>
+        <button class="event-end-btn event-end-btn-primary" onclick="proceedToTierReview()">다음 (승급 검토)</button>
+      </div>
+    </div>
+
+    <!-- Step 2: 승급 검토 -->
+    <div class="event-end-step" id="tierReviewStep">
+      <h3>승급/강등 검토</h3>
+      <p style="color:#94a3b8;font-size:13px;margin-bottom:12px;">자동 계산된 승급/강등을 확인하세요. 클릭하여 조정할 수 있습니다.</p>
+      <div class="tier-review-list" id="tierReviewList"></div>
+      <div class="event-end-buttons">
+        <button class="event-end-btn event-end-btn-secondary" onclick="backToRankingReview()">이전</button>
+        <button class="event-end-btn event-end-btn-primary" onclick="confirmEventEndFinal()">최종 확정</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- 게임 화면 -->
 <div id="gameScreen" class="hidden" style="position:relative;z-index:1;">
+  <div class="side-banner" id="sideBanner">
+    <a class="side-banner-btn discord" href="#" target="_blank" id="discordLink"><span class="side-icon">💬</span><span>Discord</span></a>
+    <a class="side-banner-btn kakao" href="#" target="_blank" id="kakaoLink"><span class="side-icon">💛</span><span>오픈채팅</span></a>
+  </div>
   <div class="top-bar">
     <h1>GRIMI ARENA</h1>
     <div class="top-info">
@@ -1631,39 +1722,301 @@ function kickFromTeam(tid,mid,name){
   dataRef.update(updates);
 }
 
-// 이벤트 종료 + 승급
-function endEvent(){
-  if(!isAdmin)return;const teams=appData.teams||{};if(!Object.keys(teams).length){alert('진행 중 이벤트 없음');return;}
-  const rule=appData.tierRule||{};const promoTo=rule.promoTo||1;const relegBottom=rule.relegBottom||1;
-  const totalTeams=Object.keys(teams).length;const relegFrom=totalTeams-relegBottom+1;
-  if(!confirm(`종료하고 결과 저장?\n승급: 상위 ${promoTo}팀 / 강등: 하위 ${relegBottom===1?'꼴등만':relegBottom+'팀'}`))return;
-  const history=appData.history||{};const eventNum=Object.keys(history).length+1;
-  const today=new Date();const dateStr=(today.getMonth()+1)+'/'+(today.getDate());
-  const tids=Object.keys(teams);const rounds=appData.rounds||0;const members=appData.members||{};
-  const result={date:dateStr,rounds,teams:{},playerScores:{},tierSnapshot:{}};
-  // 현재 티어 스냅샷 저장
-  Object.keys(members).forEach(mid=>{result.tierSnapshot[mid]={name:members[mid].name,tier:members[mid].tier||4,subTier:members[mid].subTier||'mid'};});
-  const totals={},targets2={},pcts2={};tids.forEach(tid=>{totals[tid]=getTeamTotal(tid);targets2[tid]=getTeamTarget(tid);pcts2[tid]=(totals[tid]/targets2[tid])*100;});
-  const sorted=tids.slice().sort((a,b)=>pcts2[b]-pcts2[a]);
-  sorted.forEach((tid,i)=>{
-    const team=teams[tid];result.teams[tid]={name:team.name,rank:i+1,total:totals[tid],target:getTeamTarget(tid),members:team.members};
-    Object.keys(team.members||{}).forEach(mid=>{const st=getPlayerStats(tid,mid);result.playerScores[mid]={name:team.members[mid].name,score:st.total,damage:st.damage,kills:st.kills,target:mScore(team.members[mid]),team:team.name,rank:i+1};});
+function closeSwapDropdown(){document.querySelectorAll('[data-swap-container]').forEach(el=>el.innerHTML='');}
+function closeAddDropdown(){document.querySelectorAll('.add-member-dropdown').forEach(el=>el.remove());}
+function showAddMember(tid){
+  if(!isAdmin)return;
+  closeAddDropdown();closeSwapDropdown();
+  const members=appData.members||{},teams=appData.teams||{};
+  const available=Object.keys(members).filter(id=>{
+    for(const t of Object.keys(teams)){if(teams[t].members&&teams[t].members[id])return false;}
+    return true;
   });
-  // 승급/강등 계산 + 저장
-  const updates={};const tierChanges={};const mt=getMaxTier();
-  sorted.forEach((tid,i)=>{
-    const rank=i+1;Object.keys(teams[tid].members||{}).forEach(mid=>{
-      const m=members[mid];if(!m)return;const beforeTier=m.tier||4;const beforeSub=m.subTier||'mid';let tier=beforeTier,sub=beforeSub;
-      if(rank<=promoTo){if(sub==='lower')sub='mid';else if(sub==='mid')sub='upper';else if(sub==='upper'&&tier>1){tier--;sub='lower';}}
-      else if(rank>=relegFrom){if(sub==='upper')sub='mid';else if(sub==='mid')sub='lower';else if(sub==='lower'&&tier<mt){tier++;sub='upper';}}
-      updates['members/'+mid+'/tier']=tier;updates['members/'+mid+'/subTier']=sub;
-      if(tier!==beforeTier||sub!==beforeSub){const dir=(tier<beforeTier||(tier===beforeTier&&['lower','mid','upper'].indexOf(sub)>['lower','mid','upper'].indexOf(beforeSub)))?'up':'down';tierChanges[mid]={name:m.name,from:{tier:beforeTier,subTier:beforeSub},to:{tier,subTier:sub},dir};}
+  if(!available.length){alert('추가 가능한 멤버가 없습니다');return;}
+  const container=document.querySelector(`[data-add-container="${tid}"]`);
+  if(!container)return;
+  let html=`<div class="add-member-dropdown swap-dropdown" onclick="event.stopPropagation()" style="position:absolute;bottom:100%;left:0;margin-bottom:4px;">`;
+  available.forEach(aid=>{
+    const am=members[aid];
+    html+=`<div class="swap-dropdown-item" onclick="event.stopPropagation();addToTeam('${tid}','${aid}')">${am.name} <span class="tier-badge tier-sm tier-${am.tier||4}">${am.tier||4}${SL[am.subTier||'mid']}</span></div>`;
+  });
+  html+=`</div>`;
+  container.insertAdjacentHTML('beforeend',html);
+  setTimeout(()=>document.addEventListener('click',closeAddDropdown,{once:true}),0);
+}
+function addToTeam(tid,mid){
+  if(!isAdmin)return;
+  const members=appData.members||{};
+  const m=members[mid];if(!m)return;
+  if(!confirm(`${m.name}님을 ${appData.teams[tid].name}에 추가하시겠습니까?`))return;
+  dataRef.child('teams/'+tid+'/members/'+mid).set({name:m.name,tier:m.tier||4,subTier:m.subTier||'mid'});
+  closeAddDropdown();
+}
+function swapTeamMember(tid,mid,name){
+  if(!isAdmin)return;
+  closeSwapDropdown();
+  const members=appData.members||{},teams=appData.teams||{};
+  const available=Object.keys(members).filter(id=>{
+    for(const t of Object.keys(teams)){
+      if(teams[t].members&&teams[t].members[id])return false;
+    }
+    return id!==mid;
+  });
+  if(!available.length){alert('사용 가능한 멤버가 없습니다');return;}
+  const container=document.querySelector(`[data-swap-container="${tid}_${mid}"]`);
+  if(!container)return;
+  let html=`<div class="swap-dropdown" onclick="event.stopPropagation()">`;
+  available.forEach(aid=>{
+    const am=members[aid];
+    html+=`<div class="swap-dropdown-item" onclick="event.stopPropagation();confirmSwap('${tid}','${mid}','${aid}','${name}')">${am.name} <span class="tier-badge tier-sm tier-${am.tier||4}">${am.tier||4}${SL[am.subTier||'mid']}</span></div>`;
+  });
+  html+=`</div>`;
+  container.innerHTML=`<div style="position:relative;display:inline-block;">${html}</div>`;
+  setTimeout(()=>document.addEventListener('click',closeSwapDropdown,{once:true}),0);
+}
+
+function confirmSwap(tid,oldMid,newMid,oldName){
+  if(!isAdmin)return;
+  const members=appData.members||{},teams=appData.teams||{};
+  const newName=members[newMid]?.name||'';
+  if(!confirm(`${oldName}님을 ${newName}님으로 교체하시겠습니까?\n점수는 유지됩니다.`))return;
+  const updates={};
+  const oldMember=teams[tid].members[oldMid];
+  const newMember=members[newMid];
+  updates['teams/'+tid+'/members/'+oldMid]=null;
+  updates['teams/'+tid+'/members/'+newMid]={name:newMember.name,tier:newMember.tier||4,subTier:newMember.subTier||'mid'};
+  const scores=appData.scores||{};
+  if(scores[tid]&&scores[tid][oldMid]){
+    updates['scores/'+tid+'/'+newMid]=scores[tid][oldMid];
+    updates['scores/'+tid+'/'+oldMid]=null;
+  }
+  dataRef.update(updates);
+}
+
+let pendingEventEnd=null;
+let pendingRankingOrder=null;
+let pendingTierChanges=null;
+
+function openEventEndModal(){
+  if(!isAdmin)return;
+  const teams=appData.teams||{};
+  if(!Object.keys(teams).length){alert('진행 중 이벤트 없음');return;}
+  const rule=appData.tierRule||{},promoTo=rule.promoTo||1,relegBottom=rule.relegBottom||1;
+  const totalTeams=Object.keys(teams).length,relegFrom=totalTeams-relegBottom+1;
+  const tids=Object.keys(teams),members=appData.members||{},scores=appData.scores||{};
+  const totals={},targets={},pcts={};
+  tids.forEach(tid=>{totals[tid]=getTeamTotal(tid);targets[tid]=getTeamTarget(tid);pcts[tid]=(totals[tid]/targets[tid])*100;});
+  const sorted=tids.slice().sort((a,b)=>pcts[b]-pcts[a]);
+  pendingEventEnd={promoTo,relegBottom,totalTeams,relegFrom,tids,members,scores,totals,targets,pcts,sorted};
+  pendingRankingOrder=sorted.slice();
+  renderRankingReview();
+  const modal=document.getElementById('eventEndModal');
+  modal.classList.remove('hidden');
+  modal.style.display='flex';
+}
+
+function renderRankingReview(){
+  const list=document.getElementById('rankingReviewList');
+  const html=pendingRankingOrder.map((tid,idx)=>{
+    const team=pendingEventEnd.members||{},pct=Math.round((pendingEventEnd.totals[tid]/pendingEventEnd.targets[tid])*100);
+    const members=appData.teams[tid]?.members||{};
+    const memberNames=Object.values(members).map(m=>m.name).join(', ');
+    return`<div class="ranking-review-item">
+      <div class="ranking-review-rank">${idx+1}</div>
+      <div class="ranking-review-info">
+        <div class="ranking-review-name">${appData.teams[tid].name}</div>
+        <div class="ranking-review-members">${memberNames}</div>
+      </div>
+      <div class="ranking-review-pct">${pct}%</div>
+      <div class="ranking-review-buttons">
+        ${idx>0?`<button class="ranking-review-btn" onclick="moveRankingUp('${tid}')">▲</button>`:''}
+        ${idx<pendingRankingOrder.length-1?`<button class="ranking-review-btn" onclick="moveRankingDown('${tid}')">▼</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  list.innerHTML=html;
+}
+
+function moveRankingUp(tid){
+  const idx=pendingRankingOrder.indexOf(tid);
+  if(idx>0){
+    [pendingRankingOrder[idx],pendingRankingOrder[idx-1]]=[pendingRankingOrder[idx-1],pendingRankingOrder[idx]];
+    renderRankingReview();
+  }
+}
+
+function moveRankingDown(tid){
+  const idx=pendingRankingOrder.indexOf(tid);
+  if(idx<pendingRankingOrder.length-1){
+    [pendingRankingOrder[idx],pendingRankingOrder[idx+1]]=[pendingRankingOrder[idx+1],pendingRankingOrder[idx]];
+    renderRankingReview();
+  }
+}
+
+function proceedToTierReview(){
+  const members=pendingEventEnd.members;
+  const mt=getMaxTier();
+  pendingTierChanges={};
+  const {promoTo,relegFrom,sorted:_}=pendingEventEnd;
+  pendingRankingOrder.forEach((tid,i)=>{
+    const rank=i+1;
+    const teamMembers=appData.teams[tid]?.members||{};
+    Object.keys(teamMembers).forEach(mid=>{
+      const m=members[mid];
+      if(!m)return;
+      const beforeTier=m.tier||4,beforeSub=m.subTier||'mid';
+      let tier=beforeTier,sub=beforeSub;
+      if(rank<=promoTo){
+        if(sub==='lower')sub='mid';
+        else if(sub==='mid')sub='upper';
+        else if(sub==='upper'&&tier>1){tier--;sub='lower';}
+      }else if(rank>=relegFrom){
+        if(sub==='upper')sub='mid';
+        else if(sub==='mid')sub='lower';
+        else if(sub==='lower'&&tier<mt){tier++;sub='upper';}
+      }
+      const dir=(tier<beforeTier||(tier===beforeTier&&['lower','mid','upper'].indexOf(sub)>['lower','mid','upper'].indexOf(beforeSub)))?'▲':(tier>beforeTier||(tier===beforeTier&&['lower','mid','upper'].indexOf(sub)<['lower','mid','upper'].indexOf(beforeSub)))?'▼':'=';
+      pendingTierChanges[mid]={name:m.name,tier:beforeTier,subTier:beforeSub,newTier:tier,newSubTier:sub,dir,teamName:appData.teams[tid].name,rank:rank};
     });
   });
-  result.tierChanges=tierChanges;
+  renderTierReview();
+  document.getElementById('rankingReviewStep').classList.remove('active');
+  document.getElementById('tierReviewStep').classList.add('active');
+}
+
+function renderTierReview(){
+  const list=document.getElementById('tierReviewList');
+  const entries=Object.entries(pendingTierChanges).sort((a,b)=>(a[1].rank||99)-(b[1].rank||99));
+  // 팀별 그룹핑
+  const groups={};entries.forEach(([mid,info])=>{
+    const key=info.rank+'_'+(info.teamName||'');
+    if(!groups[key])groups[key]={rank:info.rank,teamName:info.teamName||'',members:[]};
+    groups[key].members.push([mid,info]);
+  });
+  const {promoTo,relegFrom}=pendingEventEnd;
+  let html='';
+  Object.values(groups).sort((a,b)=>a.rank-b.rank).forEach(g=>{
+    const badge=g.rank<=promoTo?'<span style="color:#10b981;font-weight:700;margin-left:6px;">승급</span>':g.rank>=relegFrom?'<span style="color:#ef4444;font-weight:700;margin-left:6px;">강등</span>':'<span style="color:#64748b;margin-left:6px;">유지</span>';
+    html+=`<div style="margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:700;color:#94a3b8;padding:6px 0;border-bottom:1px solid #334155;margin-bottom:6px;">#${g.rank} ${g.teamName} ${badge}</div>`;
+    g.members.forEach(([mid,info])=>{
+      const dirColor=info.dir==='▲'?'color:#10b981;':info.dir==='▼'?'color:#ef4444;':'color:#64748b;';
+      const changed=info.newTier!==info.tier||info.newSubTier!==info.subTier;
+      html+=`<div class="tier-review-item" style="${changed?'border-left:3px solid '+(info.dir==='▲'?'#10b981':'#ef4444')+';padding-left:8px;':'border-left:3px solid transparent;padding-left:8px;'}">
+        <div class="tier-review-member">
+          <div class="tier-review-name">${info.name}</div>
+          <div class="tier-review-current">
+            <span class="tier-badge tier-sm tier-${info.tier}">${info.tier}T${SL[info.subTier||'mid']}</span>
+            <span style="${dirColor}font-weight:700;margin:0 6px;">${info.dir==='='?'→':info.dir}</span>
+            <span class="tier-badge tier-sm tier-${info.newTier}">${info.newTier}T${SL[info.newSubTier||'mid']}</span>
+          </div>
+        </div>
+        <div class="tier-review-buttons">
+          <button class="tier-review-btn tier-review-up-btn" onclick="adjustTierUp('${mid}')">▲</button>
+          <button class="tier-review-btn tier-review-down-btn" onclick="adjustTierDown('${mid}')">▼</button>
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+  list.innerHTML=html;
+}
+
+function adjustTierUp(mid){
+  const change=pendingTierChanges[mid];
+  if(!change)return;
+  if(change.newTier<=1&&change.newSubTier==='upper')return;
+  if(change.newSubTier==='lower')change.newSubTier='mid';
+  else if(change.newSubTier==='mid')change.newSubTier='upper';
+  else if(change.newSubTier==='upper'&&change.newTier>1){change.newTier--;change.newSubTier='lower';}
+  change.dir=(change.newTier<change.tier||(change.newTier===change.tier&&['lower','mid','upper'].indexOf(change.newSubTier)>['lower','mid','upper'].indexOf(change.subTier)))?'▲':'▼';
+  if(change.newTier===change.tier&&change.newSubTier===change.subTier)change.dir='=';
+  renderTierReview();
+}
+
+function adjustTierDown(mid){
+  const change=pendingTierChanges[mid];
+  if(!change)return;
+  const mt=getMaxTier();
+  if(change.newTier>=mt&&change.newSubTier==='lower')return;
+  if(change.newSubTier==='upper')change.newSubTier='mid';
+  else if(change.newSubTier==='mid')change.newSubTier='lower';
+  else if(change.newSubTier==='lower'&&change.newTier<mt){change.newTier++;change.newSubTier='upper';}
+  change.dir=(change.newTier<change.tier||(change.newTier===change.tier&&['lower','mid','upper'].indexOf(change.newSubTier)>['lower','mid','upper'].indexOf(change.subTier)))?'▲':'▼';
+  if(change.newTier===change.tier&&change.newSubTier===change.subTier)change.dir='=';
+  renderTierReview();
+}
+
+function backToRankingReview(){
+  document.getElementById('tierReviewStep').classList.remove('active');
+  document.getElementById('rankingReviewStep').classList.add('active');
+}
+
+function confirmEventEndFinal(){
+  if(!pendingEventEnd||!pendingRankingOrder)return;
+  const {promoTo,tids,members,scores,totals,targets}=pendingEventEnd;
+  const history=appData.history||{};
+  const eventNum=Object.keys(history).length+1;
+  const today=new Date();
+  const dateStr=(today.getMonth()+1)+'/'+(today.getDate());
+  const rounds=appData.rounds||0;
+  const result={date:dateStr,rounds,teams:{},playerScores:{},tierSnapshot:{}};
+  Object.keys(members).forEach(mid=>{
+    result.tierSnapshot[mid]={name:members[mid].name,tier:members[mid].tier||4,subTier:members[mid].subTier||'mid'};
+  });
+  pendingRankingOrder.forEach((tid,i)=>{
+    const rank=i+1;
+    const team=appData.teams[tid];
+    result.teams[tid]={name:team.name,rank,total:totals[tid],target:targets[tid],members:team.members};
+    Object.keys(team.members||{}).forEach(mid=>{
+      const st=getPlayerStats(tid,mid);
+      result.playerScores[mid]={name:team.members[mid].name,score:st.total,damage:st.damage,kills:st.kills,target:mScore(team.members[mid]),team:team.name,rank};
+    });
+  });
+  const updates={};
+  const actualChanges={};
+  Object.entries(pendingTierChanges).forEach(([mid,info])=>{
+    if(info.newTier!==info.tier||info.newSubTier!==info.subTier){
+      updates['members/'+mid+'/tier']=info.newTier;
+      updates['members/'+mid+'/subTier']=info.newSubTier;
+      actualChanges[mid]=info;
+    }
+  });
+  result.tierChanges=actualChanges;
   dataRef.child('history/event_'+eventNum).set(result);
-  updates['teams']=null;updates['scores']=null;updates['rounds']=0;updates['roundMaps']=null;updates['eventStatus']='idle';updates['timer']=null;
-  dataRef.update(updates);if(timerInterval)clearInterval(timerInterval);selectedRounds={};switchTab('ranking');
+  updates['teams']=null;
+  updates['scores']=null;
+  updates['rounds']=0;
+  updates['roundMaps']=null;
+  updates['eventStatus']='idle';
+  updates['timer']=null;
+  dataRef.update(updates);
+  if(timerInterval)clearInterval(timerInterval);
+  selectedRounds={};
+  pendingEventEnd=null;
+  pendingRankingOrder=null;
+  pendingTierChanges=null;
+  const modal=document.getElementById('eventEndModal');
+  modal.classList.add('hidden');
+  modal.style.display='none';
+  switchTab('ranking');
+}
+
+function cancelEventEnd(){
+  pendingEventEnd=null;
+  pendingRankingOrder=null;
+  pendingTierChanges=null;
+  document.getElementById('rankingReviewStep').classList.add('active');
+  document.getElementById('tierReviewStep').classList.remove('active');
+  const modal=document.getElementById('eventEndModal');
+  modal.classList.add('hidden');
+  modal.style.display='none';
+}
+
+// 이벤트 종료 + 승급
+function endEvent(){
+  if(!isAdmin)return;
+  openEventEndModal();
 }
 function saveRule(){if(!isAdmin)return;const promoTo=parseInt(document.getElementById('rulePromoTo').value)||1;const relegBottom=parseInt(document.getElementById('ruleRelegBottom').value)||1;dataRef.child('tierRule').set({promoTo,relegBottom});}
 function loadTierScores(){
@@ -2739,9 +3092,9 @@ function renderGame(){
       h+=`<div class="member-totals"><table class="mt-table"><thead><tr><th style="text-align:left;">멤버</th><th>킬</th><th>딜</th><th>딜→</th><th>점수</th><th>목표</th></tr></thead><tbody>`;
       let tk=0,td=0,tdp=0,tt=0,tg=0;
       mids.forEach(mid=>{const mt=team.members[mid];const st=getPlayerStats(tid,mid);const it=mScore(mt);tk+=st.kills;td+=st.damage;tdp+=st.dmgPts;tt+=st.total;tg+=it;
-        h+=`<tr><td class="mt-name">${mt.name}${isAdmin?` <span class="member-kick" onclick="kickFromTeam('${tid}','${mid}','${mt.name}')" title="팀에서 제거">✕</span>`:''}</td><td>${st.kills}</td><td>${st.damage}</td><td>${st.dmgPts}</td><td class="mt-score">${st.total}</td><td style="color:#64748b;">${it}</td></tr>`;
+        h+=`<tr><td class="mt-name">${mt.name}${isAdmin?` <span class="member-swap" onclick="swapTeamMember('${tid}','${mid}','${mt.name}')" title="멤버 교체">🔄</span> <span class="member-kick" onclick="kickFromTeam('${tid}','${mid}','${mt.name}')" title="팀에서 제거">✕</span><span data-swap-container="${tid}_${mid}" style="position:relative;display:inline-block;"></span>`:''}</td><td>${st.kills}</td><td>${st.damage}</td><td>${st.dmgPts}</td><td class="mt-score">${st.total}</td><td style="color:#64748b;">${it}</td></tr>`;
       });
-      h+=`<tr class="mt-total-row"><td class="mt-name">합계</td><td>${tk}</td><td>${td}</td><td>${tdp}</td><td class="mt-score">${tt}${teamChk?` <span style="color:${teamChk>0?'#10b981':'#ef4444'};font-size:12px;">${teamChk>0?'+':''}${teamChk}</span>`:''}</td><td style="color:#64748b;">${tg}</td></tr></tbody></table></div>`;
+      h+=`<tr class="mt-total-row"><td class="mt-name">합계</td><td>${tk}</td><td>${td}</td><td>${tdp}</td><td class="mt-score">${tt}${teamChk?` <span style="color:${teamChk>0?'#10b981':'#ef4444'};font-size:12px;">${teamChk>0?'+':''}${teamChk}</span>`:''}</td><td style="color:#64748b;">${tg}</td></tr></tbody></table>${isAdmin?`<div style="margin-top:6px;position:relative;" data-add-container="${tid}"><button class="btn btn-xs btn-gray" onclick="event.stopPropagation();showAddMember('${tid}')" style="font-size:12px;padding:4px 10px;">+ 멤버 추가</button></div>`:''}</div>`;
       // 맵별 요약
       if(rounds>=1){
         h+=`<div style="margin-top:10px;border-top:1px solid #334155;padding-top:8px;"><div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:6px;">라운드별 요약</div><div style="display:flex;gap:6px;flex-wrap:wrap;">`;
