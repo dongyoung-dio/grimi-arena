@@ -3267,7 +3267,7 @@ function renderRanking(){
     // 승급/강등 내역
     const tc=ev.tierChanges||{};const tcKeys=Object.keys(tc);
     if(tcKeys.length>0){
-      h+=`<div style="margin-top:10px;padding-top:10px;border-top:1px solid #334155;"><div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:6px;">승급/강등</div><div style="display:flex;flex-wrap:wrap;gap:4px;">${tcKeys.map(mid=>{const c=tc[mid];return`<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;background:#0f172a;font-size:13px;font-weight:600;"><span style="color:${c.dir==='up'?'#10b981':'#ef4444'};">${c.dir==='up'?'▲':'▼'}</span> ${c.name} <span style="color:#64748b;">${c.from.tier}T${SL[c.from.subTier]}</span>→<span style="font-weight:700;">${c.to.tier}T${SL[c.to.subTier]}</span></span>`;}).join('')}</div></div>`;
+      h+=`<div style="margin-top:10px;padding-top:10px;border-top:1px solid #334155;"><div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:6px;">승급/강등</div><div style="display:flex;flex-wrap:wrap;gap:4px;">${tcKeys.map(mid=>{const c=tc[mid];const fromT=c.from?c.from.tier:c.tier;const fromS=c.from?c.from.subTier:c.subTier;const toT=c.to?c.to.tier:c.newTier;const toS=c.to?c.to.subTier:c.newSubTier;const d=c.dir==='up'||c.dir==='▲'?'up':'down';return`<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;background:#0f172a;font-size:13px;font-weight:600;"><span style="color:${d==='up'?'#10b981':'#ef4444'};">${d==='up'?'▲':'▼'}</span> ${c.name} <span style="color:#64748b;">${fromT}T${SL[fromS]}</span>→<span style="font-weight:700;">${toT}T${SL[toS]}</span></span>`;}).join('')}</div></div>`;
     }
     h+=`</div>`;
   });h+=`</div>`;
