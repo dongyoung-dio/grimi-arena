@@ -1987,6 +1987,9 @@ function confirmEventEndFinal(){
     }
   });
   result.tierChanges=actualChanges;
+  // 자동 백업: 이벤트 저장 전 전체 스냅샷
+  const backupData={timestamp:new Date().toISOString(),history:appData.history||{},members:appData.members||{},teams:appData.teams||null,scores:appData.scores||null};
+  dataRef.child('_backup/before_event_'+eventNum).set(backupData);
   // history 저장 완료 후에 나머지 정리
   dataRef.child('history/event_'+eventNum).set(result).then(()=>{
     updates['teams']=null;
@@ -2027,6 +2030,34 @@ function endEvent(){
   openEventEndModal();
 }
 function saveRule(){if(!isAdmin)return;const promoTo=parseInt(document.getElementById('rulePromoTo').value)||1;const relegBottom=parseInt(document.getElementById('ruleRelegBottom').value)||1;dataRef.child('tierRule').set({promoTo,relegBottom});}
+function exportBackup(){
+  if(!isAdmin)return;
+  dataRef.once('value').then(snap=>{
+    const data=snap.val();
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='grimi_backup_'+new Date().toISOString().slice(0,10)+'.json';
+    a.click();URL.revokeObjectURL(a.href);
+    alert('백업 다운로드 완료!');
+  });
+}
+function importBackup(){
+  if(!isAdmin)return;
+  const input=document.createElement('input');input.type='file';input.accept='.json';
+  input.onchange=e=>{
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=()=>{
+      try{
+        const data=JSON.parse(reader.result);
+        if(!data.members){alert('유효하지 않은 백업 파일입니다.');return;}
+        if(!confirm('현재 데이터를 백업 파일로 덮어쓰시겠습니까?\n\n⚠️ 이 작업은 되돌릴 수 없습니다.'))return;
+        dataRef.set(data).then(()=>alert('복원 완료!')).catch(err=>alert('복원 실패: '+err.message));
+      }catch(err){alert('파일 파싱 실패: '+err.message);}
+    };reader.readAsText(file);
+  };input.click();
+}
 function loadTierScores(){
   const grid=document.getElementById('tierScoreGrid');if(!grid)return;const mt=getMaxTier();
   let h='<div style="background:#334155;padding:8px;text-align:center;font-size:13px;font-weight:700;color:#94a3b8;border-bottom:1px solid #475569;">티어</div><div style="background:#334155;padding:8px;text-align:center;font-size:13px;font-weight:700;color:#94a3b8;border-bottom:1px solid #475569;">상</div><div style="background:#334155;padding:8px;text-align:center;font-size:13px;font-weight:700;color:#94a3b8;border-bottom:1px solid #475569;">중</div><div style="background:#334155;padding:8px;text-align:center;font-size:13px;font-weight:700;color:#94a3b8;border-bottom:1px solid #475569;">하</div>';
