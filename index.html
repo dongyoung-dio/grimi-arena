@@ -1202,7 +1202,7 @@ input:focus,select:focus{border-color:#3b82f6;}
       <div id="gameTeams" class="teams-grid"></div>
       <div id="noTeamsMsg" class="card" style="text-align:center;color:#64748b;padding:40px;font-size:16px;">아직 팀이 배정되지 않았습니다.<br>관리자가 "팀 배정" 탭에서 설정해주세요.</div>
     </div>
-    <div id="tab-tier"><div class="card"><h3 style="margin-bottom:6px;font-size:17px;">티어별 목표 점수</h3><p style="font-size:14px;color:#64748b;margin-bottom:16px;">1킬 = 1점 · 총 딜 100당 = 1점</p><div id="tierTableArea"></div></div></div>
+    <div id="tab-tier" class="hidden"><div class="card"><h3 style="margin-bottom:6px;font-size:17px;">티어별 목표 점수</h3><p style="font-size:14px;color:#64748b;margin-bottom:16px;">1킬 = 1점 · 총 딜 100당 = 1점</p><div id="tierTableArea"></div></div></div>
     <div id="tab-members" class="hidden"><div class="card"><h3 style="margin-bottom:14px;font-size:17px;">멤버 관리 <span id="memberCount" style="font-size:14px;color:#64748b;font-weight:400;"></span></h3><div id="adminAddArea"></div><div style="margin-bottom:10px;display:flex;align-items:center;gap:8px;"><input type="text" id="memberSearchInput" placeholder="멤버 검색..." oninput="renderMembers()" style="flex:1;max-width:260px;padding:8px 12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:14px;"><span id="memberSearchCount" style="font-size:13px;color:#64748b;"></span></div><div id="adminBulkArea"></div><div id="memberTableArea"></div></div></div>
     <div id="tab-setup" class="hidden">
       <div class="card setup-section"><h3>참가 멤버 선택</h3><div class="participant-bar"><button class="btn btn-xs btn-gray" onclick="toggleAllParticipants(true)">전체 선택</button><button class="btn btn-xs btn-gray" onclick="toggleAllParticipants(false)">전체 해제</button><span style="font-size:14px;color:#94a3b8;"><strong id="selectedCount" style="color:#fbbf24;">0</strong>명 선택</span></div><div class="participant-grid" id="participantGrid"></div></div>
@@ -1513,7 +1513,7 @@ function enterAsGuest(){isGuest=true;isAdmin=false;currentUser={id:'guest',name:
   switchTab('home');
   const presRef=dataRef.child('presence');const myRef=presRef.push();myRef.set({name:'게스트',type:'guest'});myRef.onDisconnect().remove();
   presRef.on('value',s=>{presenceData=s.exists()?s.val():{};updateOnlineDisplay();});
-  dataRef.on('value',snap=>{appData=snap.val()||{};renderAll();});
+  dataRef.on('value',snap=>{appData=snap.val()||{};if(appData.members)Object.keys(appData.members).forEach(k=>{if(!appData.members[k]||!appData.members[k].name)delete appData.members[k];});renderAll();});
 }
 function enterApp(id,memberData){
   isGuest=false;currentUser={id,...memberData};isAdmin=memberData.role==='admin';
@@ -1528,7 +1528,7 @@ function enterApp(id,memberData){
   const presRef=dataRef.child('presence');const myRef=presRef.child(id);myRef.set({name:memberData.name,id:id,type:'member'});myRef.onDisconnect().remove();
   presRef.on('value',s=>{presenceData=s.exists()?s.val():{};updateOnlineDisplay();});
   let firstLoad=true;
-  dataRef.on('value',snap=>{appData=snap.val()||{};if(appData.members&&appData.members[id]){currentUser={id,...appData.members[id]};isAdmin=appData.members[id].role==='admin';document.getElementById('userAvatarTop').textContent=appData.members[id].avatar||appData.members[id].name.charAt(0);}renderAll();if(firstLoad){firstLoad=false;ensureDefaultNotice();ensureDefaultNews();ensureDefaultPubgNicks();switchTab('home');}});
+  dataRef.on('value',snap=>{appData=snap.val()||{};if(appData.members)Object.keys(appData.members).forEach(k=>{if(!appData.members[k]||!appData.members[k].name)delete appData.members[k];});if(appData.members&&appData.members[id]){currentUser={id,...appData.members[id]};isAdmin=appData.members[id].role==='admin';document.getElementById('userAvatarTop').textContent=appData.members[id].avatar||appData.members[id].name.charAt(0);}renderAll();if(firstLoad){firstLoad=false;ensureDefaultNotice();ensureDefaultNews();ensureDefaultPubgNicks();switchTab('home');}});
 }
 function logout(){localStorage.removeItem('grimi_kill_user');isGuest=false;location.reload();}
 function switchTab(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));['home','game','tier','members','setup','ranking','bingo','minigame'].forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});window.scrollTo(0,0);if(tab==='home')renderHome();if(tab==='minigame')drawMarbleBoard();}
