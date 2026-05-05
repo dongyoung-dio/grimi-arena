@@ -1479,7 +1479,7 @@ function renderLoginList(members){
   const list=document.getElementById('memberSelectList');const ids=Object.keys(members);
   const q=(document.getElementById('memberSearch')?.value||'').toLowerCase();
   if(!ids.length){list.innerHTML='<div class="no-result">등록된 멤버가 없습니다.</div>';return;}
-  const filtered=ids.filter(id=>!members[id].hidden&&members[id].name.toLowerCase().includes(q));
+  const filtered=ids.filter(id=>members[id]&&members[id].name&&!members[id].hidden&&members[id].name.toLowerCase().includes(q));
   if(!filtered.length){list.innerHTML='<div class="no-result">검색 결과 없음</div>';return;}
   list.innerHTML=`<div class="login-grid">${filtered.map(id=>{
     const m=members[id];const av=getAvatar(m);const c=nameColor(m.name);
