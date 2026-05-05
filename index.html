@@ -1108,8 +1108,8 @@ input:focus,select:focus{border-color:#3b82f6;}
 <!-- 게임 화면 -->
 <div id="gameScreen" class="hidden" style="position:relative;z-index:1;">
   <div class="side-banner" id="sideBanner">
-    <a class="side-banner-btn discord" href="#" target="_blank" id="discordLink"><span class="side-icon">💬</span><span>Discord</span></a>
-    <a class="side-banner-btn kakao" href="#" target="_blank" id="kakaoLink"><span class="side-icon">💛</span><span>오픈채팅</span></a>
+    <a class="side-banner-btn discord" href="https://discord.gg/jrq3fKbpwm" target="_blank" id="discordLink"><span class="side-icon">💬</span><span>Discord</span></a>
+    <a class="side-banner-btn kakao" href="https://open.kakao.com/o/g9kTSFnh" target="_blank" id="kakaoLink"><span class="side-icon">💛</span><span>오픈채팅</span></a>
   </div>
   <div class="top-bar">
     <h1>GRIMI ARENA</h1>
@@ -1983,23 +1983,27 @@ function confirmEventEndFinal(){
     }
   });
   result.tierChanges=actualChanges;
-  dataRef.child('history/event_'+eventNum).set(result);
-  updates['teams']=null;
-  updates['scores']=null;
-  updates['rounds']=0;
-  updates['roundMaps']=null;
-  updates['eventStatus']='idle';
-  updates['timer']=null;
-  dataRef.update(updates);
-  if(timerInterval)clearInterval(timerInterval);
-  selectedRounds={};
-  pendingEventEnd=null;
-  pendingRankingOrder=null;
-  pendingTierChanges=null;
-  const modal=document.getElementById('eventEndModal');
-  modal.classList.add('hidden');
-  modal.style.display='none';
-  switchTab('ranking');
+  // history 저장 완료 후에 나머지 정리
+  dataRef.child('history/event_'+eventNum).set(result).then(()=>{
+    updates['teams']=null;
+    updates['scores']=null;
+    updates['rounds']=0;
+    updates['roundMaps']=null;
+    updates['eventStatus']='idle';
+    updates['timer']=null;
+    dataRef.update(updates);
+    if(timerInterval)clearInterval(timerInterval);
+    selectedRounds={};
+    pendingEventEnd=null;
+    pendingRankingOrder=null;
+    pendingTierChanges=null;
+    const modal=document.getElementById('eventEndModal');
+    modal.classList.add('hidden');
+    modal.style.display='none';
+    switchTab('ranking');
+  }).catch(err=>{
+    alert('저장 실패! 다시 시도해주세요.\n'+err.message);
+  });
 }
 
 function cancelEventEnd(){
