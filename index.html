@@ -1433,7 +1433,7 @@ const IS_LOCAL=location.hostname==='localhost'||location.hostname==='127.0.0.1'|
 const ROOT=IS_LOCAL?'killcount/grimi_dev':'killcount/grimi';
 if(IS_LOCAL){document.title='[DEV] '+document.title;document.body.style.borderTop='4px solid #f59e0b';}
 const dataRef=db.ref(ROOT);
-if(IS_LOCAL){dataRef.once('value').then(snap=>{if(!snap.exists()||!snap.val().members){db.ref('killcount/grimi').once('value').then(prod=>{if(prod.exists()){dataRef.set(prod.val());console.log('[DEV] 운영 데이터 복사 완료');}});}});}
+const devReady=IS_LOCAL?new Promise(res=>{dataRef.once('value').then(snap=>{if(!snap.exists()||!snap.val().members){db.ref('killcount/grimi').once('value').then(prod=>{if(prod.exists()){dataRef.set(prod.val()).then(()=>{console.log('[DEV] 운영 데이터 복사 완료');res();}).catch(()=>res());}else res();});}else res();});}):Promise.resolve();
 const TS_DEFAULT={1:{upper:60,mid:50,lower:40},2:{upper:40,mid:35,lower:30},3:{upper:30,mid:25,lower:20},4:{upper:20,mid:15,lower:12},5:{upper:12,mid:10,lower:8},6:{upper:8,mid:6,lower:5}};
 const TS_PRESETS={
   default:{1:{upper:60,mid:50,lower:40},2:{upper:40,mid:35,lower:30},3:{upper:30,mid:25,lower:20},4:{upper:20,mid:15,lower:12},5:{upper:12,mid:10,lower:8},6:{upper:8,mid:6,lower:5}},
@@ -1470,7 +1470,7 @@ function updateOnlineDisplay(){const total=Object.keys(presenceData).length;cons
 function init(){
   dataRef.child('members').on('value',snap=>{loginMembers=snap.val()||{};Object.keys(loginMembers).forEach(k=>{if(!loginMembers[k]||!loginMembers[k].name)delete loginMembers[k];});if(!document.getElementById('loginScreen').classList.contains('hidden'))renderLoginList(loginMembers);});
   const saved=localStorage.getItem('grimi_kill_user');
-  if(saved){const u=JSON.parse(saved);dataRef.child('members/'+u.id).once('value').then(snap=>{if(snap.exists()){const m=snap.val();if(m.pinSet||(m.pin&&m.pin!=='0000'))enterApp(u.id,m);}});}
+  if(saved){try{const u=JSON.parse(saved);dataRef.child('members/'+u.id).once('value').then(snap=>{if(snap.exists()){const m=snap.val();if(m&&m.name&&(m.pinSet||(m.pin&&m.pin!=='0000')))enterApp(u.id,m);}});}catch(e){localStorage.removeItem('grimi_kill_user');}}
 }
 
 // 로그인 (그리드 정렬, 아바타)
@@ -1814,6 +1814,9 @@ function openEventEndModal(){
   const sorted=tids.slice().sort((a,b)=>pcts[b]-pcts[a]);
   pendingEventEnd={promoTo,relegBottom,totalTeams,relegFrom,tids,members,scores,totals,targets,pcts,sorted};
   pendingRankingOrder=sorted.slice();
+  pendingTierChanges=null;
+  document.getElementById('rankingReviewStep').classList.add('active');
+  document.getElementById('tierReviewStep').classList.remove('active');
   renderRankingReview();
   const modal=document.getElementById('eventEndModal');
   modal.classList.remove('hidden');
@@ -2109,7 +2112,7 @@ function resetEvent(){if(!isAdmin||!confirm('초기화? 결과 저장 안됨'))r
 function deleteHistory(ek){
   if(!isAdmin||!confirm(ek.replace('event_','')+'회차 삭제?'))return;
   const history=appData.history||{};
-  const keys=Object.keys(history).sort((a,b)=>parseInt(a.replace('event_',''))-parseInt(b.replace('event_','')));
+  const keys=Object.keys(history).filter(k=>/^event_\d+$/.test(k)).sort((a,b)=>parseInt(a.replace('event_',''))-parseInt(b.replace('event_','')));
   const remaining=keys.filter(k=>k!==ek);
   const newHistory={};
   remaining.forEach((k,i)=>{newHistory['event_'+(i+1)]=history[k];});
@@ -3073,7 +3076,7 @@ function ensureDefaultPubgNicks(){
   }
 }
 
-function renderAll(){loadTierScoresFromDB();renderEventStatus();updateTimer();renderHome();renderGame();renderTierTable();renderMembers();renderSetup();renderRanking();}
+function renderAll(){[loadTierScoresFromDB,renderEventStatus,updateTimer,renderHome,renderGame,renderTierTable,renderMembers,renderSetup,renderRanking].forEach(fn=>{try{fn();}catch(e){console.error('[renderAll]',fn.name,e);}});}
 function renderEventStatus(){const bar=document.getElementById('eventStatusBar');const r=appData.rounds||0;const d=new Date();const ds=(d.getMonth()+1)+'/'+d.getDate();if((appData.eventStatus||'idle')==='live'||Object.keys(appData.teams||{}).length>0){bar.className='event-status event-live';bar.textContent='이벤트 진행 중 · '+ds+' ('+r+'라운드)';}else{bar.className='event-status event-idle';bar.textContent='이벤트 대기 중';}}
 
 function renderGame(){
@@ -4015,7 +4018,7 @@ function renderGuide(){
   body.innerHTML=GUIDE_DATA[currentGuideTab].content;
 }
 
-init();
+devReady.then(()=>init());
 
 // ===== 로비 배경 동적 효과 =====
 (function(){
