@@ -1433,6 +1433,7 @@ const IS_LOCAL=location.hostname==='localhost'||location.hostname==='127.0.0.1'|
 const ROOT=IS_LOCAL?'killcount/grimi_dev':'killcount/grimi';
 if(IS_LOCAL){document.title='[DEV] '+document.title;document.body.style.borderTop='4px solid #f59e0b';}
 const dataRef=db.ref(ROOT);
+if(IS_LOCAL){dataRef.once('value').then(snap=>{if(!snap.exists()||!snap.val().members){db.ref('killcount/grimi').once('value').then(prod=>{if(prod.exists()){dataRef.set(prod.val());console.log('[DEV] 운영 데이터 복사 완료');}});}});}
 const TS_DEFAULT={1:{upper:60,mid:50,lower:40},2:{upper:40,mid:35,lower:30},3:{upper:30,mid:25,lower:20},4:{upper:20,mid:15,lower:12},5:{upper:12,mid:10,lower:8},6:{upper:8,mid:6,lower:5}};
 const TS_PRESETS={
   default:{1:{upper:60,mid:50,lower:40},2:{upper:40,mid:35,lower:30},3:{upper:30,mid:25,lower:20},4:{upper:20,mid:15,lower:12},5:{upper:12,mid:10,lower:8},6:{upper:8,mid:6,lower:5}},
