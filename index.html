@@ -319,6 +319,7 @@ input:focus,select:focus{border-color:#3b82f6;}
 
 .tier-badge{font-size:12px;padding:3px 10px;border-radius:10px;font-weight:700;display:inline-block;}
 .tier-sm{font-size:11px;padding:2px 8px;}
+.tier-S{background:linear-gradient(135deg,#fbbf24,#f59e0b,#d97706);color:#1e293b;text-shadow:0 1px 2px rgba(251,191,36,.3);box-shadow:0 0 8px rgba(251,191,36,.4);}
 .tier-1{background:#fbbf24;color:#1e293b;}.tier-2{background:#f87171;color:#fff;}.tier-3{background:#a78bfa;color:#fff;}
 .tier-4{background:#60a5fa;color:#fff;}.tier-5{background:#34d399;color:#1e293b;}.tier-6{background:#94a3b8;color:#1e293b;}
 
@@ -765,14 +766,14 @@ input:focus,select:focus{border-color:#3b82f6;}
 .bg-scoreboard {
   display: flex;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 6px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
 }
 .bg-score-chip {
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 12px;
   font-weight: 600;
   background: #1e293b;
   border: 1px solid #334155;
@@ -788,8 +789,8 @@ input:focus,select:focus{border-color:#3b82f6;}
 .bg-teams {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  max-width: 1200px;
+  gap: 10px;
+  max-width: 900px;
   margin: 0 auto;
 }
 @media (max-width: 900px) { .bg-teams { grid-template-columns: repeat(2, 1fr); } }
@@ -797,45 +798,45 @@ input:focus,select:focus{border-color:#3b82f6;}
 
 .bg-team-card {
   background: #1e293b;
-  border-radius: 12px;
-  padding: 14px;
+  border-radius: 10px;
+  padding: 8px 10px;
   border: 2px solid #334155;
   transition: all 0.3s;
 }
 .bg-team-card.has-bingo {
   border-color: #10b981;
-  box-shadow: 0 0 25px rgba(16,185,129,0.25);
+  box-shadow: 0 0 20px rgba(16,185,129,0.2);
 }
 
 .bg-team-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
-.bg-team-name { font-size: 17px; font-weight: 700; }
-.bg-team-score { font-size: 13px; color: #64748b; }
+.bg-team-name { font-size: 14px; font-weight: 700; }
+.bg-team-score { font-size: 11px; color: #64748b; }
 .bg-team-score strong { color: #fbbf24; }
 
 .bg-bingo-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 4px;
+  gap: 2px;
 }
 .bg-bingo-cell {
   aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 17px;
+  font-size: 13px;
   font-weight: 700;
-  border-radius: 8px;
+  border-radius: 5px;
   cursor: pointer;
   user-select: none;
   transition: all 0.15s;
   background: #334155;
   color: #e2e8f0;
-  border: 2px solid transparent;
+  border: 1px solid transparent;
 }
 .bg-bingo-cell:hover { border-color: #60a5fa; transform: scale(1.05); }
 .bg-bingo-cell:active { transform: scale(0.95); }
@@ -843,10 +844,10 @@ input:focus,select:focus{border-color:#3b82f6;}
   background: linear-gradient(135deg, #fbbf24, #f59e0b);
   color: #1e293b;
   border-color: #fbbf24;
-  box-shadow: 0 0 12px rgba(251,191,36,0.4);
+  box-shadow: 0 0 8px rgba(251,191,36,0.3);
 }
 .bg-bingo-cell.in-bingo-line {
-  box-shadow: 0 0 16px rgba(16,185,129,0.6);
+  box-shadow: 0 0 12px rgba(16,185,129,0.5);
   border-color: #10b981;
   background: linear-gradient(135deg, #10b981, #059669);
 }
@@ -855,11 +856,11 @@ input:focus,select:focus{border-color:#3b82f6;}
   display: inline-block;
   background: linear-gradient(135deg, #10b981, #059669);
   color: white;
-  padding: 2px 10px;
-  border-radius: 12px;
-  font-size: 12px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 10px;
   font-weight: 700;
-  margin-left: 6px;
+  margin-left: 4px;
   animation: bg-pulse 1s infinite;
 }
 @keyframes bg-pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
@@ -870,6 +871,17 @@ input:focus,select:focus{border-color:#3b82f6;}
 .bg-team-card:nth-child(4) .bg-team-name { color: #fb923c; }
 .bg-team-card:nth-child(5) .bg-team-name { color: #a78bfa; }
 .bg-team-card:nth-child(6) .bg-team-name { color: #f472b6; }
+.bg-team-card:nth-child(7) .bg-team-name { color: #fbbf24; }
+.bg-team-card:nth-child(8) .bg-team-name { color: #38bdf8; }
+.bg-team-card:nth-child(9) .bg-team-name { color: #e879f9; }
+.bg-team-card.bg-empty { opacity: 0.35; pointer-events: none; }
+.bg-team-card.bg-empty .bg-bingo-grid { filter: grayscale(1); }
+.bg-team-card.bg-surrendered { opacity: 0.5; border-color: #ef4444 !important; }
+.bg-team-card.bg-surrendered .bg-bingo-grid { filter: grayscale(0.8); pointer-events: none; }
+.bg-team-card.bg-surrendered .bg-team-name { text-decoration: line-through; }
+.bg-surrender-btn { padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 700; cursor: pointer; border: 1px solid #475569; background: #0f172a; color: #94a3b8; transition: all 0.2s; }
+.bg-surrender-btn:hover { border-color: #ef4444; color: #ef4444; }
+.bg-surrender-btn.active { background: #7f1d1d; border-color: #ef4444; color: #fca5a5; }
 
 .bg-footer {
   text-align: center;
@@ -1443,7 +1455,9 @@ const TS_PRESETS={
 let TS=JSON.parse(JSON.stringify(TS_DEFAULT));
 function getMaxTier(){return appData.maxTier||6;}
 const SL={upper:'상',mid:'중',lower:'하'};const EMOJIS=['😀','😎','🤗','🥳','😈','👻','🤖','👽','🦊','🐶','🐱','🐯','🦁','🐸','🐧','🔥','⭐','💀','🎮','🎯','🏆','🎪','🍗','🍕'];
-function mScore(m){return(TS[m.tier||4]||TS[4])[m.subTier||'mid'];}
+function mScore(m){if(m.tier==='S')return 55;return(TS[m.tier||4]||TS[4])[m.subTier||'mid'];}
+function tierLabel(m){const t=m.tier||4;if(t==='S')return'S';return t+'T'+SL[m.subTier||'mid'];}
+function tierBadge(m,sm){const t=m.tier||4;const cls='tier-badge'+(sm?' tier-sm':'')+' tier-'+t;if(t==='S')return'<span class="'+cls+'">S</span>';return'<span class="'+cls+'">'+t+'T'+SL[m.subTier||'mid']+'</span>';}
 function loadTierScoresFromDB(){const saved=appData.tierScores;if(saved){for(let t=1;t<=6;t++){if(saved[t])TS[t]={upper:saved[t].upper||TS_DEFAULT[t].upper,mid:saved[t].mid||TS_DEFAULT[t].mid,lower:saved[t].lower||TS_DEFAULT[t].lower};}}}
 function loadMaxTier(){return appData.maxTier||6;}
 
@@ -1542,7 +1556,7 @@ function openProfile(){
   let h=`<div class="profile-avatar-big" ${!hasAv?`style="background:${nameColor(m.name)};font-size:28px;font-weight:800;color:#fff;"`:''}>${hasAv?av:m.name.charAt(0)}</div>`;
   h+=`<div class="profile-field"><label>아바타 선택</label><div class="emoji-grid"><div class="emoji-pick ${!hasAv?'active':''}" onclick="setAvatar('')" style="font-size:14px;font-weight:700;color:#94a3b8;">없음</div>${EMOJIS.map(e=>`<div class="emoji-pick ${e===av?'active':''}" onclick="setAvatar('${e}')">${e}</div>`).join('')}</div></div>`;
   h+=`<div class="profile-field"><label>이름</label><p style="font-size:17px;font-weight:700;">${m.name}</p></div>`;
-  h+=`<div class="profile-field"><label>티어</label><p><span class="tier-badge tier-${m.tier||4}">${m.tier||4}T ${SL[m.subTier||'mid']}</span> <span style="color:#fbbf24;font-weight:700;">${mScore(m)}점</span></p></div>`;
+  h+=`<div class="profile-field"><label>티어</label><p>${tierBadge(m)} <span style="color:#fbbf24;font-weight:700;">${mScore(m)}점</span></p></div>`;
   h+=`<button class="btn btn-sm btn-gray" onclick="changeMyPin()" style="width:100%;">비밀번호 변경</button>`;
   document.getElementById('profileContent').innerHTML=h;
 }
@@ -1557,9 +1571,9 @@ function changeMyPin(){
 }
 
 // 멤버 CRUD
-function addMember(){if(!isAdmin)return;const name=document.getElementById('addMemberName').value.trim();const tier=parseInt(document.getElementById('addMemberTier').value);const subTier=document.getElementById('addMemberSubTier').value;const pubgNick=(document.getElementById('addMemberPubgNick')?.value||'').trim();if(!name)return;const members=appData.members||{};const dup=Object.values(members).some(m=>m.name===name);if(dup){alert('이미 같은 이름의 멤버가 있습니다.');return;}const id=name.replace(/[.#$/\[\]]/g,'_');const mData={name,tier,subTier,role:'member',pin:'0000'};if(pubgNick)mData.pubgNick=pubgNick;dataRef.child('members/'+id).set(mData);document.getElementById('addMemberName').value='';if(document.getElementById('addMemberPubgNick'))document.getElementById('addMemberPubgNick').value='';}
+function addMember(){if(!isAdmin)return;const name=document.getElementById('addMemberName').value.trim();const tierVal=document.getElementById('addMemberTier').value;const tier=tierVal==='S'?'S':parseInt(tierVal);const subTier=tier==='S'?'mid':document.getElementById('addMemberSubTier').value;const pubgNick=(document.getElementById('addMemberPubgNick')?.value||'').trim();if(!name)return;const members=appData.members||{};const dup=Object.values(members).some(m=>m.name===name);if(dup){alert('이미 같은 이름의 멤버가 있습니다.');return;}const id=name.replace(/[.#$/\[\]]/g,'_');const mData={name,tier,subTier,role:'member',pin:'0000'};if(pubgNick)mData.pubgNick=pubgNick;dataRef.child('members/'+id).set(mData);document.getElementById('addMemberName').value='';if(document.getElementById('addMemberPubgNick'))document.getElementById('addMemberPubgNick').value='';}
 function removeMember(id,name){if(!isAdmin||!confirm(name+' 삭제?'))return;dataRef.child('members/'+id).remove();}
-function changeTier(id,tier){if(!isAdmin)return;dataRef.child('members/'+id+'/tier').set(parseInt(tier));}
+function changeTier(id,tier){if(!isAdmin)return;const val=tier==='S'?'S':parseInt(tier);dataRef.child('members/'+id+'/tier').set(val);if(val==='S')dataRef.child('members/'+id+'/subTier').set('mid');}
 function changeSubTier(id,sub){if(!isAdmin)return;dataRef.child('members/'+id+'/subTier').set(sub);}
 function changeRole(id,role){if(!isAdmin)return;dataRef.child('members/'+id+'/role').set(role);}
 function toggleHidden(id,hidden){if(!isAdmin)return;dataRef.child('members/'+id+'/hidden').set(hidden||null);}
@@ -1609,7 +1623,7 @@ function renderParticipants(){
   if(!participantsInit&&ids.length>0){ids.forEach(id=>selectedParticipants.add(id));participantsInit=true;}
   const grid=document.getElementById('participantGrid');if(!grid)return;
   grid.innerHTML=ids.map(id=>{const m=members[id];const sel=selectedParticipants.has(id);
-    return`<div class="participant-chip ${sel?'selected':''}" onclick="toggleParticipant('${id}')"><span class="check-icon">${sel?'✓':''}</span><span>${m.name}</span><span class="tier-badge tier-sm tier-${m.tier||4}">${m.tier||4}${SL[m.subTier||'mid']}</span></div>`;
+    return`<div class="participant-chip ${sel?'selected':''}" onclick="toggleParticipant('${id}')"><span class="check-icon">${sel?'✓':''}</span><span>${m.name}</span>${tierBadge(m,true)}</div>`;
   }).join('');
   const selCount=ids.filter(id=>selectedParticipants.has(id)).length;
   document.getElementById('selectedCount').textContent=selCount;document.getElementById('availableCount').textContent=selCount;
@@ -1657,7 +1671,7 @@ function renderTeamPreview(ta,members,mode){
     const tid='team_'+(idx+1);
     const totalTarget=arr.reduce((s,mid)=>s+mScore(members[mid]),0);
     h+=`<div class="tp-card"><div class="tp-card-head" style="color:${teamColor(tid)}">${idx+1}팀 <span style="font-size:12px;color:#64748b;font-weight:400;">(${arr.length}명 · 목표${totalTarget})</span></div>`;
-    arr.forEach(mid=>{const m=members[mid];h+=`<div class="tp-member"><span class="tier-badge tier-sm tier-${m.tier||4}">${m.tier||4}${SL[m.subTier||'mid']}</span><span>${m.name}</span></div>`;});
+    arr.forEach(mid=>{const m=members[mid];h+=`<div class="tp-member">${tierBadge(m,true)}<span>${m.name}</span></div>`;});
     h+=`</div>`;
   });
   h+=`</div><div class="tp-actions"><button class="btn btn-sm btn-green" onclick="confirmTeams()">이 팀으로 확정</button><button class="btn btn-sm btn-gray" onclick="cancelPreview()">취소</button><button class="btn btn-sm btn-blue" onclick="previewTeams('${mode}')">다시 섞기</button></div></div>`;
@@ -1686,7 +1700,7 @@ function renderManualAssign(){
   for(let t=1;t<=nt;t++){const tid='team_'+t;const asg=ids.filter(id=>manualAssign[id]===tid);
     h+=`<div class="manual-team"><div class="manual-team-head" style="color:${teamColor(tid)}">${t}팀 (${asg.length})</div><div>${asg.map(id=>`<span class="manual-member">${members[id].name}<span class="mm-remove" onclick="delete manualAssign['${id}'];renderManualAssign()">✕</span></span>`).join('')}<span class="manual-picker"><button class="manual-add-btn" onclick="toggleManualPicker('${tid}',event)">+</button>${manualPickerOpen===tid?buildManualPicker(tid,ua,members):''}</span></div></div>`;
   }
-  h+=`<div style="margin-top:10px;"><span style="font-size:13px;color:#64748b;">미배정 (${ua.length}명)</span><div style="margin-top:4px;">${ua.map(id=>`<span class="pool-chip">${members[id].name} <span class="tier-badge tier-sm tier-${members[id].tier||4}">${members[id].tier||4}${SL[members[id].subTier||'mid']}</span></span>`).join('')}</div></div>`;
+  h+=`<div style="margin-top:10px;"><span style="font-size:13px;color:#64748b;">미배정 (${ua.length}명)</span><div style="margin-top:4px;">${ua.map(id=>`<span class="pool-chip">${members[id].name} ${tierBadge(members[id],true)}</span>`).join('')}</div></div>`;
   h+=`<div style="margin-top:12px;"><button class="btn btn-sm btn-green" onclick="applyManualTeams(${nt})">수동 팀 적용</button></div>`;
   area.innerHTML=h;
   if(manualPickerOpen){const si=document.getElementById('manualPickerSearch');if(si)si.focus();}
@@ -1694,7 +1708,7 @@ function renderManualAssign(){
 function buildManualPicker(tid,ua,members){
   if(!ua.length)return`<div class="manual-picker-drop"><div class="manual-picker-empty">미배정 멤버 없음</div></div>`;
   let h=`<div class="manual-picker-drop"><input type="text" class="manual-picker-search" id="manualPickerSearch" placeholder="이름 검색..." oninput="filterManualPicker(this.value)">`;
-  h+=`<div id="manualPickerList">${ua.map(id=>`<div class="manual-picker-item" data-name="${members[id].name.toLowerCase()}" onclick="pickManual('${id}','${tid}')">${members[id].name} <span class="tier-badge tier-sm tier-${members[id].tier||4}">${members[id].tier||4}${SL[members[id].subTier||'mid']}</span></div>`).join('')}</div></div>`;
+  h+=`<div id="manualPickerList">${ua.map(id=>`<div class="manual-picker-item" data-name="${members[id].name.toLowerCase()}" onclick="pickManual('${id}','${tid}')">${members[id].name} ${tierBadge(members[id],true)}</div>`).join('')}</div></div>`;
   return h;
 }
 function toggleManualPicker(tid,e){e&&e.stopPropagation();manualPickerOpen=manualPickerOpen===tid?null:tid;renderManualAssign();}
@@ -1743,7 +1757,7 @@ function showAddMember(tid){
   let html=`<div class="add-member-dropdown swap-dropdown" onclick="event.stopPropagation()" style="position:absolute;bottom:100%;left:0;margin-bottom:4px;">`;
   available.forEach(aid=>{
     const am=members[aid];
-    html+=`<div class="swap-dropdown-item" onclick="event.stopPropagation();addToTeam('${tid}','${aid}')">${am.name} <span class="tier-badge tier-sm tier-${am.tier||4}">${am.tier||4}${SL[am.subTier||'mid']}</span></div>`;
+    html+=`<div class="swap-dropdown-item" onclick="event.stopPropagation();addToTeam('${tid}','${aid}')">${am.name} ${tierBadge(am,true)}</div>`;
   });
   html+=`</div>`;
   container.insertAdjacentHTML('beforeend',html);
@@ -1773,7 +1787,7 @@ function swapTeamMember(tid,mid,name){
   let html=`<div class="swap-dropdown" onclick="event.stopPropagation()">`;
   available.forEach(aid=>{
     const am=members[aid];
-    html+=`<div class="swap-dropdown-item" onclick="event.stopPropagation();confirmSwap('${tid}','${mid}','${aid}','${name}')">${am.name} <span class="tier-badge tier-sm tier-${am.tier||4}">${am.tier||4}${SL[am.subTier||'mid']}</span></div>`;
+    html+=`<div class="swap-dropdown-item" onclick="event.stopPropagation();confirmSwap('${tid}','${mid}','${aid}','${name}')">${am.name} ${tierBadge(am,true)}</div>`;
   });
   html+=`</div>`;
   container.innerHTML=`<div style="position:relative;display:inline-block;">${html}</div>`;
@@ -1874,6 +1888,11 @@ function proceedToTierReview(){
       if(!m)return;
       const beforeTier=m.tier||4,beforeSub=m.subTier||'mid';
       let tier=beforeTier,sub=beforeSub;
+      if(beforeTier==='S'){
+        // S티어는 승급/강등 면제
+        pendingTierChanges[mid]={name:m.name,tier:'S',subTier:'mid',newTier:'S',newSubTier:'mid',dir:'=',teamName:appData.teams[tid].name,rank:rank};
+        return;
+      }
       if(rank<=promoTo){
         if(sub==='lower')sub='mid';
         else if(sub==='mid')sub='upper';
@@ -1914,9 +1933,9 @@ function renderTierReview(){
         <div class="tier-review-member">
           <div class="tier-review-name">${info.name}</div>
           <div class="tier-review-current">
-            <span class="tier-badge tier-sm tier-${info.tier}">${info.tier}T${SL[info.subTier||'mid']}</span>
+            <span class="tier-badge tier-sm tier-${info.tier}">${info.tier==='S'?'S':info.tier+'T'+SL[info.subTier||'mid']}</span>
             <span style="${dirColor}font-weight:700;margin:0 6px;">${info.dir==='='?'→':info.dir}</span>
-            <span class="tier-badge tier-sm tier-${info.newTier}">${info.newTier}T${SL[info.newSubTier||'mid']}</span>
+            <span class="tier-badge tier-sm tier-${info.newTier}">${info.newTier==='S'?'S':info.newTier+'T'+SL[info.newSubTier||'mid']}</span>
           </div>
         </div>
         <div class="tier-review-buttons">
@@ -1933,12 +1952,14 @@ function renderTierReview(){
 function adjustTierUp(mid){
   const change=pendingTierChanges[mid];
   if(!change)return;
-  if(change.newTier<=1&&change.newSubTier==='upper')return;
-  if(change.newSubTier==='lower')change.newSubTier='mid';
+  if(change.newTier==='S')return; // S티어는 더 올릴 수 없음
+  if(change.newTier<=1&&change.newSubTier==='upper'){change.newTier='S';change.newSubTier='mid';}
+  else if(change.newSubTier==='lower')change.newSubTier='mid';
   else if(change.newSubTier==='mid')change.newSubTier='upper';
   else if(change.newSubTier==='upper'&&change.newTier>1){change.newTier--;change.newSubTier='lower';}
-  change.dir=(change.newTier<change.tier||(change.newTier===change.tier&&['lower','mid','upper'].indexOf(change.newSubTier)>['lower','mid','upper'].indexOf(change.subTier)))?'▲':'▼';
-  if(change.newTier===change.tier&&change.newSubTier===change.subTier)change.dir='=';
+  if(change.newTier==='S'||change.tier==='S'){change.dir=change.newTier===change.tier?'=':change.newTier==='S'?'▲':'▼';}
+  else{change.dir=(change.newTier<change.tier||(change.newTier===change.tier&&['lower','mid','upper'].indexOf(change.newSubTier)>['lower','mid','upper'].indexOf(change.subTier)))?'▲':'▼';
+  if(change.newTier===change.tier&&change.newSubTier===change.subTier)change.dir='=';}
   renderTierReview();
 }
 
@@ -1946,12 +1967,14 @@ function adjustTierDown(mid){
   const change=pendingTierChanges[mid];
   if(!change)return;
   const mt=getMaxTier();
-  if(change.newTier>=mt&&change.newSubTier==='lower')return;
-  if(change.newSubTier==='upper')change.newSubTier='mid';
+  if(change.newTier!=='S'&&change.newTier>=mt&&change.newSubTier==='lower')return;
+  if(change.newTier==='S'){change.newTier=1;change.newSubTier='upper';}
+  else if(change.newSubTier==='upper')change.newSubTier='mid';
   else if(change.newSubTier==='mid')change.newSubTier='lower';
   else if(change.newSubTier==='lower'&&change.newTier<mt){change.newTier++;change.newSubTier='upper';}
-  change.dir=(change.newTier<change.tier||(change.newTier===change.tier&&['lower','mid','upper'].indexOf(change.newSubTier)>['lower','mid','upper'].indexOf(change.subTier)))?'▲':'▼';
-  if(change.newTier===change.tier&&change.newSubTier===change.subTier)change.dir='=';
+  if(change.newTier==='S'||change.tier==='S'){change.dir=change.newTier===change.tier?'=':change.newTier==='S'?'▲':'▼';}
+  else{change.dir=(change.newTier<change.tier||(change.newTier===change.tier&&['lower','mid','upper'].indexOf(change.newSubTier)>['lower','mid','upper'].indexOf(change.subTier)))?'▲':'▼';
+  if(change.newTier===change.tier&&change.newSubTier===change.subTier)change.dir='=';}
   renderTierReview();
 }
 
@@ -2147,8 +2170,10 @@ function recalcEvent(ek){
       const s=snap[mid];if(!s)return;
       let tier=s.tier||4,sub=s.subTier||'mid';
       const beforeTier=tier,beforeSub=sub;
-      if(rank<=promoTo){if(sub==='lower')sub='mid';else if(sub==='mid')sub='upper';else if(sub==='upper'&&tier>1){tier--;sub='lower';}}
-      else if(rank>=relegFrom){if(sub==='upper')sub='mid';else if(sub==='mid')sub='lower';else if(sub==='lower'&&tier<mt){tier++;sub='upper';}}
+      if(tier!=='S'){ // S티어는 승급/강등 면제
+        if(rank<=promoTo){if(sub==='lower')sub='mid';else if(sub==='mid')sub='upper';else if(sub==='upper'&&tier>1){tier--;sub='lower';}}
+        else if(rank>=relegFrom){if(sub==='upper')sub='mid';else if(sub==='mid')sub='lower';else if(sub==='lower'&&tier<mt){tier++;sub='upper';}}
+      }
       if(members[mid]){memberUpdates['members/'+mid+'/tier']=tier;memberUpdates['members/'+mid+'/subTier']=sub;}
       if(tier!==beforeTier||sub!==beforeSub){
         const dir=(tier<beforeTier||(tier===beforeTier&&['lower','mid','upper'].indexOf(sub)>['lower','mid','upper'].indexOf(beforeSub)))?'up':'down';
@@ -3187,9 +3212,13 @@ function renderGame(){
 function renderTierTable(){
   const members=appData.members||{};const ids=Object.keys(members);const area=document.getElementById('tierTableArea');
   const mt=getMaxTier();const tiers=[];for(let i=1;i<=mt;i++)tiers.push(i);
-  const groups={};tiers.forEach(t=>{groups[t]={upper:[],mid:[],lower:[]};});
-  ids.forEach(id=>{const m=members[id];if(!m||!m.name)return;const t=m.tier||4;if(t<=mt&&groups[t])groups[t][m.subTier||'mid'].push(m.name);});
+  const groups={};groups['S']=[];tiers.forEach(t=>{groups[t]={upper:[],mid:[],lower:[]};});
+  ids.forEach(id=>{const m=members[id];if(!m||!m.name)return;const t=m.tier||4;if(t==='S'){groups['S'].push(m.name);}else if(t<=mt&&groups[t])groups[t][m.subTier||'mid'].push(m.name);});
   let h=`<table class="tier-table"><thead><tr><th>티어</th><th>상</th><th>중</th><th>하</th></tr></thead><tbody>`;
+  // S티어 행
+  if(groups['S'].length>0){
+    h+=`<tr><td class="tier-head"><span class="tier-badge tier-S">S</span></td><td colspan="3"><span class="tier-cell-score">55점 (고정)</span><div class="tier-cell-members">${groups['S'].map(n=>`<span class="tier-cell-member">${n}</span>`).join('')}</div></td></tr>`;
+  }
   tiers.forEach(t=>{const s=TS[t];
     h+=`<tr><td class="tier-head"><span class="tier-badge tier-${t}">${t}T</span></td>`;
     ['upper','mid','lower'].forEach(sub=>{h+=`<td><span class="tier-cell-score">${s[sub]}점</span><div class="tier-cell-members">${groups[t][sub].length?groups[t][sub].map(n=>`<span class="tier-cell-member">${n}</span>`).join(''):'<span style="color:#334155;">-</span>'}</div></td>`;});
@@ -3206,8 +3235,8 @@ function renderTierTable(){
       const cur=members[id];if(!cur||!cur.name)return;const prev=snap[id];if(!prev)return;
       const curKey=(cur.tier||4)+'_'+(cur.subTier||'mid');const prevKey=prev.tier+'_'+prev.subTier;
       if(curKey!==prevKey){
-        const dir=((cur.tier||4)<prev.tier||(cur.tier===prev.tier&&['lower','mid','upper'].indexOf(cur.subTier||'mid')>['lower','mid','upper'].indexOf(prev.subTier)))?'up':'down';
-        changes.push({name:cur.name,from:`${prev.tier}T${SL[prev.subTier]}`,to:`${cur.tier||4}T${SL[cur.subTier||'mid']}`,dir});
+        const curT=cur.tier||4;const prevT=prev.tier;const dir=(curT==='S'&&prevT!=='S')?'up':(curT!=='S'&&prevT==='S')?'down':(curT<prevT||(curT===prevT&&['lower','mid','upper'].indexOf(cur.subTier||'mid')>['lower','mid','upper'].indexOf(prev.subTier)))?'up':'down';
+        changes.push({name:cur.name,from:prev.tier==='S'?'S':`${prev.tier}T${SL[prev.subTier]}`,to:(cur.tier||4)==='S'?'S':`${cur.tier||4}T${SL[cur.subTier||'mid']}`,dir});
       }
     });
     if(changes.length>0){
@@ -3225,7 +3254,7 @@ function renderMembers(){
   document.getElementById('memberCount').textContent=`(${ids.length}명)`;
   const addArea=document.getElementById('adminAddArea');
   const mt=getMaxTier();
-  if(isAdmin){addArea.innerHTML=`<div class="add-member-bar" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><input type="text" id="addMemberName" placeholder="멤버 이름" style="width:120px;" onkeydown="if(event.key==='Enter')addMember()"><input type="text" id="addMemberPubgNick" placeholder="PUBG 닉네임 (선택)" style="width:150px;"><select id="addMemberTier" style="width:75px;padding:8px;">${Array.from({length:mt},(_,i)=>i+1).map(t=>`<option value="${t}" ${t===Math.min(4,mt)?'selected':''}>${t}티어</option>`).join('')}</select><select id="addMemberSubTier" style="width:75px;padding:8px;"><option value="upper">상</option><option value="mid" selected>중</option><option value="lower">하</option></select><button class="btn btn-blue" onclick="addMember()" style="padding:10px 24px;font-size:15px;font-weight:700;border-radius:10px;">+ 추가</button></div>`;}else addArea.innerHTML='';
+  if(isAdmin){addArea.innerHTML=`<div class="add-member-bar" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><input type="text" id="addMemberName" placeholder="멤버 이름" style="width:120px;" onkeydown="if(event.key==='Enter')addMember()"><input type="text" id="addMemberPubgNick" placeholder="PUBG 닉네임 (선택)" style="width:150px;"><select id="addMemberTier" style="width:75px;padding:8px;" onchange="document.getElementById('addMemberSubTier').disabled=this.value==='S'"><option value="S">S티어</option>${Array.from({length:mt},(_,i)=>i+1).map(t=>`<option value="${t}" ${t===Math.min(4,mt)?'selected':''}>${t}티어</option>`).join('')}</select><select id="addMemberSubTier" style="width:75px;padding:8px;"><option value="upper">상</option><option value="mid" selected>중</option><option value="lower">하</option></select><button class="btn btn-blue" onclick="addMember()" style="padding:10px 24px;font-size:15px;font-weight:700;border-radius:10px;">+ 추가</button></div>`;}else addArea.innerHTML='';
   const searchVal=(document.getElementById('memberSearchInput')?.value||'').trim().toLowerCase();
   const filtered=ids.filter(id=>{if(!members[id]||!members[id].name)return false;if(!searchVal)return true;return members[id].name.toLowerCase().includes(searchVal);});
   const searchCount=document.getElementById('memberSearchCount');
@@ -3236,7 +3265,7 @@ function renderMembers(){
     const selCount=bulkSelected.size;
     const prevTier=document.getElementById('bulkTier')?.value||'';
     const prevSub=document.getElementById('bulkSubTier')?.value||'';
-    bulkArea.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;padding:8px 12px;background:#0f172a;border:1px solid #334155;border-radius:10px;"><label style="font-size:13px;color:#94a3b8;font-weight:600;">일괄 적용</label><select id="bulkTier" style="width:65px;padding:6px;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:13px;"><option value="">티어</option>${Array.from({length:mt},(_,i)=>i+1).map(t=>`<option value="${t}" ${t==parseInt(prevTier)?'selected':''}>${t}T</option>`).join('')}</select><select id="bulkSubTier" style="width:65px;padding:6px;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:13px;"><option value="">등급</option><option value="upper" ${prevSub==='upper'?'selected':''}>상</option><option value="mid" ${prevSub==='mid'?'selected':''}>중</option><option value="lower" ${prevSub==='lower'?'selected':''}>하</option></select><button class="btn btn-xs btn-blue" onclick="applyBulkTier()" style="padding:6px 14px;font-size:13px;">적용</button><span style="font-size:12px;color:#64748b;margin-left:4px;">${selCount}명 선택</span><button class="btn btn-xs btn-gray" onclick="bulkSelectAll(true)" style="font-size:11px;padding:4px 8px;">전체선택</button><button class="btn btn-xs btn-gray" onclick="bulkSelectAll(false)" style="font-size:11px;padding:4px 8px;">전체해제</button></div>`;
+    bulkArea.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;padding:8px 12px;background:#0f172a;border:1px solid #334155;border-radius:10px;"><label style="font-size:13px;color:#94a3b8;font-weight:600;">일괄 적용</label><select id="bulkTier" style="width:65px;padding:6px;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:13px;"><option value="">티어</option><option value="S" ${prevTier==='S'?'selected':''}>S</option>${Array.from({length:mt},(_,i)=>i+1).map(t=>`<option value="${t}" ${t==parseInt(prevTier)?'selected':''}>${t}T</option>`).join('')}</select><select id="bulkSubTier" style="width:65px;padding:6px;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:13px;"><option value="">등급</option><option value="upper" ${prevSub==='upper'?'selected':''}>상</option><option value="mid" ${prevSub==='mid'?'selected':''}>중</option><option value="lower" ${prevSub==='lower'?'selected':''}>하</option></select><button class="btn btn-xs btn-blue" onclick="applyBulkTier()" style="padding:6px 14px;font-size:13px;">적용</button><span style="font-size:12px;color:#64748b;margin-left:4px;">${selCount}명 선택</span><button class="btn btn-xs btn-gray" onclick="bulkSelectAll(true)" style="font-size:11px;padding:4px 8px;">전체선택</button><button class="btn btn-xs btn-gray" onclick="bulkSelectAll(false)" style="font-size:11px;padding:4px 8px;">전체해제</button></div>`;
   }else bulkArea.innerHTML='';
   const area=document.getElementById('memberTableArea');
   if(!filtered.length){area.innerHTML=`<p style="color:#64748b;text-align:center;padding:20px;">${searchVal?'검색 결과 없음':'멤버 없음'}</p>`;return;}
@@ -3245,15 +3274,15 @@ function renderMembers(){
   filtered.forEach(id=>{const m=members[id];const sc=mScore(m);const isOnline=onlineIds.has(id);const checked=bulkSelected.has(id);
     h+=`<tr><td>${isAdmin?`<input type="checkbox" ${checked?'checked':''} onchange="toggleBulkSelect('${id}',this.checked)" style="cursor:pointer;">`:''}</td><td>${isAdmin?`<span class="m-name m-name-edit" onclick="startEditName('${id}','${m.name.replace(/'/g,"\\&#39;")}')" title="클릭하여 이름 수정" id="mname_${id}">${isOnline?'<span style="display:inline-block;width:8px;height:8px;background:#3b82f6;border-radius:50%;margin-right:5px;box-shadow:0 0 6px #3b82f6;"></span>':''}${m.name}</span>`:`<span class="m-name">${isOnline?'<span style="display:inline-block;width:8px;height:8px;background:#3b82f6;border-radius:50%;margin-right:5px;box-shadow:0 0 6px #3b82f6;"></span>':''}${m.name}</span>`} ${m.role==='admin'?'<span class="badge-admin" style="font-size:10px;">관리자</span>':''} ${m.hidden?'<span style="font-size:10px;color:#64748b;background:#1e293b;padding:2px 6px;border-radius:4px;">숨김</span>':''}</td>
     ${isAdmin?`<td><div style="display:flex;gap:3px;align-items:center;"><input type="text" id="pnick_${id}" value="${m.pubgNick||''}" placeholder="-" style="width:90px;padding:4px 6px;background:#0f172a;border:1px solid #334155;border-radius:5px;color:#e2e8f0;font-size:12px;"><button onclick="savePubgNick('${id}',document.getElementById('pnick_${id}').value)" style="padding:4px 6px;background:#334155;border:none;border-radius:5px;color:#94a3b8;font-size:10px;cursor:pointer;">저장</button></div></td>`:''}
-    <td>${isAdmin?`<select class="m-select" onchange="changeTier('${id}',this.value)">${Array.from({length:mt},(_,i)=>i+1).map(t=>`<option value="${t}" ${t===(m.tier||4)?'selected':''}>${t}T</option>`).join('')}</select>`:`<span class="tier-badge tier-${m.tier||4}">${m.tier||4}T</span>`}</td>
-    <td>${isAdmin?`<select class="m-select" onchange="changeSubTier('${id}',this.value)"><option value="upper" ${m.subTier==='upper'?'selected':''}>상</option><option value="mid" ${(!m.subTier||m.subTier==='mid')?'selected':''}>중</option><option value="lower" ${m.subTier==='lower'?'selected':''}>하</option></select>`:`${SL[m.subTier||'mid']}`}</td>
+    <td>${isAdmin?`<select class="m-select" onchange="changeTier('${id}',this.value)"><option value="S" ${m.tier==='S'?'selected':''}>S</option>${Array.from({length:mt},(_,i)=>i+1).map(t=>`<option value="${t}" ${t===(m.tier||4)&&m.tier!=='S'?'selected':''}>${t}T</option>`).join('')}</select>`:`<span class="tier-badge tier-${m.tier||4}">${m.tier==='S'?'S':(m.tier||4)+'T'}</span>`}</td>
+    <td>${isAdmin?(m.tier==='S'?`<span style="color:#64748b;font-size:12px;">-</span>`:`<select class="m-select" onchange="changeSubTier('${id}',this.value)"><option value="upper" ${m.subTier==='upper'?'selected':''}>상</option><option value="mid" ${(!m.subTier||m.subTier==='mid')?'selected':''}>중</option><option value="lower" ${m.subTier==='lower'?'selected':''}>하</option></select>`):(m.tier==='S'?'-':SL[m.subTier||'mid'])}</td>
     <td><span class="m-score">${sc}점</span></td>
     ${isAdmin?`<td><select class="m-select" onchange="changeRole('${id}',this.value)"><option value="member" ${m.role!=='admin'?'selected':''}>일반</option><option value="admin" ${m.role==='admin'?'selected':''}>관리자</option></select></td><td><button class="btn btn-xs btn-gray" onclick="resetPin('${id}','${m.name}')">초기화</button></td><td><button class="btn btn-xs ${m.hidden?'btn-red':'btn-gray'}" onclick="toggleHidden('${id}',${!m.hidden})" style="font-size:11px;padding:4px 8px;">${m.hidden?'해제':'숨김'}</button></td><td><button class="m-delete" onclick="removeMember('${id}','${m.name}')">✕</button></td>`:''}</tr>`;
   });h+=`</tbody></table>`;area.innerHTML=h;
 }
 function toggleBulkSelect(id,checked){if(checked)bulkSelected.add(id);else bulkSelected.delete(id);renderMembers();}
 function bulkSelectAll(checked){const members=appData.members||{};const searchVal=(document.getElementById('memberSearchInput')?.value||'').trim().toLowerCase();const ids=Object.keys(members).filter(id=>members[id]&&members[id].name&&(!searchVal||members[id].name.toLowerCase().includes(searchVal)));if(checked)ids.forEach(id=>bulkSelected.add(id));else bulkSelected.clear();renderMembers();}
-function applyBulkTier(){if(!isAdmin||!bulkSelected.size)return;const tier=document.getElementById('bulkTier').value;const sub=document.getElementById('bulkSubTier').value;if(!tier&&!sub){alert('티어 또는 등급을 선택해주세요.');return;}const names=[...bulkSelected].map(id=>(appData.members||{})[id]?.name).filter(Boolean);if(!confirm(`${names.length}명에게 ${tier?tier+'T ':''}${sub?({'upper':'상','mid':'중','lower':'하'}[sub])+' ':''}일괄 적용하시겠습니까?\n\n${names.join(', ')}`))return;const updates={};bulkSelected.forEach(id=>{if(tier)updates[`members/${id}/tier`]=parseInt(tier);if(sub)updates[`members/${id}/subTier`]=sub;});dataRef.update(updates);}
+function applyBulkTier(){if(!isAdmin||!bulkSelected.size)return;const tier=document.getElementById('bulkTier').value;const sub=document.getElementById('bulkSubTier').value;if(!tier&&!sub){alert('티어 또는 등급을 선택해주세요.');return;}const names=[...bulkSelected].map(id=>(appData.members||{})[id]?.name).filter(Boolean);const tierDisp=tier==='S'?'S':tier?tier+'T ':'';if(!confirm(`${names.length}명에게 ${tierDisp}${tier==='S'?'':sub?({'upper':'상','mid':'중','lower':'하'}[sub])+' ':''}일괄 적용하시겠습니까?\n\n${names.join(', ')}`))return;const updates={};bulkSelected.forEach(id=>{if(tier==='S'){updates[`members/${id}/tier`]='S';updates[`members/${id}/subTier`]='mid';}else{if(tier)updates[`members/${id}/tier`]=parseInt(tier);if(sub)updates[`members/${id}/subTier`]=sub;}});dataRef.update(updates);}
 
 function renderSetup(){
   renderParticipants();document.getElementById('roundDisplay').textContent=appData.rounds||0;loadRule();loadChickenPts();
@@ -3297,10 +3326,12 @@ function renderRanking(){
   const ha=document.getElementById('historyArea');
   if(!eventKeys.length){ha.innerHTML='<p style="color:#64748b;font-size:14px;">완료된 이벤트 없음</p>';return;}
   const totalEvents=eventKeys.length;const playerTotals={};const members=appData.members||{};
-  eventKeys.forEach(ek=>{const ev=history[ek];const ps=ev.playerScores||{};
+  eventKeys.forEach(ek=>{const ev=history[ek];const ps=ev.playerScores||{};const tc=ev.tierChanges||{};
     Object.keys(ps).forEach(mid=>{if(!ps[mid]||!ps[mid].name)return;if(!playerTotals[mid])playerTotals[mid]={name:ps[mid].name,scores:[],wins:0,stays:0,downs:0,participated:0,totalDamage:0};
       playerTotals[mid].scores.push({event:ek,score:ps[mid].score,damage:ps[mid].damage||0,rank:ps[mid].rank});playerTotals[mid].participated++;playerTotals[mid].totalDamage+=(ps[mid].damage||0);
-      if(ps[mid].rank===1)playerTotals[mid].wins++;else if(ps[mid].rank===2)playerTotals[mid].stays++;else playerTotals[mid].downs++;
+      const ch=tc[mid];
+      if(ch){const d=ch.dir;if(d==='▲'||d==='up')playerTotals[mid].wins++;else if(d==='▼'||d==='down')playerTotals[mid].downs++;else playerTotals[mid].stays++;}
+      else playerTotals[mid].stays++;
     });
   });
 
@@ -3310,7 +3341,7 @@ function renderRanking(){
   h+=`<th>총점</th><th>평균</th><th>평균딜</th><th>참여</th><th>승급</th></tr></thead><tbody>`;
   const pids=Object.keys(playerTotals).sort((a,b)=>playerTotals[b].scores.reduce((s,x)=>s+x.score,0)-playerTotals[a].scores.reduce((s,x)=>s+x.score,0));
   pids.forEach(mid=>{const p=playerTotals[mid];const m=members[mid];const total=p.scores.reduce((s,x)=>s+x.score,0);const avg=(total/p.participated).toFixed(1);const avgDmg=Math.round(p.totalDamage/p.participated);const pp=Math.round((p.participated/totalEvents)*100);
-    h+=`<tr><td class="name-col">${p.name}</td><td>${m?`<span class="tier-badge tier-sm tier-${m.tier||4}">${m.tier||4}${SL[m.subTier||'mid']}</span>`:'-'}</td>`;
+    h+=`<tr><td class="name-col">${p.name}</td><td>${m?tierBadge(m,true):'-'}</td>`;
     eventKeys.slice().reverse().forEach(ek=>{const sc=p.scores.find(s=>s.event===ek);h+=`<td ${sc&&sc.rank===1?'class="gold"':''}>${sc?sc.score:'-'}</td>`;});
     let rec='';if(p.wins)rec+=`<span style="color:#10b981;">${p.wins}승</span> `;if(p.stays)rec+=`<span style="color:#94a3b8;">${p.stays}유</span> `;if(p.downs)rec+=`<span style="color:#ef4444;">${p.downs}강</span>`;
     h+=`<td class="gold">${total}</td><td>${avg}</td><td style="color:#94a3b8;">${avgDmg||'-'}</td><td>${p.participated}/${totalEvents} (${pp}%)</td><td style="font-size:13px;">${rec||'-'}</td></tr>`;
@@ -3335,7 +3366,7 @@ function renderRanking(){
     // 승급/강등 내역
     const tc=ev.tierChanges||{};const tcKeys=Object.keys(tc);
     if(tcKeys.length>0){
-      h+=`<div style="margin-top:10px;padding-top:10px;border-top:1px solid #334155;"><div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:6px;">승급/강등</div><div style="display:flex;flex-wrap:wrap;gap:4px;">${tcKeys.map(mid=>{const c=tc[mid];const fromT=c.from?c.from.tier:c.tier;const fromS=c.from?c.from.subTier:c.subTier;const toT=c.to?c.to.tier:c.newTier;const toS=c.to?c.to.subTier:c.newSubTier;const d=c.dir==='up'||c.dir==='▲'?'up':'down';return`<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;background:#0f172a;font-size:13px;font-weight:600;"><span style="color:${d==='up'?'#10b981':'#ef4444'};">${d==='up'?'▲':'▼'}</span> ${c.name} <span style="color:#64748b;">${fromT}T${SL[fromS]}</span>→<span style="font-weight:700;">${toT}T${SL[toS]}</span></span>`;}).join('')}</div></div>`;
+      h+=`<div style="margin-top:10px;padding-top:10px;border-top:1px solid #334155;"><div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:6px;">승급/강등</div><div style="display:flex;flex-wrap:wrap;gap:4px;">${tcKeys.map(mid=>{const c=tc[mid];const fromT=c.from?c.from.tier:c.tier;const fromS=c.from?c.from.subTier:c.subTier;const toT=c.to?c.to.tier:c.newTier;const toS=c.to?c.to.subTier:c.newSubTier;const d=c.dir==='up'||c.dir==='▲'?'up':'down';const fromLabel=fromT==='S'?'S':fromT+'T'+SL[fromS];const toLabel=toT==='S'?'S':toT+'T'+SL[toS];return`<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;background:#0f172a;font-size:13px;font-weight:600;"><span style="color:${d==='up'?'#10b981':'#ef4444'};">${d==='up'?'▲':'▼'}</span> ${c.name} <span style="color:#64748b;">${fromLabel}</span>→<span style="font-weight:700;">${toLabel}</span></span>`;}).join('')}</div></div>`;
     }
     h+=`</div>`;
   });h+=`</div>`;
@@ -3543,7 +3574,7 @@ function openMemberPicker(target){
   memberPickTarget=target;memberPickSelected=new Set();
   const members=appData.members||{};const ids=Object.keys(members);
   document.getElementById('memberPickerList').innerHTML=ids.map(id=>{
-    const m=members[id];return`<div class="mp-chip" data-id="${id}" onclick="toggleMemberPick(this,'${id}')"><span class="check-icon" style="width:18px;height:18px;border-radius:4px;border:2px solid #475569;display:flex;align-items:center;justify-content:center;font-size:11px;"></span><span style="font-weight:600;">${m.name}</span><span class="tier-badge tier-sm tier-${m.tier||4}">${m.tier||4}${SL[m.subTier||'mid']}</span></div>`;
+    const m=members[id];return`<div class="mp-chip" data-id="${id}" onclick="toggleMemberPick(this,'${id}')"><span class="check-icon" style="width:18px;height:18px;border-radius:4px;border:2px solid #475569;display:flex;align-items:center;justify-content:center;font-size:11px;"></span><span style="font-weight:600;">${m.name}</span>${tierBadge(m,true)}</div>`;
   }).join('');
   document.getElementById('memberPickerModal').classList.remove('hidden');
 }
@@ -3956,7 +3987,7 @@ const GUIDE_DATA={
 `},
   bingo:{title:'빙고',content:`
 <h3>빙고 게임</h3>
-<p>6팀이 각자 다른 5×5 빙고판(1~99 랜덤 숫자)을 가지고 동시에 진행하는 실시간 멀티 빙고입니다.</p>
+<p>최대 9팀이 각자 다른 5×5 빙고판(1~99 랜덤 숫자)을 가지고 동시에 진행하는 실시간 멀티 빙고입니다.</p>
 
 <h3>방 만들기 / 참가</h3>
 <p><b>방 만들기</b> : 새 방을 생성하면 6자리 숫자 방 코드가 나옵니다. 방을 만든 사람이 방장이 됩니다.</p>
@@ -4167,17 +4198,19 @@ function stopStarfield(){if(starfieldAnim){cancelAnimationFrame(starfieldAnim);s
 // ============================================================
 
 // 상수
-const BG_TEAM_COUNT = 6;
+const BG_TEAM_COUNT = 9;
 const BG_GRID_SIZE = 5;
 const BG_NUM_RANGE = 99;
-const BG_TEAM_NAMES = ['1팀','2팀','3팀','4팀','5팀','6팀'];
-const BG_TEAM_COLORS = ['#60a5fa','#f87171','#34d399','#fb923c','#a78bfa','#f472b6'];
+const BG_TEAM_NAMES = ['1팀','2팀','3팀','4팀','5팀','6팀','7팀','8팀','9팀'];
+const BG_TEAM_COLORS = ['#60a5fa','#f87171','#34d399','#fb923c','#a78bfa','#f472b6','#fbbf24','#38bdf8','#e879f9'];
 
 // 변수
 let bgCurrentRoom = null;
 let bgRoomRef = null;
 let bgPresenceRef = null;
 let bgMyPresenceRef = null;
+let bgSurrenderRef = null;
+let bgSurrenderState = {};
 let bgIsCreator = false;
 let bgCurrentModalAction = null;
 let bgConfirmCode = '';
@@ -4267,6 +4300,14 @@ function bgEnterRoom(code, isCreator) {
     document.getElementById('bgOnlineCount').textContent = count;
   });
 
+  // 서렌 상태 리스닝
+  bgSurrenderRef = db.ref('rooms/' + code + '/surrendered');
+  bgSurrenderRef.on('value', snap => {
+    bgSurrenderState = snap.val() || {};
+    // 팀 데이터도 같이 리렌더
+    bgRoomRef.once('value').then(s => { if (s.exists()) bgRenderFromData(s.val()); });
+  });
+
   // 실시간 데이터 리스닝
   bgRoomRef.on('value', snap => {
     if (!snap.exists()) return;
@@ -4278,8 +4319,11 @@ function bgLeaveRoom() {
   if (bgMyPresenceRef) bgMyPresenceRef.remove();
   if (bgRoomRef) bgRoomRef.off();
   if (bgPresenceRef) bgPresenceRef.off();
+  if (bgSurrenderRef) bgSurrenderRef.off();
   bgCurrentRoom = null;
   bgRoomRef = null;
+  bgSurrenderRef = null;
+  bgSurrenderState = {};
   bgIsCreator = false;
 
   document.getElementById('bgLobby').style.display = 'block';
@@ -4326,16 +4370,26 @@ function bgTryNewGame() {
       bgShowModal('newGame');
     } else {
       bgRoomRef.set(bgGenerateTeamsData());
+      db.ref('rooms/' + bgCurrentRoom + '/surrendered').remove();
     }
   });
 }
 
 function bgToggleCell(teamIdx, row, col) {
   if (isGuest) return;
+  if (bgSurrenderState['team_' + teamIdx]) return; // 서렌 팀은 클릭 불가
   const path = 'team_' + teamIdx + '/' + row + '_' + col + '/marked';
   bgRoomRef.child(path).once('value').then(snap => {
     bgRoomRef.child(path).set(!snap.val());
   });
+}
+
+function bgToggleSurrender(teamIdx) {
+  if (isGuest) return;
+  if (!bgIsCreator && !isAdmin) return;
+  const key = 'team_' + teamIdx;
+  const current = bgSurrenderState[key] || false;
+  db.ref('rooms/' + bgCurrentRoom + '/surrendered/' + key).set(!current || null);
 }
 
 function bgUpdateControlButtons() {
@@ -4398,6 +4452,7 @@ function bgExecuteModalAction() {
 
   if (bgCurrentModalAction === 'newGame') {
     bgRoomRef.set(bgGenerateTeamsData());
+    db.ref('rooms/' + bgCurrentRoom + '/surrendered').remove(); // 서렌 초기화
   } else if (bgCurrentModalAction === 'reset') {
     const updates = {};
     for (let t = 0; t < BG_TEAM_COUNT; t++) {
@@ -4446,54 +4501,79 @@ function bgRenderFromData(teamsData) {
 
   for (let t = 0; t < BG_TEAM_COUNT; t++) {
     const teamData = teamsData['team_' + t];
-    if (!teamData) continue;
-
-    const values = [], marked = [];
-    for (let r = 0; r < BG_GRID_SIZE; r++) {
-      values[r] = [];
-      marked[r] = [];
-      for (let c = 0; c < BG_GRID_SIZE; c++) {
-        const cell = teamData[r + '_' + c];
-        values[r][c] = cell.value;
-        marked[r][c] = !!cell.marked;
-      }
-    }
-
-    const { lines, bingoSet } = bgGetBingoInfo(marked);
-    const markedCount = marked.flat().filter(v => v).length;
+    const isEmpty = !teamData;
 
     // 스코어 칩
     const chip = document.createElement('div');
-    chip.className = 'bg-score-chip' + (lines > 0 ? ' has-bingo' : '');
-    chip.innerHTML = `<span style="color:${BG_TEAM_COLORS[t]}">${BG_TEAM_NAMES[t]}</span> <span class="lines">${lines}줄</span>`;
-    sb.appendChild(chip);
-
-    // 팀 카드
-    const card = document.createElement('div');
-    card.className = 'bg-team-card' + (lines > 0 ? ' has-bingo' : '');
-
-    let html = `
-      <div class="bg-team-header">
-        <div>
-          <span class="bg-team-name">${BG_TEAM_NAMES[t]}</span>
-          ${lines > 0 ? `<span class="bg-bingo-badge">${lines} BINGO!</span>` : ''}
-        </div>
-        <span class="bg-team-score">체크 <strong>${markedCount}</strong>/25</span>
-      </div>
-      <div class="bg-bingo-grid">
-    `;
-
-    for (let r = 0; r < BG_GRID_SIZE; r++) {
-      for (let c = 0; c < BG_GRID_SIZE; c++) {
-        const isMarked = marked[r][c];
-        const inBingo = bingoSet.has(r+','+c);
-        let cls = 'bg-bingo-cell';
-        if (isMarked && inBingo) cls += ' marked in-bingo-line';
-        else if (isMarked) cls += ' marked';
-        html += `<div class="${cls}" onclick="bgToggleCell(${t},${r},${c})">${values[r][c]}</div>`;
+    if (isEmpty) {
+      chip.className = 'bg-score-chip';
+      chip.style.opacity = '0.3';
+      chip.innerHTML = `<span style="color:${BG_TEAM_COLORS[t]}">${BG_TEAM_NAMES[t]}</span> <span class="lines">-</span>`;
+      sb.appendChild(chip);
+    } else {
+      const values = [], marked = [];
+      for (let r = 0; r < BG_GRID_SIZE; r++) {
+        values[r] = [];
+        marked[r] = [];
+        for (let c = 0; c < BG_GRID_SIZE; c++) {
+          const cell = teamData[r + '_' + c];
+          values[r][c] = cell ? cell.value : 0;
+          marked[r][c] = cell ? !!cell.marked : false;
+        }
       }
+
+      const { lines, bingoSet } = bgGetBingoInfo(marked);
+      const markedCount = marked.flat().filter(v => v).length;
+
+      const isSurr = !!bgSurrenderState['team_' + t];
+      chip.className = 'bg-score-chip' + (lines > 0 ? ' has-bingo' : '');
+      if (isSurr) chip.style.opacity = '0.4';
+      chip.innerHTML = `<span style="color:${BG_TEAM_COLORS[t]}">${BG_TEAM_NAMES[t]}</span> <span class="lines">${isSurr ? 'GG' : lines+'줄'}</span>`;
+      sb.appendChild(chip);
+
+      // 팀 카드
+      const card = document.createElement('div');
+      card.className = 'bg-team-card' + (lines > 0 && !isSurr ? ' has-bingo' : '') + (isSurr ? ' bg-surrendered' : '');
+      const canControl = (bgIsCreator || isAdmin) && !isGuest;
+      const surrBtn = canControl ? `<button class="bg-surrender-btn ${isSurr?'active':''}" onclick="bgToggleSurrender(${t})">${isSurr?'서렌 해제':'서렌'}</button>` : (isSurr ? '<span style="font-size:11px;color:#ef4444;font-weight:700;">SURRENDERED</span>' : '');
+
+      let html = `
+        <div class="bg-team-header">
+          <div>
+            <span class="bg-team-name">${BG_TEAM_NAMES[t]}</span>
+            ${isSurr ? '<span style="font-size:11px;color:#ef4444;font-weight:700;margin-left:6px;">GG</span>' : ''}
+            ${!isSurr && lines > 0 ? `<span class="bg-bingo-badge">${lines} BINGO!</span>` : ''}
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${surrBtn}
+            <span class="bg-team-score">체크 <strong>${markedCount}</strong>/25</span>
+          </div>
+        </div>
+        <div class="bg-bingo-grid">
+      `;
+
+      for (let r = 0; r < BG_GRID_SIZE; r++) {
+        for (let c = 0; c < BG_GRID_SIZE; c++) {
+          const isMarked = marked[r][c];
+          const inBingo = bingoSet.has(r+','+c);
+          let cls = 'bg-bingo-cell';
+          if (isMarked && inBingo) cls += ' marked in-bingo-line';
+          else if (isMarked) cls += ' marked';
+          html += `<div class="${cls}" onclick="bgToggleCell(${t},${r},${c})">${values[r][c]}</div>`;
+        }
+      }
+
+      html += '</div>';
+      card.innerHTML = html;
+      container.appendChild(card);
+      continue;
     }
 
+    // 빈 팀 카드
+    const card = document.createElement('div');
+    card.className = 'bg-team-card bg-empty';
+    let html = `<div class="bg-team-header"><div><span class="bg-team-name">${BG_TEAM_NAMES[t]}</span></div><span class="bg-team-score" style="color:#334155;">대기</span></div><div class="bg-bingo-grid">`;
+    for (let i = 0; i < BG_GRID_SIZE * BG_GRID_SIZE; i++) html += `<div class="bg-bingo-cell" style="color:#334155;">-</div>`;
     html += '</div>';
     card.innerHTML = html;
     container.appendChild(card);
