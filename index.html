@@ -3227,18 +3227,14 @@ function renderTierTable(){
   const visibleCount=ids.filter(id=>members[id]&&members[id].name&&!members[id].hidden).length;
   h+=`<tr class="tier-total-row"><td colspan="4" style="text-align:center;color:#94a3b8;">전체 ${visibleCount}명</td></tr></tbody></table>`;
 
-  // 최근 승급/강등 내역
+  // 최근 승급/강등 내역 (이벤트 종료 시 저장된 tierChanges만 표시)
   const history=appData.history||{};const ek=Object.keys(history).sort((a,b)=>parseInt(b.replace('event_',''))-parseInt(a.replace('event_','')));
   if(ek.length>0){
-    const lastEv=history[ek[0]];const snap=lastEv.tierSnapshot||{};
-    const changes=[];
-    ids.forEach(id=>{
-      const cur=members[id];if(!cur||!cur.name||cur.hidden)return;const prev=snap[id];if(!prev)return;
-      const curKey=(cur.tier||4)+'_'+(cur.subTier||'mid');const prevKey=prev.tier+'_'+prev.subTier;
-      if(curKey!==prevKey){
-        const curT=cur.tier||4;const prevT=prev.tier;const dir=(curT==='S'&&prevT!=='S')?'up':(curT!=='S'&&prevT==='S')?'down':(curT<prevT||(curT===prevT&&['lower','mid','upper'].indexOf(cur.subTier||'mid')>['lower','mid','upper'].indexOf(prev.subTier)))?'up':'down';
-        changes.push({name:cur.name,from:prev.tier==='S'?'S':`${prev.tier}T${SL[prev.subTier]}`,to:(cur.tier||4)==='S'?'S':`${cur.tier||4}T${SL[cur.subTier||'mid']}`,dir});
-      }
+    const lastEv=history[ek[0]];const tc=lastEv.tierChanges||{};
+    const changes=Object.values(tc).filter(c=>c&&c.name).map(c=>{
+      const fromLabel=c.tier==='S'?'S':`${c.tier}T${SL[c.subTier]}`;
+      const toLabel=c.newTier==='S'?'S':`${c.newTier}T${SL[c.newSubTier]}`;
+      return{name:c.name,from:fromLabel,to:toLabel,dir:c.dir==='▲'?'up':'down'};
     });
     if(changes.length>0){
       h+=`<div class="tier-changes"><p style="font-size:14px;font-weight:700;color:#94a3b8;margin-bottom:8px;">최근 변동 (${lastEv.date})</p>${
