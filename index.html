@@ -3213,7 +3213,7 @@ function renderTierTable(){
   const members=appData.members||{};const ids=Object.keys(members);const area=document.getElementById('tierTableArea');
   const mt=getMaxTier();const tiers=[];for(let i=1;i<=mt;i++)tiers.push(i);
   const groups={};groups['S']=[];tiers.forEach(t=>{groups[t]={upper:[],mid:[],lower:[]};});
-  ids.forEach(id=>{const m=members[id];if(!m||!m.name)return;const t=m.tier||4;if(t==='S'){groups['S'].push(m.name);}else if(t<=mt&&groups[t])groups[t][m.subTier||'mid'].push(m.name);});
+  ids.forEach(id=>{const m=members[id];if(!m||!m.name||m.hidden)return;const t=m.tier||4;if(t==='S'){groups['S'].push(m.name);}else if(t<=mt&&groups[t])groups[t][m.subTier||'mid'].push(m.name);});
   let h=`<table class="tier-table"><thead><tr><th>티어</th><th>상</th><th>중</th><th>하</th></tr></thead><tbody>`;
   // S티어 행
   if(groups['S'].length>0){
@@ -3224,7 +3224,8 @@ function renderTierTable(){
     ['upper','mid','lower'].forEach(sub=>{h+=`<td><span class="tier-cell-score">${s[sub]}점</span><div class="tier-cell-members">${groups[t][sub].length?groups[t][sub].map(n=>`<span class="tier-cell-member">${n}</span>`).join(''):'<span style="color:#334155;">-</span>'}</div></td>`;});
     h+=`</tr>`;
   });
-  h+=`<tr class="tier-total-row"><td colspan="4" style="text-align:center;color:#94a3b8;">전체 ${ids.length}명</td></tr></tbody></table>`;
+  const visibleCount=ids.filter(id=>members[id]&&members[id].name&&!members[id].hidden).length;
+  h+=`<tr class="tier-total-row"><td colspan="4" style="text-align:center;color:#94a3b8;">전체 ${visibleCount}명</td></tr></tbody></table>`;
 
   // 최근 승급/강등 내역
   const history=appData.history||{};const ek=Object.keys(history).sort((a,b)=>parseInt(b.replace('event_',''))-parseInt(a.replace('event_','')));
@@ -3232,7 +3233,7 @@ function renderTierTable(){
     const lastEv=history[ek[0]];const snap=lastEv.tierSnapshot||{};
     const changes=[];
     ids.forEach(id=>{
-      const cur=members[id];if(!cur||!cur.name)return;const prev=snap[id];if(!prev)return;
+      const cur=members[id];if(!cur||!cur.name||cur.hidden)return;const prev=snap[id];if(!prev)return;
       const curKey=(cur.tier||4)+'_'+(cur.subTier||'mid');const prevKey=prev.tier+'_'+prev.subTier;
       if(curKey!==prevKey){
         const curT=cur.tier||4;const prevT=prev.tier;const dir=(curT==='S'&&prevT!=='S')?'up':(curT!=='S'&&prevT==='S')?'down':(curT<prevT||(curT===prevT&&['lower','mid','upper'].indexOf(cur.subTier||'mid')>['lower','mid','upper'].indexOf(prev.subTier)))?'up':'down';
