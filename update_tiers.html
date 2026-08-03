@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>시즌 티어 리셋</title>
+<style>body{background:#1a1a2e;color:#e0e0e0;font-family:'Pretendard',sans-serif;padding:20px;}.card{background:#16213e;border-radius:16px;padding:32px;max-width:900px;margin:0 auto;}h2{color:#fbbf24;margin-bottom:8px;}p{color:#94a3b8;font-size:14px;margin-bottom:16px;}table{width:100%;border-collapse:collapse;margin-bottom:16px;}th{text-align:left;padding:6px 8px;color:#64748b;font-size:12px;border-bottom:2px solid #334155;}td{padding:5px 8px;border-bottom:1px solid #1e293b;font-size:13px;}.tier-badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;margin-right:4px;}.t1{background:#fbbf24;color:#1e293b;}.t2{background:#f87171;color:#fff;}.t3{background:#a78bfa;color:#fff;}.t4{background:#60a5fa;color:#fff;}.miss{color:#ef4444;font-weight:700;}button{background:#f59e0b;color:#000;font-weight:700;font-size:1rem;border:none;border-radius:8px;padding:12px 32px;cursor:pointer;width:100%;margin-top:12px;}button:disabled{background:#555;color:#999;}pre{background:#0f172a;padding:12px;border-radius:8px;font-size:12px;max-height:300px;overflow:auto;margin-top:12px;white-space:pre-wrap;}.warn{background:#7f1d1d;border:1px solid #ef4444;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;}</style>
+</head><body>
+<div class="card">
+<h2>시즌 티어 리셋</h2>
+<p>아래 매핑대로 멤버 티어를 일괄 변경하고, 최근 이벤트 tierSnapshot도 같이 업데이트합니다.<br>→ 티어표 "최근 변동"에 표시되지 않습니다.</p>
+
+<div class="warn">⚠️ 이 작업은 모든 멤버의 티어를 덮어씁니다. 실행 전 반드시 매핑을 확인하세요.</div>
+
+<div id="content">로딩 중...</div>
+<button id="btn" onclick="run()" style="display:none">티어 리셋 실행</button>
+<pre id="log"></pre>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({apiKey:"AIzaSyABoG4B0ahW0OAZURa3WZAz9HDST49A2K4",authDomain:"grimi-pubg.firebaseapp.com",databaseURL:"https://grimi-pubg-default-rtdb.firebaseio.com",projectId:"grimi-pubg",storageBucket:"grimi-pubg.firebasestorage.app",messagingSenderId:"507556279092",appId:"1:507556279092:web:71182597db9c8c8a71ab61"});
+const db=firebase.database();
+const ROOT='killcount/grimi';
+const logEl=document.getElementById('log');
+function log(m){logEl.textContent+=m+'\n';logEl.scrollTop=logEl.scrollHeight;}
+
+// ===== 시즌 티어 매핑 =====
+// 이름은 Firebase에 저장된 이름 기준
+const TIER_MAP = [
+  // [티어, 등급, 이름]
+  [1,'upper','헤이'],[1,'upper','다라'],[1,'upper','르시'],
+  [1,'mid','상밤'],[1,'mid','덤보'],
+  [1,'lower','호영'],
+  [2,'upper','유유'],[2,'upper','황해'],[2,'upper','테크'],
+  [2,'mid','박대리'],[2,'mid','개종'],[2,'mid','바다'],[2,'mid','라떼'],
+  [2,'lower','가을'],[2,'mid','상디'],[2,'lower','태쓰'],[2,'lower','댕댕'],[2,'lower','빵지'],
+  [3,'upper','원이'],[3,'upper','경환'],[3,'upper','도도'],[3,'upper','지단'],[3,'upper','순금이'],[3,'upper','쿨'],[3,'upper','육삼'],[3,'upper','명태'],[3,'upper','동동'],[3,'upper','수연'],
+  [3,'mid','마크'],[3,'mid','오삼'],[3,'mid','온'],[3,'mid','이즈온'],[3,'mid','꼬삼이'],[3,'mid','사피'],[3,'mid','케이'],[3,'mid','유티'],[3,'mid','웅이'],[3,'mid','준섭'],
+  [3,'lower','포든'],[3,'lower','갱이'],[3,'lower','오징어'],
+  [4,'mid','레오'],[4,'mid','겔포스'],[4,'mid','디노'],[4,'mid','맹이'],[4,'mid','머드'],[4,'mid','산이'],[4,'mid','쩡구루'],[4,'mid','포든'],[4,'mid','강인'],[4,'mid','범'],[4,'mid','샾샾이'],[4,'mid','에스비디'],[4,'mid','포차코'],
+];
+
+// ===== 신규 멤버 (Firebase에 없는 경우 추가) =====
+const NEW_MEMBERS = [
+  {name:'준섭', tier:3, subTier:'mid'},
+  {name:'에스비디', tier:4, subTier:'mid'},
+  {name:'포차코', tier:4, subTier:'mid'},
+];
+
+// ===== 이름 변경 =====
+const RENAME_MAP = {
+  // 이미 변경 완료
+};
+
+const SL={upper:'상',mid:'중',lower:'하'};
+
+let memberData={};
+let lastEventKey='';
+
+async function load(){
+  const [memberSnap, histSnap] = await Promise.all([
+    db.ref(ROOT+'/members').once('value'),
+    db.ref(ROOT+'/history').once('value')
+  ]);
+  memberData = memberSnap.val()||{};
+  const history = histSnap.val()||{};
+  const eventKeys = Object.keys(history).sort((a,b)=>parseInt(b.replace('event_',''))-parseInt(a.replace('event_','')));
+  lastEventKey = eventKeys[0]||'';
+
+  // 이름→ID 매핑
+  const nameToId={};
+  Object.entries(memberData).forEach(([id,m])=>{
+    if(m&&m.name) nameToId[m.name]=id;
+  });
+
+  // 매핑 테이블 생성
+  let html='';
+
+  // 이름 변경 섹션
+  const renameEntries=Object.entries(RENAME_MAP).filter(([old])=>nameToId[old]);
+  if(renameEntries.length>0){
+    html+='<h3 style="color:#38bdf8;font-size:14px;margin:8px 0;">이름 변경</h3>';
+    html+='<table><thead><tr><th>현재 이름</th><th>→</th><th>변경 후</th></tr></thead><tbody>';
+    renameEntries.forEach(([old,nw])=>{html+=`<tr><td>${old}</td><td>→</td><td style="color:#10b981;font-weight:700;">${nw}</td></tr>`;});
+    html+='</tbody></table>';
+  }
+
+  // 신규 멤버 섹션
+  if(NEW_MEMBERS.length>0){
+    html+='<h3 style="color:#f59e0b;font-size:14px;margin:12px 0 8px;">신규 멤버 추가</h3>';
+    html+='<table><thead><tr><th>이름</th><th>티어</th></tr></thead><tbody>';
+    NEW_MEMBERS.forEach(nm=>{
+      const exists=nameToId[nm.name];
+      html+=`<tr><td>${nm.name}</td><td><span class="tier-badge t${nm.tier}">${nm.tier}T${SL[nm.subTier]}</span></td><td>${exists?'<span style="color:#64748b;">이미 존재</span>':'<span style="color:#10b981;">새로 추가</span>'}</td></tr>`;
+    });
+    html+='</tbody></table>';
+  }
+
+  // 티어 변경 테이블
+  html+='<h3 style="color:#fbbf24;font-size:14px;margin:12px 0 8px;">티어 변경</h3>';
+  html+='<table><thead><tr><th>이름</th><th>현재</th><th>→</th><th>변경 후</th><th>상태</th></tr></thead><tbody>';
+  let matchCount=0, missCount=0;
+  const processed=new Set();
+
+  TIER_MAP.forEach(([tier,sub,name])=>{
+    const id=nameToId[name];
+    const newLabel=tier+'T'+SL[sub];
+    if(id){
+      const m=memberData[id];
+      const curTier=m.tier||4;
+      const curSub=m.subTier||'mid';
+      const curLabel=curTier==='S'?'S':curTier+'T'+SL[curSub];
+      const changed=(curTier!==tier||curSub!==sub);
+      html+=`<tr><td>${name}</td><td><span class="tier-badge t${curTier==='S'?1:curTier}">${curLabel}</span></td><td>→</td><td><span class="tier-badge t${tier}">${newLabel}</span></td><td>${changed?'<span style="color:#fbbf24;">변경</span>':'<span style="color:#64748b;">유지</span>'}</td></tr>`;
+      matchCount++;
+      processed.add(id);
+    } else {
+      html+=`<tr><td>${name}</td><td>-</td><td>→</td><td><span class="tier-badge t${tier}">${newLabel}</span></td><td class="miss">❌ 매칭 실패</td></tr>`;
+      missCount++;
+    }
+  });
+
+  // 매핑에 없는 멤버 (변경 안 됨)
+  const unmapped=Object.entries(memberData).filter(([id,m])=>m&&m.name&&!processed.has(id));
+  if(unmapped.length>0){
+    html+=`<tr><td colspan="5" style="padding:12px 0 6px;color:#64748b;font-weight:700;border-bottom:2px solid #334155;">매핑에 없는 멤버 (티어 유지)</td></tr>`;
+    unmapped.forEach(([id,m])=>{
+      const t=m.tier||4;const s=m.subTier||'mid';
+      const label=t==='S'?'S':t+'T'+SL[s];
+      html+=`<tr style="opacity:0.6;"><td>${m.name}</td><td colspan="3"><span class="tier-badge t${t==='S'?1:t}">${label}</span> 유지</td><td style="color:#64748b;">-</td></tr>`;
+    });
+  }
+
+  html+='</tbody></table>';
+  html+=`<p style="font-size:13px;">매칭: <strong style="color:#10b981;">${matchCount}</strong>명 / 실패: <strong style="color:#ef4444;">${missCount}</strong>명 / 미포함: <strong style="color:#64748b;">${unmapped.length}</strong>명</p>`;
+  html+=`<p style="font-size:12px;color:#64748b;">멤버 티어만 변경합니다. 이벤트 데이터(tierSnapshot/tierChanges)는 건드리지 않습니다.</p>`;
+
+  document.getElementById('content').innerHTML=html;
+  document.getElementById('btn').style.display='block';
+}
+
+async function run(){
+  document.getElementById('btn').disabled=true;
+  const nameToId={};
+  Object.entries(memberData).forEach(([id,m])=>{if(m&&m.name)nameToId[m.name]=id;});
+
+  const updates={};
+  let count=0;
+
+  // 1. 이름 변경
+  Object.entries(RENAME_MAP).forEach(([oldName,newName])=>{
+    const id=nameToId[oldName];
+    if(!id)return;
+    updates[ROOT+'/members/'+id+'/name']=newName;
+    nameToId[newName]=id; // 이후 매핑에서 새 이름으로 찾을 수 있도록
+    delete nameToId[oldName];
+    log('이름 변경: '+oldName+' → '+newName);
+  });
+
+  // 2. 신규 멤버 추가
+  NEW_MEMBERS.forEach(nm=>{
+    if(nameToId[nm.name])return; // 이미 존재하면 스킵
+    const id=nm.name.replace(/[.#$/\[\]]/g,'_');
+    updates[ROOT+'/members/'+id+'/name']=nm.name;
+    updates[ROOT+'/members/'+id+'/tier']=nm.tier;
+    updates[ROOT+'/members/'+id+'/subTier']=nm.subTier;
+    nameToId[nm.name]=id;
+    log('신규 멤버 추가: '+nm.name+' ('+nm.tier+'T'+SL[nm.subTier]+')');
+  });
+
+  // 3. 티어 변경
+  TIER_MAP.forEach(([tier,sub,name])=>{
+    const id=nameToId[name];
+    if(!id)return;
+    updates[ROOT+'/members/'+id+'/tier']=tier;
+    updates[ROOT+'/members/'+id+'/subTier']=sub;
+    count++;
+  });
+  log(`${count}명 티어 업데이트 준비 완료`);
+
+  // tierSnapshot은 건드리지 않음 (최근 변동은 tierChanges 기반으로 변경됨)
+
+  log('Firebase 업데이트 중... ('+Object.keys(updates).length+'개 필드)');
+  try{
+    await db.ref().update(updates);
+    log('\n🎉 완료! '+count+'명 티어 리셋 + tierSnapshot 동기화');
+    log('신규 멤버 '+NEW_MEMBERS.length+'명 추가, 이름 변경 '+Object.keys(RENAME_MAP).length+'건');
+    log('사이트 새로고침하면 "최근 변동" 없이 반영됩니다.');
+  }catch(e){
+    log('\n❌ 에러: '+e.message);
+    document.getElementById('btn').disabled=false;
+  }
+}
+
+load().catch(e=>{document.getElementById('content').innerHTML='에러: '+e.message;});
+</script>
+</body></html>

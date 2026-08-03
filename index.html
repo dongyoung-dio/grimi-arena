@@ -1572,7 +1572,18 @@ function changeMyPin(){
 
 // 멤버 CRUD
 function addMember(){if(!isAdmin)return;const name=document.getElementById('addMemberName').value.trim();const tierVal=document.getElementById('addMemberTier').value;const tier=tierVal==='S'?'S':parseInt(tierVal);const subTier=tier==='S'?'mid':document.getElementById('addMemberSubTier').value;const pubgNick=(document.getElementById('addMemberPubgNick')?.value||'').trim();if(!name)return;const members=appData.members||{};const dup=Object.values(members).some(m=>m.name===name);if(dup){alert('이미 같은 이름의 멤버가 있습니다.');return;}const id=name.replace(/[.#$/\[\]]/g,'_');const mData={name,tier,subTier,role:'member',pin:'0000'};if(pubgNick)mData.pubgNick=pubgNick;dataRef.child('members/'+id).set(mData);document.getElementById('addMemberName').value='';if(document.getElementById('addMemberPubgNick'))document.getElementById('addMemberPubgNick').value='';}
-function removeMember(id,name){if(!isAdmin||!confirm(name+' 삭제?'))return;dataRef.child('members/'+id).remove();}
+function removeMember(id,name){if(!isAdmin||!confirm(name+' 삭제?\n\n누적 기록(순위/결과)에서도 함께 삭제됩니다.\n탈퇴자는 "숨김" 처리를 권장합니다.'))return;
+  const updates={};updates['members/'+id]=null;
+  const history=appData.history||{};
+  Object.keys(history).forEach(ek=>{
+    const ev=history[ek];
+    if(ev.playerScores&&ev.playerScores[id])updates['history/'+ek+'/playerScores/'+id]=null;
+    if(ev.tierSnapshot&&ev.tierSnapshot[id])updates['history/'+ek+'/tierSnapshot/'+id]=null;
+    if(ev.tierChanges&&ev.tierChanges[id])updates['history/'+ek+'/tierChanges/'+id]=null;
+    if(ev.teams){Object.keys(ev.teams).forEach(tid=>{if(ev.teams[tid].members&&ev.teams[tid].members[id])updates['history/'+ek+'/teams/'+tid+'/members/'+id]=null;});}
+  });
+  dataRef.update(updates);
+}
 function changeTier(id,tier){if(!isAdmin)return;const val=tier==='S'?'S':parseInt(tier);dataRef.child('members/'+id+'/tier').set(val);if(val==='S')dataRef.child('members/'+id+'/subTier').set('mid');}
 function changeSubTier(id,sub){if(!isAdmin)return;dataRef.child('members/'+id+'/subTier').set(sub);}
 function changeRole(id,role){if(!isAdmin)return;dataRef.child('members/'+id+'/role').set(role);}
