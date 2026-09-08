@@ -10,6 +10,7 @@
 <link rel="icon" type="image/png" href="grimi-logo.png">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:-apple-system,'Pretendard','Noto Sans KR',sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh;font-size:15px;}
@@ -1003,6 +1004,168 @@ input:focus,select:focus{border-color:#3b82f6;}
   margin: 0 auto 12px;
 }
 @keyframes bg-spin { to { transform: rotate(360deg); } }
+
+/* ===== 클랜전 (clanwar 이식, #tab-clanwar 스코프) ===== */
+@keyframes cw-appOrbFloat{0%,100%{transform:translate(0,0)}33%{transform:translate(40px,-30px)}66%{transform:translate(-30px,40px)}}
+@keyframes cw-gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes cw-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes cw-scanDown{0%{top:-2%}100%{top:102%}}
+#tab-clanwar .hidden{display:none!important;}
+#tab-clanwar .btn{padding:10px 20px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;}
+#tab-clanwar .btn:hover{filter:brightness(1.1);transform:translateY(-1px);}
+#tab-clanwar .btn:active{transform:translateY(0);}
+#tab-clanwar .btn-blue{background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;}
+#tab-clanwar .btn-green{background:linear-gradient(135deg,#10b981,#059669);color:#fff;}
+#tab-clanwar .btn-red{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;}
+#tab-clanwar .btn-gray{background:#334155;color:#94a3b8;}
+#tab-clanwar .btn-gray:hover{background:#475569;color:#cbd5e1;}
+#tab-clanwar .btn-amber{background:linear-gradient(135deg,#f59e0b,#d97706);color:#1e293b;}
+#tab-clanwar .btn-sm{padding:7px 16px;font-size:13px;}
+#tab-clanwar .btn-xs{padding:5px 12px;font-size:12px;}
+#tab-clanwar .btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;}
+#tab-clanwar input, #tab-clanwar select{padding:8px 12px;border:2px solid #334155;border-radius:8px;background:#0f172a;color:#e2e8f0;font-size:15px;outline:none;transition:border-color .2s;}
+#tab-clanwar input:focus, #tab-clanwar select:focus{border-color:#3b82f6;}
+#tab-clanwar .card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155;transition:border-color .2s;}
+#tab-clanwar .card:hover{border-color:rgba(59,130,246,.15);}
+#tab-clanwar /* 앱 배경 */
+#appScreen{position:relative;}
+#tab-clanwar #appScreen::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
+  radial-gradient(ellipse at 15% 10%,rgba(59,130,246,.10) 0%,transparent 50%),
+  radial-gradient(ellipse at 85% 90%,rgba(139,92,246,.08) 0%,transparent 50%),
+  radial-gradient(ellipse at 50% 50%,rgba(99,102,241,.05) 0%,transparent 60%);
+  pointer-events:none;z-index:0;}
+#tab-clanwar #appScreen::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+  background:linear-gradient(rgba(59,130,246,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,.02) 1px,transparent 1px);
+  background-size:120px 120px;pointer-events:none;z-index:0;}
+#tab-clanwar .app-orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;animation:cw-appOrbFloat 20s ease-in-out infinite;}
+#tab-clanwar .app-scan{position:fixed;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,.08),transparent);animation:cw-scanDown 12s linear infinite;pointer-events:none;z-index:0;}
+#tab-clanwar #appScreen>*{position:relative;z-index:1;}
+#tab-clanwar /* 상단바 */
+.top-bar{position:relative;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+  background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(30,41,59,.9));
+  border-bottom:1px solid rgba(59,130,246,.15);
+  box-shadow:0 4px 20px rgba(0,0,0,.3),0 1px 0 rgba(59,130,246,.08) inset;}
+#tab-clanwar .top-bar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,.3),rgba(139,92,246,.2),transparent);}
+#tab-clanwar .top-bar h1{font-size:26px;font-weight:900;letter-spacing:5px;cursor:pointer;position:relative;-webkit-text-stroke:1.5px rgba(96,165,250,.4);
+  background:linear-gradient(135deg,#60a5fa,#818cf8,#60a5fa);background-size:200% 200%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:cw-gradientShift 4s ease infinite;text-shadow:0 0 20px rgba(96,165,250,.15);}
+#tab-clanwar .top-bar h1::before{content:'🛡️';margin-right:8px;font-size:22px;-webkit-text-fill-color:initial;filter:drop-shadow(0 0 8px rgba(59,130,246,.4));vertical-align:middle;}
+#tab-clanwar .badge-admin{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:700;box-shadow:0 0 10px rgba(239,68,68,.2);}
+#tab-clanwar /* TOP 3 포디움 */
+.podium{display:flex;justify-content:center;gap:12px;margin-bottom:20px;}
+#tab-clanwar .podium-card{background:#1e293b;border-radius:14px;padding:14px 20px;border:2px solid #334155;text-align:center;min-width:140px;flex:0 1 200px;transition:all .2s;}
+#tab-clanwar .podium-card.p1{border-color:#fbbf24;box-shadow:0 0 24px rgba(251,191,36,.15),0 0 48px rgba(251,191,36,.05);order:2;}
+#tab-clanwar .podium-card.p2{border-color:#c0c0c0;order:1;}
+#tab-clanwar .podium-card.p3{border-color:#cd7f32;order:3;}
+#tab-clanwar .podium-medal{font-size:28px;margin-bottom:2px;}
+#tab-clanwar .podium-rank{font-size:12px;font-weight:800;color:#64748b;margin-bottom:4px;}
+#tab-clanwar .podium-team{font-size:16px;font-weight:900;margin-bottom:2px;}
+#tab-clanwar .podium-score{font-size:22px;font-weight:900;color:#fbbf24;}
+#tab-clanwar .podium-clan{margin-top:4px;}
+#tab-clanwar /* 순위 보드 */
+.board-section{margin-bottom:24px;}
+#tab-clanwar .board-title{font-size:18px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+#tab-clanwar .board-title .live-dot{width:8px;height:8px;background:#10b981;border-radius:50%;animation:cw-pulse 2s infinite;}
+#tab-clanwar .score-table-wrap{overflow-x:auto;border-radius:10px;border:1px solid #334155;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+#tab-clanwar .score-table{width:100%;border-collapse:collapse;font-size:15px;min-width:600px;}
+#tab-clanwar .score-table th{background:#334155;padding:12px 10px;text-align:center;font-weight:700;font-size:13px;color:#94a3b8;white-space:nowrap;position:sticky;top:0;z-index:1;}
+#tab-clanwar .score-table td{padding:12px 10px;text-align:center;border-bottom:1px solid #0f172a;white-space:nowrap;font-size:15px;}
+#tab-clanwar .score-table tbody tr:hover td{background:rgba(51,65,85,.4);}
+#tab-clanwar .score-table .col-rank{font-size:22px;font-weight:900;width:46px;}
+#tab-clanwar .score-table .col-team{text-align:left;font-weight:700;font-size:16px;}
+#tab-clanwar .score-table .col-kill{color:#fbbf24;font-weight:700;}
+#tab-clanwar .score-table .col-place{color:#60a5fa;font-weight:600;}
+#tab-clanwar .score-table .col-total{font-weight:900;font-size:18px;color:#fbbf24;}
+#tab-clanwar .score-table .row-gold td{background:rgba(251,191,36,.14);}
+#tab-clanwar .score-table .row-silver td{background:rgba(192,192,192,.10);}
+#tab-clanwar .score-table .row-bronze td{background:rgba(205,127,50,.10);}
+#tab-clanwar .rank-1{color:#fbbf24;}
+#tab-clanwar .rank-2{color:#c0c0c0;}
+#tab-clanwar .rank-3{color:#cd7f32;}
+#tab-clanwar .rank-else{color:#475569;}
+#tab-clanwar .clan-tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700;color:#fff;}
+#tab-clanwar .round-header{font-size:11px;color:#64748b;display:block;font-weight:400;}
+#tab-clanwar .placement-num{font-size:11px;color:#94a3b8;display:block;margin-top:1px;}
+#tab-clanwar /* 라운드별 순위 */
+.round-rank-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-top:20px;}
+#tab-clanwar .round-rank-card{background:#1e293b;border-radius:12px;border:1px solid #334155;overflow:visible;min-width:0;}
+#tab-clanwar .round-rank-head{padding:12px 16px;background:#334155;font-weight:800;font-size:14px;display:flex;align-items:center;gap:8px;}
+#tab-clanwar .round-rank-head .rr-round{color:#60a5fa;}
+#tab-clanwar .round-rank-head .rr-map{color:#94a3b8;font-weight:600;font-size:13px;}
+#tab-clanwar .rr-table{width:100%;border-collapse:collapse;font-size:14px;}
+#tab-clanwar .rr-table td{padding:8px 12px;border-bottom:1px solid #0f172a;}
+#tab-clanwar .rr-table .rr-rank{font-weight:900;width:32px;text-align:center;font-size:16px;}
+#tab-clanwar .rr-table .rr-team{font-weight:700;text-align:left;word-break:break-all;}
+#tab-clanwar .rr-table .rr-kill{color:#fbbf24;font-weight:700;text-align:center;width:50px;}
+#tab-clanwar .rr-table .rr-pts{color:#60a5fa;font-weight:700;text-align:center;width:50px;}
+#tab-clanwar .rr-table .rr-total{font-weight:900;color:#fbbf24;text-align:center;width:55px;font-size:15px;}
+#tab-clanwar .rr-table tr:first-child td{background:rgba(251,191,36,.14);}
+#tab-clanwar .rr-table tr:nth-child(2) td{background:rgba(192,192,192,.10);}
+#tab-clanwar .rr-table tr:nth-child(3) td{background:rgba(205,127,50,.10);}
+#tab-clanwar /* 점수 입력 */
+.round-tabs{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap;}
+#tab-clanwar .round-tab{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:#0f172a;color:#64748b;border:1px solid #334155;transition:all .15s;}
+#tab-clanwar .round-tab:hover{border-color:#60a5fa;color:#94a3b8;}
+#tab-clanwar .round-tab.active{background:#3b82f6;color:#fff;border-color:#3b82f6;}
+#tab-clanwar .input-table{width:100%;border-collapse:collapse;font-size:15px;}
+#tab-clanwar .input-table th{background:#334155;padding:12px;text-align:center;font-weight:700;font-size:13px;color:#94a3b8;}
+#tab-clanwar .input-table td{padding:10px;text-align:center;border-bottom:1px solid #0f172a;}
+#tab-clanwar .input-table .team-name-cell{text-align:left;font-weight:700;font-size:15px;}
+#tab-clanwar .input-table select, #tab-clanwar .input-table input[type=number]{width:70px;padding:7px 4px;font-size:15px;text-align:center;border:1px solid #334155;border-radius:6px;background:#0f172a;color:#e2e8f0;}
+#tab-clanwar .input-table input[type=number]:focus, #tab-clanwar .input-table select:focus{border-color:#3b82f6;outline:none;}
+#tab-clanwar .auto-pts{font-size:14px;color:#60a5fa;font-weight:700;}
+#tab-clanwar /* 설정 */
+.setup-card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155;margin-bottom:16px;}
+#tab-clanwar .setup-card h3{font-size:16px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+#tab-clanwar .setup-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;}
+#tab-clanwar .setup-row label{font-size:14px;color:#94a3b8;min-width:60px;}
+#tab-clanwar .item-list{display:flex;flex-direction:column;gap:6px;}
+#tab-clanwar .item-row{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#0f172a;border-radius:8px;border:1px solid #334155;}
+#tab-clanwar .item-row .item-name{flex:1;font-weight:600;font-size:14px;}
+#tab-clanwar .item-delete{background:none;border:none;color:#475569;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;}
+#tab-clanwar .item-delete:hover{background:#ef4444;color:#fff;}
+#tab-clanwar .color-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;}
+#tab-clanwar .clan-logo{width:24px;height:24px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid #475569;}
+#tab-clanwar .clan-logo-sm{width:34px;height:34px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;border:1px solid #475569;}
+#tab-clanwar .clan-avatar{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;color:#fff;font-size:15px;font-weight:800;vertical-align:middle;margin-right:6px;flex-shrink:0;}
+#tab-clanwar .clan-logo-lg{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #475569;margin-bottom:6px;}
+#tab-clanwar .logo-upload-btn{padding:6px 12px;background:#334155;border:1px dashed #475569;border-radius:8px;color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-block;}
+#tab-clanwar .logo-upload-btn:hover{background:#475569;color:#e2e8f0;border-color:#60a5fa;}
+#tab-clanwar .logo-preview{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #475569;}
+#tab-clanwar .pts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px;}
+#tab-clanwar .pts-item{display:flex;align-items:center;gap:6px;padding:6px 10px;background:#0f172a;border-radius:6px;border:1px solid #334155;font-size:13px;}
+#tab-clanwar .pts-item label{color:#94a3b8;white-space:nowrap;min-width:30px;}
+#tab-clanwar .pts-item input{width:44px;padding:4px;font-size:13px;text-align:center;border:1px solid #334155;border-radius:4px;background:#1e293b;color:#fbbf24;font-weight:700;}
+#tab-clanwar /* 캡처 */
+.capture-btn{background:#334155;border:1px solid #475569;color:#94a3b8;padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:4px;}
+#tab-clanwar .capture-btn:hover{background:#475569;color:#e2e8f0;border-color:#60a5fa;}
+#tab-clanwar .capture-btn svg{width:14px;height:14px;}
+#tab-clanwar .capture-wrap{padding:16px;background:#0f172a;border-radius:12px;}
+#tab-clanwar /* 히스토리 */
+.history-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+#tab-clanwar .history-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#0f172a;border:1px solid #334155;border-radius:10px;cursor:pointer;transition:all .15s;}
+#tab-clanwar .history-item:hover{border-color:#3b82f6;background:#1e293b;}
+#tab-clanwar .history-item .hi-title{font-weight:700;font-size:15px;}
+#tab-clanwar .history-item .hi-date{font-size:13px;color:#64748b;}
+#tab-clanwar .history-item .hi-teams{font-size:12px;color:#94a3b8;}
+#tab-clanwar /* 토스트 */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#10b981;color:#fff;padding:12px 24px;border-radius:10px;font-weight:700;font-size:14px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;}
+#tab-clanwar .toast.show{opacity:1;}
+#tab-clanwar /* 모달 */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;}
+#tab-clanwar .modal-box{background:#1e293b;border-radius:16px;padding:28px;border:1px solid #334155;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;}
+#tab-clanwar .modal-title{font-size:18px;font-weight:800;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
+#tab-clanwar .modal-close{background:none;border:none;color:#64748b;font-size:22px;cursor:pointer;padding:4px;}
+#tab-clanwar .modal-close:hover{color:#e2e8f0;}
+@media(max-width:600px){#tab-clanwar .podium{gap:8px;}#tab-clanwar .podium-card{min-width:100px;padding:10px 12px;}#tab-clanwar .podium-team{font-size:14px;}#tab-clanwar .podium-score{font-size:18px;}#tab-clanwar .score-table{min-width:500px;}#tab-clanwar .pts-grid{grid-template-columns:repeat(auto-fill,minmax(90px,1fr));}#tab-clanwar .round-rank-grid{grid-template-columns:1fr;}}
+#tab-clanwar .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:9000;}
+/* 클랜전 서브탭 */
+#tab-clanwar .cw-subtab{padding:8px 18px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;background:#1e293b;color:#94a3b8;border:1px solid #334155;transition:all .2s;}
+#tab-clanwar .cw-subtab:hover{color:#cbd5e1;border-color:#475569;}
+#tab-clanwar .cw-subtab.active{background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;border-color:#3b82f6;}
+#tab-clanwar .live-dot{width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981;animation:cw-pulse 1.5s infinite;display:inline-block;}
+#tab-clanwar .board-section{margin-top:18px;}
+#tab-clanwar .board-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:#94a3b8;margin-bottom:10px;}
 </style>
 </head>
 <body>
@@ -1142,6 +1305,7 @@ input:focus,select:focus{border-color:#3b82f6;}
     <div class="tab" data-tab="game" onclick="switchTab('game')">게임 현황</div>
     <div class="tab" data-tab="setup" onclick="switchTab('setup')">팀 배정</div>
     <div class="tab" data-tab="ranking" onclick="switchTab('ranking')">순위/결과</div>
+    <div class="tab" data-tab="clanwar" onclick="switchTab('clanwar')">클랜전</div>
     <div class="tab" data-tab="bingo" onclick="switchTab('bingo')">빙고</div>
     <div class="tab" data-tab="minigame" onclick="switchTab('minigame')">미니게임</div>
     <div class="tab" data-tab="members" onclick="switchTab('members')">멤버 관리</div>
@@ -1275,6 +1439,104 @@ input:focus,select:focus{border-color:#3b82f6;}
       <div class="card" style="margin-bottom:18px;"><div class="hist-title">현재 이벤트</div><div id="currentRankingList"></div><div id="noRankMsg" style="text-align:center;color:#64748b;padding:20px;font-size:15px;">아직 팀이 없습니다</div></div>
       <div class="card"><div class="hist-title">누적 기록 <span class="hist-badge" id="histCountBadge">0회</span></div><div id="historyArea"><p style="color:#64748b;font-size:14px;">아직 완료된 이벤트가 없습니다.</p></div></div>
     </div>
+    <!-- ===== 클랜전 ===== -->
+    <div id="tab-clanwar" class="hidden">
+      <div class="cw-subtabs" style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;">
+        <div class="cw-subtab active" data-cwtab="board" onclick="CW.switchSubTab('board')">순위 보드</div>
+        <div class="cw-subtab" data-cwtab="history" onclick="CW.switchSubTab('history')">대회 기록</div>
+        <div class="cw-subtab cw-admin-only" data-cwtab="input" onclick="CW.switchSubTab('input')">점수 입력</div>
+        <div class="cw-subtab cw-admin-only" data-cwtab="setup" onclick="CW.switchSubTab('setup')">대회 설정</div>
+      </div>
+
+      <!-- 순위 보드 -->
+      <div id="cwTabBoard">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <span id="cwTitleDisplay" style="font-weight:800;font-size:17px;color:#cbd5e1;"></span>
+        </div>
+        <div id="cwPodiumArea" class="podium"></div>
+        <div class="board-section">
+          <div class="board-title" style="justify-content:space-between;">
+            <span style="display:flex;align-items:center;gap:8px;"><span class="live-dot"></span> 실시간 팀 순위</span>
+            <button class="capture-btn" onclick="CW.captureElement('cwCaptureTotal','전체순위')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>전체 캡처</button>
+          </div>
+          <div id="cwCaptureTotal">
+            <div id="cwTeamBoardArea"><div class="card" style="text-align:center;color:#64748b;padding:40px;">아직 등록된 팀이 없습니다.</div></div>
+          </div>
+        </div>
+        <div id="cwRoundRankArea"></div>
+      </div>
+
+      <!-- 대회 기록 -->
+      <div id="cwTabHistory" class="hidden">
+        <div id="cwHistoryArea"></div>
+      </div>
+
+      <!-- 점수 입력 -->
+      <div id="cwTabInput" class="hidden">
+        <div class="card">
+          <h3 style="margin-bottom:14px;font-size:17px;">라운드별 점수 입력</h3>
+          <div id="cwRoundTabsArea" class="round-tabs"></div>
+          <div id="cwScoreInputArea"><p style="color:#64748b;font-size:14px;">라운드를 먼저 추가해주세요.</p></div>
+        </div>
+      </div>
+
+      <!-- 대회 설정 -->
+      <div id="cwTabSetup" class="hidden">
+        <div class="setup-card"><h3>대회 정보</h3>
+          <div class="setup-row"><label>대회명</label><input type="text" id="cwEventTitle" placeholder="예: 제1회 클랜 교류전" style="flex:1;max-width:300px;" onchange="CW.saveConfig()"></div>
+          <div class="setup-row" style="gap:12px;">
+            <button class="btn btn-sm btn-blue" onclick="CW.archiveTournament()">대회 종료 &amp; 기록 저장</button>
+            <button class="btn btn-sm btn-red" onclick="CW.resetAll()">전체 초기화</button>
+          </div>
+        </div>
+        <div class="setup-card"><h3>클랜 관리</h3>
+          <div class="setup-row">
+            <input type="text" id="cwNewClanId" placeholder="약칭 (예: GRM)" style="width:100px;">
+            <input type="text" id="cwNewClanName" placeholder="클랜명 (예: 그리미)" style="width:140px;">
+            <input type="color" id="cwNewClanColor" value="#3b82f6" style="width:40px;height:36px;padding:2px;border-radius:6px;cursor:pointer;">
+            <label class="logo-upload-btn" id="cwLogoUploadLabel"><span id="cwLogoUploadText">마크 업로드</span><input type="file" id="cwNewClanLogo" accept="image/*" style="display:none;" onchange="CW.previewLogo(this)"></label>
+            <img id="cwLogoPreview" class="logo-preview" style="display:none;">
+            <button class="btn btn-sm btn-blue" onclick="CW.addClan()">추가</button>
+          </div>
+          <div id="cwClanListArea" class="item-list"></div>
+        </div>
+        <div class="setup-card"><h3 style="justify-content:space-between;">팀 관리 <button class="btn btn-xs btn-red" onclick="CW.removeAllTeams()">전체 삭제</button></h3>
+          <div class="setup-row">
+            <select id="cwNewTeamClan" style="width:120px;"><option value="">클랜 선택</option></select>
+            <input id="cwNewTeamSlot" type="text" placeholder="슬롯 (예: 1, 2)" style="width:100px;">
+            <button class="btn btn-sm btn-blue" onclick="CW.addTeam()">+ 팀 추가</button>
+          </div>
+          <div id="cwTeamListArea" class="item-list"></div>
+        </div>
+        <div class="setup-card"><h3>라운드 관리</h3>
+          <div class="setup-row">
+            <select id="cwNewRoundMap" style="width:120px;">
+              <option>에란겔</option><option>미라마</option><option>사녹</option><option>테이고</option><option>비켄디</option><option>파라모</option><option>카라킨</option><option>론도</option><option>데스턴</option>
+            </select>
+            <button class="btn btn-sm btn-green" onclick="CW.addRound()">+ 라운드 추가</button>
+          </div>
+          <div id="cwRoundListArea" class="item-list"></div>
+        </div>
+        <div class="setup-card"><h3>순위 점수표</h3>
+          <p style="font-size:13px;color:#64748b;margin-bottom:10px;">각 등수에 부여할 점수 (킬 점수는 1킬 = 1점 고정)</p>
+          <div id="cwRankPtsArea" class="pts-grid"></div>
+          <button class="btn btn-sm btn-blue" onclick="CW.saveRankPts()" style="margin-top:12px;">점수표 저장</button>
+        </div>
+      </div>
+
+      <div class="toast" id="cwToast"></div>
+      <div id="cwConfirmModal" class="modal-overlay hidden" onclick="if(event.target===this)CW.closeConfirm()">
+        <div class="modal-box">
+          <div class="modal-title"><span id="cwConfirmTitle">확인</span><button class="modal-close" onclick="CW.closeConfirm()">✕</button></div>
+          <div id="cwConfirmMsg" style="margin-bottom:18px;color:#94a3b8;font-size:15px;"></div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;">
+            <button class="btn btn-sm btn-gray" onclick="CW.closeConfirm()">취소</button>
+            <button class="btn btn-sm btn-red" id="cwConfirmBtn">확인</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="tab-bingo" class="hidden">
       <!-- ===== 빙고 로비 화면 ===== -->
       <div class="bg-lobby" id="bgLobby">
@@ -1546,7 +1808,7 @@ function enterApp(id,memberData){
   dataRef.on('value',snap=>{appData=snap.val()||{};if(appData.members)Object.keys(appData.members).forEach(k=>{if(!appData.members[k]||!appData.members[k].name)delete appData.members[k];});if(appData.members&&appData.members[id]){currentUser={id,...appData.members[id]};isAdmin=appData.members[id].role==='admin';document.getElementById('userAvatarTop').textContent=appData.members[id].avatar||appData.members[id].name.charAt(0);}renderAll();if(firstLoad){firstLoad=false;ensureDefaultNotice();ensureDefaultNews();ensureDefaultPubgNicks();switchTab('home');}});
 }
 function logout(){localStorage.removeItem('grimi_kill_user');isGuest=false;location.reload();}
-function switchTab(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));['home','game','tier','members','setup','ranking','bingo','minigame'].forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});window.scrollTo(0,0);if(tab==='home')renderHome();if(tab==='minigame')drawMarbleBoard();}
+function switchTab(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));['home','game','tier','members','setup','ranking','bingo','minigame','clanwar'].forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});window.scrollTo(0,0);if(tab==='home')renderHome();if(tab==='minigame')drawMarbleBoard();if(tab==='clanwar'&&typeof CW!=='undefined')CW.onTabOpen();}
 function switchMiniGame(mg){document.querySelectorAll('.mini-tab').forEach(t=>t.classList.toggle('active',t.dataset.mg===mg));['plinko','ladder','snail'].forEach(g=>{const el=document.getElementById('mg-'+g);if(el)el.classList.toggle('hidden',g!==mg);});if(mg==='plinko')drawMarbleBoard();}
 
 // 프로필
@@ -4600,6 +4862,455 @@ window.switchTab = function(tabName) {
   }
   return bgOriginalSwitchTab.call(this, tabName);
 };
+
+// ===================== 클랜전 (CLAN MATCH) =====================
+// clanwar.html 이식. Firebase 경로 'clanwar' 그대로 사용.
+// 관리자 권한은 아레나 isAdmin을 그대로 따름 (별도 PIN 없음).
+const CW = (function(){
+  const cwRef = firebase.database().ref('clanwar');
+  const DEFAULT_RANK_PTS={1:10,2:6,3:5,4:4,5:3,6:2,7:1,8:0,9:0,10:0,11:0,12:0,13:0,14:0,15:0,16:0,17:0,18:0,19:0,20:0};
+  let D={}, activeInputRound=null, pendingLogoBase64='', confirmCb=null, activeSubTab='board', started=false;
+  const $=id=>document.getElementById(id);
+  // 아레나의 isAdmin (같은 스크립트 스코프)을 호출 시점에 읽음
+  const admin=()=>{try{return !!isAdmin;}catch(e){return false;}};
+
+  function start(){
+    if(started)return; started=true;
+    cwRef.on('value',snap=>{
+      D=snap.val()||{};
+      ['config','clans','teams','rounds','scores','history'].forEach(k=>{if(!D[k])D[k]={};});
+      if(!D.rankPts)D.rankPts=DEFAULT_RANK_PTS;
+      const el=$('tab-clanwar');
+      if(el&&!el.classList.contains('hidden'))renderAll();
+    });
+  }
+  function onTabOpen(){
+    start();
+    document.querySelectorAll('#tab-clanwar .cw-admin-only').forEach(e=>e.style.display=admin()?'':'none');
+    if(!admin()&&(activeSubTab==='input'||activeSubTab==='setup'))activeSubTab='board';
+    switchSubTab(activeSubTab);
+    renderAll();
+  }
+  function switchSubTab(t){
+    activeSubTab=t;
+    document.querySelectorAll('#tab-clanwar .cw-subtab').forEach(el=>el.classList.toggle('active',el.dataset.cwtab===t));
+    [['board','cwTabBoard'],['history','cwTabHistory'],['input','cwTabInput'],['setup','cwTabSetup']].forEach(function(pair){
+      const el=$(pair[1]); if(el)el.classList.toggle('hidden',pair[0]!==t);
+    });
+    if(t==='input')renderScoreInput();
+    if(t==='history')renderHistory();
+    if(t==='setup')renderSetup();
+  }
+  function renderAll(){
+    const td=$('cwTitleDisplay'); if(td)td.textContent=(D.config&&D.config.title)||'';
+    renderPodium(); renderTeamBoard(); renderRoundRanks();
+    if(admin()){renderSetup();renderScoreInput();}
+  }
+
+  // ===== Helpers =====
+  const getRankPts=p=>Number((D.rankPts||DEFAULT_RANK_PTS)[p])||0;
+  const getClanColor=id=>(D.clans&&D.clans[id]&&D.clans[id].color)||'#64748b';
+  const getClanLogo=id=>(D.clans&&D.clans[id]&&D.clans[id].logo)||'';
+  function clanTagHtml(id){
+    const logo=getClanLogo(id),color=getClanColor(id);
+    const tag='<span class="clan-tag" style="background:'+color+';margin-right:6px;">'+id+'</span>';
+    return logo?'<img src="'+logo+'" class="clan-logo-sm" alt="'+id+'">'+tag
+               :'<span class="clan-avatar" style="background:'+color+';">'+(id||'?').charAt(0)+'</span>'+tag;
+  }
+  function resizeImage(file,maxSize,cb){
+    const r=new FileReader();
+    r.onload=function(e){const img=new Image();img.onload=function(){
+      const c=document.createElement('canvas');let w=img.width,h=img.height;
+      if(w>h){if(w>maxSize){h=h*(maxSize/w);w=maxSize;}}else{if(h>maxSize){w=w*(maxSize/h);h=maxSize;}}
+      c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/webp',0.8));};img.src=e.target.result;};
+    r.readAsDataURL(file);
+  }
+  function getTeamScores(){
+    const teams=D.teams||{},rounds=D.rounds||{},scores=D.scores||{};
+    const roundIds=Object.keys(rounds).sort((a,b)=>(rounds[a].order||0)-(rounds[b].order||0));
+    const result=[];
+    Object.keys(teams).forEach(function(tid){
+      const t=teams[tid];let totalKills=0,totalPlacePts=0;const roundData={};
+      roundIds.forEach(function(rid){
+        const s=scores[tid]&&scores[tid][rid];
+        const kills=s?Number(s.kills)||0:0;
+        const placement=s?Number(s.placement)||0:0;
+        const placePts=placement>0?getRankPts(placement):0;
+        roundData[rid]={kills:kills,placement:placement,placePts:placePts};
+        totalKills+=kills;totalPlacePts+=placePts;
+      });
+      result.push({id:tid,name:t.name,clan:t.clan,roundData:roundData,totalKills:totalKills,totalPlacePts:totalPlacePts,total:totalKills+totalPlacePts});
+    });
+    result.sort((a,b)=>b.total-a.total||(b.totalKills-a.totalKills));
+    return {scores:result,roundIds:roundIds};
+  }
+
+  // ===== 보드 =====
+  function renderPodium(){
+    const r=getTeamScores(); const area=$('cwPodiumArea'); if(!area)return;
+    if(r.scores.length<1){area.innerHTML='';return;}
+    const medals=['🥇','🥈','🥉'],classes=['p1','p2','p3'];
+    area.innerHTML=r.scores.slice(0,3).map(function(s,i){
+      const lg=getClanLogo(s.clan)?'<img src="'+getClanLogo(s.clan)+'" class="clan-logo-sm" style="width:22px;height:22px;">':'';
+      return '<div class="podium-card '+classes[i]+'"><div class="podium-medal">'+medals[i]+'</div><div class="podium-rank">'+(i+1)+'등</div><div class="podium-team">'+s.name+'</div><div class="podium-clan">'+lg+'<span class="clan-tag" style="background:'+getClanColor(s.clan)+';font-size:11px;">'+s.clan+'</span></div><div class="podium-score">'+s.total+'</div></div>';
+    }).join('');
+  }
+  function renderTeamBoard(){
+    const r=getTeamScores(); const rounds=D.rounds||{}; const area=$('cwTeamBoardArea'); if(!area)return;
+    if(!r.scores.length){area.innerHTML='<div class="card" style="text-align:center;color:#64748b;padding:40px;">아직 등록된 팀이 없습니다.</div>';return;}
+    let rh='';
+    r.roundIds.forEach(function(rid,i){const rr=rounds[rid];rh+='<th><span class="round-header">R'+(i+1)+' '+((rr&&rr.map)||'')+'</span>킬</th><th><span class="round-header">R'+(i+1)+'</span>순위점</th>';});
+    let rows='';
+    r.scores.forEach(function(s,i){
+      const rank=i+1;
+      const rc=rank<=3?'rank-'+rank:'rank-else';
+      const rowc=rank===1?'row-gold':rank===2?'row-silver':rank===3?'row-bronze':'';
+      let cells='';
+      r.roundIds.forEach(function(rid){
+        const rd=s.roundData[rid];
+        const pl=rd.placement>0?'<span class="placement-num">'+rd.placement+'등</span>':'';
+        cells+='<td class="col-kill">'+(rd.kills||'-')+'</td><td class="col-place">'+(rd.placePts?'+'+rd.placePts:'-')+pl+'</td>';
+      });
+      rows+='<tr class="'+rowc+'"><td class="col-rank '+rc+'">'+rank+'</td><td class="col-team">'+clanTagHtml(s.clan)+s.name+'</td>'+cells+'<td class="col-kill">'+s.totalKills+'</td><td class="col-place">'+s.totalPlacePts+'</td><td class="col-total">'+s.total+'</td></tr>';
+    });
+    area.innerHTML='<div class="score-table-wrap"><table class="score-table"><thead><tr><th>#</th><th style="text-align:left;">팀</th>'+rh+'<th>총킬</th><th>순위점</th><th>합계</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  }
+  function renderRoundRanks(){
+    const r=getTeamScores(); const rounds=D.rounds||{}; const area=$('cwRoundRankArea'); if(!area)return;
+    if(!r.roundIds.length||!r.scores.length){area.innerHTML='';return;}
+    const CAM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>';
+    let cards='';
+    r.roundIds.forEach(function(rid,i){
+      const rr=rounds[rid];
+      const ranked=r.scores.map(function(s){const rd=s.roundData[rid];const kills=rd?rd.kills:0;const placePts=rd?rd.placePts:0;
+        return {name:s.name,clan:s.clan,kills:kills,placePts:placePts,roundTotal:kills+placePts};})
+        .sort((a,b)=>b.roundTotal-a.roundTotal||(b.kills-a.kills));
+      if(!ranked.length||!ranked.some(x=>x.roundTotal>0))return;
+      let rows='';
+      ranked.forEach(function(t,j){
+        const rank=j+1;
+        const cls=rank===1?'rr-gold':rank===2?'rr-silver':rank===3?'rr-bronze':'';
+        rows+='<tr class="'+cls+'"><td class="rr-rank">'+rank+'</td><td class="rr-team">'+clanTagHtml(t.clan)+t.name+'</td><td class="rr-kill">'+t.kills+'</td><td class="rr-pts">+'+t.placePts+'</td><td class="rr-total">'+t.roundTotal+'</td></tr>';
+      });
+      const mapName=(rr&&rr.map)||'';
+      cards+='<div class="round-rank-card" id="cwCaptureRound_'+rid+'"><div class="round-rank-head"><span style="color:#fbbf24;">R'+(i+1)+'</span>'+(mapName||'맵 미정')+'<span style="flex:1;"></span><button class="capture-btn" onclick="event.stopPropagation();CW.captureElement(\'cwCaptureRound_'+rid+'\',\'R'+(i+1)+'_'+mapName+'\')">'+CAM+'캡처</button></div><table class="rr-table"><thead><tr><th>#</th><th style="text-align:left;">팀</th><th>킬</th><th>순위점</th><th>합계</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+    });
+    area.innerHTML=cards?'<div style="display:flex;align-items:center;justify-content:space-between;margin:24px 0 10px;"><h3 style="color:#94a3b8;font-size:15px;font-weight:700;">라운드별 순위</h3><button class="capture-btn" onclick="CW.captureElement(\'cwCaptureRounds\',\'라운드별순위\')">'+CAM+'전체 라운드 캡처</button></div><div class="round-rank-grid" id="cwCaptureRounds">'+cards+'</div>':'';
+  }
+
+  // ===== 점수 입력 =====
+  function renderScoreInput(){
+    if(!admin())return;
+    const rounds=D.rounds||{};
+    const roundIds=Object.keys(rounds).sort((a,b)=>(rounds[a].order||0)-(rounds[b].order||0));
+    const tabsArea=$('cwRoundTabsArea'),inputArea=$('cwScoreInputArea');
+    if(!tabsArea||!inputArea)return;
+    if(!roundIds.length){tabsArea.innerHTML='';inputArea.innerHTML='<p style="color:#64748b;font-size:14px;">라운드를 먼저 추가해주세요.</p>';return;}
+    if(!activeInputRound||!rounds[activeInputRound])activeInputRound=roundIds[0];
+    tabsArea.innerHTML=roundIds.map(function(rid,i){
+      return '<div class="round-tab '+(rid===activeInputRound?'active':'')+'" onclick="CW.setInputRound(\''+rid+'\')">R'+(i+1)+' '+(rounds[rid].map||'')+'</div>';
+    }).join('');
+    const teams=D.teams||{};
+    const teamIds=Object.keys(teams).sort((a,b)=>(teams[a].name||'').localeCompare(teams[b].name||''));
+    if(!teamIds.length){inputArea.innerHTML='<p style="color:#64748b;font-size:14px;">팀을 먼저 등록해주세요.</p>';return;}
+    let rows='';
+    teamIds.forEach(function(tid){
+      const t=teams[tid];
+      const s=D.scores&&D.scores[tid]&&D.scores[tid][activeInputRound];
+      const kills=s?Number(s.kills)||0:0;
+      const placement=s?Number(s.placement)||0:0;
+      const placePts=placement>0?getRankPts(placement):0;
+      let opts='<option value="0">-</option>';
+      for(let p=1;p<=teamIds.length;p++)opts+='<option value="'+p+'" '+(placement===p?'selected':'')+'>'+p+'등</option>';
+      rows+='<tr><td class="team-name-cell">'+clanTagHtml(t.clan)+t.name+'</td><td><select onchange="CW.saveScore(\''+tid+'\',\''+activeInputRound+'\',\'placement\',this.value)">'+opts+'</select></td><td class="auto-pts">'+(placement>0?'+'+placePts:'-')+'</td><td><input type="number" min="0" max="99" value="'+(kills||'')+'" placeholder="0" onfocus="this.select()" onchange="CW.saveScore(\''+tid+'\',\''+activeInputRound+'\',\'kills\',this.value)"></td><td style="font-weight:800;color:#fbbf24;font-size:16px;">'+(kills+placePts)+'</td></tr>';
+    });
+    inputArea.innerHTML='<div style="overflow-x:auto;"><table class="input-table"><thead><tr><th style="text-align:left;">팀</th><th>순위</th><th>순위점</th><th>킬</th><th>합계</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  }
+  function setInputRound(rid){activeInputRound=rid;renderScoreInput();}
+  function saveScore(tid,rid,field,val){if(!admin())return;cwRef.child('scores/'+tid+'/'+rid+'/'+field).set(Number(val)||0);}
+
+  // ===== 설정 =====
+  function renderSetup(){
+    if(!admin())return;
+    const et=$('cwEventTitle'); if(et&&et!==document.activeElement)et.value=(D.config&&D.config.title)||'';
+    renderClanList();renderTeamList();renderRoundList();renderRankPtsGrid();updateTeamClanSelect();
+  }
+  function saveConfig(){if(!admin())return;cwRef.child('config/title').set($('cwEventTitle').value||'');toast('저장됨');}
+  function resetAll(){if(!admin())return;showConfirm('전체 초기화','모든 점수, 라운드, 팀이 삭제됩니다.',function(){cwRef.child('scores').remove();cwRef.child('rounds').remove();cwRef.child('teams').remove();toast('초기화 완료');});}
+
+  // 클랜
+  function resetClanForm(){
+    $('cwNewClanId').value='';$('cwNewClanName').value='';$('cwNewClanLogo').value='';
+    $('cwLogoPreview').style.display='none';$('cwLogoUploadText').textContent='마크 업로드';pendingLogoBase64='';
+  }
+  function previewLogo(input){
+    const file=input.files[0];
+    if(!file){pendingLogoBase64='';$('cwLogoPreview').style.display='none';$('cwLogoUploadText').textContent='마크 업로드';return;}
+    resizeImage(file,128,function(b64){pendingLogoBase64=b64;const p=$('cwLogoPreview');p.src=b64;p.style.display='block';$('cwLogoUploadText').textContent='변경';});
+  }
+  function addClan(){
+    if(!admin())return;
+    const id=$('cwNewClanId').value.trim().toUpperCase();
+    const name=$('cwNewClanName').value.trim();
+    const color=$('cwNewClanColor').value;
+    if(!id){toast('클랜 약칭을 입력하세요');return;}
+    if(D.clans&&D.clans[id]){toast('이미 존재하는 약칭입니다');return;}
+    const data={name:name||id,color:color};
+    if(pendingLogoBase64)data.logo=pendingLogoBase64;
+    cwRef.child('clans/'+id).set(data);resetClanForm();toast(id+' 클랜 추가');
+  }
+  function updateClanLogo(cid,input){if(!admin())return;const f=input.files[0];if(!f)return;resizeImage(f,128,function(b64){cwRef.child('clans/'+cid+'/logo').set(b64);toast(cid+' 마크 업데이트');});}
+  function updateClanName(cid,name){if(!admin())return;cwRef.child('clans/'+cid+'/name').set(name.trim()||cid);toast('클랜명 변경');}
+  function updateClanColor(cid,color){if(!admin())return;cwRef.child('clans/'+cid+'/color').set(color);toast('색상 변경');}
+  function renameClanId(oldId,newId){
+    if(!admin())return;
+    newId=newId.trim().toUpperCase();
+    if(!newId||newId===oldId)return;
+    if(D.clans&&D.clans[newId]){toast('이미 존재하는 약칭입니다');return;}
+    const updates={};
+    updates['clans/'+oldId]=null;
+    updates['clans/'+newId]=D.clans[oldId];
+    Object.keys(D.teams||{}).forEach(function(tid){
+      const t=D.teams[tid];
+      if(t.clan===oldId){
+        updates['teams/'+tid+'/clan']=newId;
+        if(t.name.indexOf(oldId+'-')===0)updates['teams/'+tid+'/name']=t.name.replace(oldId,newId);
+      }
+    });
+    cwRef.update(updates);toast(oldId+' → '+newId+' 변경');
+  }
+  function removeClan(id){if(!admin())return;showConfirm('클랜 삭제',id+' 클랜 삭제?',function(){cwRef.child('clans/'+id).remove();toast('삭제됨');});}
+  function renderClanList(){
+    const clans=D.clans||{},area=$('cwClanListArea');if(!area)return;
+    const ids=Object.keys(clans).sort();
+    if(!ids.length){area.innerHTML='<p style="color:#64748b;font-size:13px;">등록된 클랜이 없습니다.</p>';return;}
+    area.innerHTML=ids.map(function(id){const c=clans[id];
+      const logo=c.logo?'<img src="'+c.logo+'" class="clan-logo-sm">':'<span class="clan-avatar" style="background:'+c.color+';">'+id.charAt(0)+'</span>';
+      return '<div class="item-row" style="flex-wrap:wrap;gap:6px;">'+logo+'<input type="text" value="'+id+'" style="width:70px;padding:4px 8px;font-size:13px;font-weight:700;" onchange="CW.renameClanId(\''+id+'\',this.value)"><input type="text" value="'+c.name+'" style="width:100px;padding:4px 8px;font-size:13px;" onchange="CW.updateClanName(\''+id+'\',this.value)"><input type="color" value="'+c.color+'" style="width:30px;height:28px;padding:1px;border-radius:6px;cursor:pointer;" onchange="CW.updateClanColor(\''+id+'\',this.value)"><label class="logo-upload-btn" style="font-size:11px;padding:4px 8px;">'+(c.logo?'마크 변경':'마크 추가')+'<input type="file" accept="image/*" style="display:none;" onchange="CW.updateClanLogo(\''+id+'\',this)"></label><button class="item-delete" onclick="CW.removeClan(\''+id+'\')">✕</button></div>';
+    }).join('');
+  }
+  function updateTeamClanSelect(){
+    const sel=$('cwNewTeamClan');if(!sel)return;
+    const clans=D.clans||{},prev=sel.value;
+    sel.innerHTML='<option value="">클랜 선택</option>'+Object.keys(clans).sort().map(function(id){return '<option value="'+id+'">'+id+' ('+clans[id].name+')</option>';}).join('');
+    if(prev&&clans[prev])sel.value=prev;
+  }
+
+  // 팀
+  function addTeam(){
+    if(!admin())return;
+    const clan=$('cwNewTeamClan').value;
+    if(!clan){toast('클랜을 선택하세요');return;}
+    const slotInput=$('cwNewTeamSlot'),slotVal=slotInput.value.trim(),teams=D.teams||{};
+    let name;
+    if(slotVal){
+      name=clan+'-'+slotVal;
+      const dup=Object.keys(teams).some(function(k){return teams[k].name===name;});
+      if(dup){toast(name+' 이미 존재합니다');return;}
+    }else{
+      let maxNum=0;
+      Object.keys(teams).forEach(function(k){
+        const t=teams[k];
+        if(t.clan===clan){const m=t.name.match(new RegExp('^'+clan+'-(\\d+)$'));if(m)maxNum=Math.max(maxNum,Number(m[1]));}
+      });
+      name=clan+'-'+(maxNum+1);
+    }
+    cwRef.child('teams/'+cwRef.child('teams').push().key).set({name:name,clan:clan});
+    slotInput.value='';toast(name+' 팀 추가');
+  }
+  function removeTeam(id){
+    if(!admin())return;
+    const t=D.teams&&D.teams[id];
+    showConfirm('팀 삭제',((t&&t.name)||'')+' 삭제?',function(){cwRef.child('teams/'+id).remove();cwRef.child('scores/'+id).remove();toast('삭제됨');});
+  }
+  function removeAllTeams(){
+    if(!admin())return;
+    const cnt=Object.keys(D.teams||{}).length;
+    if(!cnt){toast('삭제할 팀이 없습니다');return;}
+    showConfirm('전체 팀 삭제',cnt+'개 팀을 모두 삭제합니다.',function(){cwRef.child('teams').remove();cwRef.child('scores').remove();toast('전체 팀 삭제 완료');});
+  }
+  function renderTeamList(){
+    const teams=D.teams||{},area=$('cwTeamListArea');if(!area)return;
+    const ids=Object.keys(teams).sort((a,b)=>(teams[a].name||'').localeCompare(teams[b].name||''));
+    if(!ids.length){area.innerHTML='<p style="color:#64748b;font-size:13px;">등록된 팀이 없습니다.</p>';return;}
+    area.innerHTML=ids.map(function(id){const t=teams[id];
+      const logo=getClanLogo(t.clan)?'<img src="'+getClanLogo(t.clan)+'" class="clan-logo-sm">':'<span class="clan-avatar" style="background:'+getClanColor(t.clan)+';">'+(t.clan||'?').charAt(0)+'</span>';
+      return '<div class="item-row">'+logo+'<span class="clan-tag" style="background:'+getClanColor(t.clan)+';font-size:11px;">'+t.clan+'</span><span class="item-name" style="min-width:auto;flex:none;">'+t.name+'</span><input type="text" value="'+(t.slot!=null?t.slot:'')+'" placeholder="#" style="width:38px;padding:3px 4px;font-size:12px;text-align:center;" id="cwSlot_'+id+'"><button class="btn btn-xs btn-gray" onclick="CW.saveTeamSlot(\''+id+'\')" style="padding:3px 6px;font-size:11px;">저장</button><span style="flex:1;"></span><button class="item-delete" onclick="CW.removeTeam(\''+id+'\')">✕</button></div>';
+    }).join('');
+  }
+  function saveTeamSlot(tid){
+    if(!admin())return;
+    const input=$('cwSlot_'+tid);if(!input)return;
+    const val=input.value.trim();
+    cwRef.child('teams/'+tid+'/slot').set(val||null);toast('슬롯 저장: '+(val||'없음'));
+  }
+
+  // 라운드
+  function addRound(){
+    if(!admin())return;
+    const map=$('cwNewRoundMap').value;
+    const order=Object.keys(D.rounds||{}).length+1;
+    cwRef.child('rounds/'+cwRef.child('rounds').push().key).set({map:map,order:order});toast('R'+order+' '+map+' 추가');
+  }
+  function removeRound(id){
+    if(!admin())return;
+    const rounds=D.rounds||{},r=rounds[id];
+    const idx=Object.keys(rounds).sort((a,b)=>(rounds[a].order||0)-(rounds[b].order||0)).indexOf(id)+1;
+    showConfirm('라운드 삭제','R'+idx+' '+((r&&r.map)||'')+' 삭제?',function(){
+      cwRef.child('rounds/'+id).remove();
+      Object.keys(D.teams||{}).forEach(function(tid){cwRef.child('scores/'+tid+'/'+id).remove();});
+      toast('삭제됨');
+    });
+  }
+  function renderRoundList(){
+    const rounds=D.rounds||{},area=$('cwRoundListArea');if(!area)return;
+    const ids=Object.keys(rounds).sort((a,b)=>(rounds[a].order||0)-(rounds[b].order||0));
+    if(!ids.length){area.innerHTML='<p style="color:#64748b;font-size:13px;">등록된 라운드가 없습니다.</p>';return;}
+    area.innerHTML=ids.map(function(id,i){return '<div class="item-row"><span style="font-weight:800;color:#60a5fa;min-width:30px;">R'+(i+1)+'</span><span class="item-name">'+rounds[id].map+'</span><button class="item-delete" onclick="CW.removeRound(\''+id+'\')">✕</button></div>';}).join('');
+  }
+
+  // 순위 점수표
+  function renderRankPtsGrid(){
+    const pts=D.rankPts||DEFAULT_RANK_PTS,area=$('cwRankPtsArea');if(!area)return;
+    let h='';for(let p=1;p<=20;p++)h+='<div class="pts-item"><label>'+p+'등</label><input type="number" id="cwRp_'+p+'" min="0" max="99" value="'+(pts[p]||'')+'" placeholder="0" onfocus="this.select()"></div>';
+    area.innerHTML=h;
+  }
+  function saveRankPts(){
+    if(!admin())return;
+    const pts={};for(let p=1;p<=20;p++)pts[p]=Number($('cwRp_'+p).value)||0;
+    cwRef.child('rankPts').set(pts);toast('점수표 저장됨');
+  }
+
+  // ===== 대회 기록 =====
+  function archiveTournament(){
+    if(!admin())return;
+    const title=D.config&&D.config.title;
+    if(!title){toast('대회명을 먼저 입력하세요');return;}
+    const r=getTeamScores();
+    if(!r.scores.length){toast('점수 데이터가 없습니다');return;}
+    showConfirm('대회 기록 저장','"'+title+'" 대회 결과를 저장하고 초기화합니다.',function(){
+      const archive={title:title,date:new Date().toISOString(),clans:D.clans||{},teams:D.teams||{},rounds:D.rounds||{},scores:D.scores||{},rankPts:D.rankPts||DEFAULT_RANK_PTS};
+      cwRef.child('history/'+cwRef.child('history').push().key).set(archive).then(function(){
+        captureElement('cwCaptureTotal',title.replace(/\s/g,'_'));
+        cwRef.child('scores').remove();cwRef.child('rounds').remove();cwRef.child('teams').remove();
+        toast('기록 저장 완료!');
+      });
+    });
+  }
+  function renderHistory(){
+    const history=D.history||{},area=$('cwHistoryArea');if(!area)return;
+    const ids=Object.keys(history).sort((a,b)=>(history[b].date||'').localeCompare(history[a].date||''));
+    if(!ids.length){area.innerHTML='<div class="card" style="text-align:center;color:#64748b;padding:40px;">저장된 대회 기록이 없습니다.</div>';return;}
+    let items='';
+    ids.forEach(function(id){
+      const h=history[id],d=h.date?new Date(h.date):null;
+      const dateStr=d?(d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0')):'';
+      const delBtn=admin()?'<button class="item-delete" onclick="event.stopPropagation();CW.deleteHistory(\''+id+'\')" style="margin-left:8px;">✕</button>':'';
+      items+='<div class="history-item" onclick="CW.viewHistory(\''+id+'\')"><div><div class="hi-title">'+(h.title||'무제')+'</div><div class="hi-date">'+dateStr+'</div></div><div style="display:flex;align-items:center;"><div style="text-align:right;"><div class="hi-teams">'+Object.keys(h.clans||{}).length+'클랜 '+Object.keys(h.teams||{}).length+'팀</div><span style="color:#3b82f6;font-size:13px;font-weight:600;">조회 →</span></div>'+delBtn+'</div></div>';
+    });
+    area.innerHTML='<h3 style="font-size:18px;font-weight:800;margin-bottom:14px;">대회 기록</h3><div class="history-list">'+items+'</div>';
+  }
+  function deleteHistory(hid){
+    if(!admin())return;
+    const h=D.history&&D.history[hid];
+    showConfirm('기록 삭제','"'+((h&&h.title)||'무제')+'" 대회 기록을 삭제합니다.',function(){cwRef.child('history/'+hid).remove();toast('기록 삭제됨');renderHistory();});
+  }
+  function viewHistory(hid){
+    const h=D.history&&D.history[hid];if(!h)return;
+    const teams=h.teams||{},rounds=h.rounds||{},scores=h.scores||{},rankPts=h.rankPts||DEFAULT_RANK_PTS;
+    const roundIds=Object.keys(rounds).sort((a,b)=>(rounds[a].order||0)-(rounds[b].order||0));
+    const getRp=p=>Number(rankPts[p])||0;
+    const result=[];
+    Object.keys(teams).forEach(function(tid){
+      const t=teams[tid];let tk=0,tp=0;
+      roundIds.forEach(function(rid){
+        const s=scores[tid]&&scores[tid][rid];
+        const kills=s?Number(s.kills)||0:0;
+        const placement=s?Number(s.placement)||0:0;
+        tk+=kills;tp+=placement>0?getRp(placement):0;
+      });
+      result.push({name:t.name,clan:t.clan,totalKills:tk,totalPlacePts:tp,total:tk+tp});
+    });
+    result.sort((a,b)=>b.total-a.total||(b.totalKills-a.totalKills));
+    const clans=h.clans||{};
+    function clanTag(cid){
+      const c=clans[cid];
+      const logo=(c&&c.logo)?'<img src="'+c.logo+'" style="width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:3px;border:1px solid #475569;">':'';
+      return logo+'<span class="clan-tag" style="background:'+((c&&c.color)||'#64748b')+';margin-right:6px;">'+cid+'</span>';
+    }
+    const d=h.date?new Date(h.date):null;
+    const dateStr=d?(d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0')):'';
+    let rows='';
+    result.forEach(function(s,i){
+      const rank=i+1;
+      const rc=rank<=3?'rank-'+rank:'rank-else';
+      const rowc=rank===1?'row-gold':rank===2?'row-silver':rank===3?'row-bronze':'';
+      rows+='<tr class="'+rowc+'"><td class="col-rank '+rc+'">'+rank+'</td><td class="col-team">'+clanTag(s.clan)+s.name+'</td><td class="col-kill">'+s.totalKills+'</td><td class="col-place">'+s.totalPlacePts+'</td><td class="col-total">'+s.total+'</td></tr>';
+    });
+    $('cwConfirmTitle').innerHTML=(h.title||'무제')+' <span style="font-size:13px;color:#64748b;font-weight:400;">'+dateStr+'</span>';
+    $('cwConfirmMsg').innerHTML='<div id="cwCaptureHistory_'+hid+'" style="overflow-x:auto;"><table class="score-table" style="min-width:400px;"><thead><tr><th>#</th><th style="text-align:left;">팀</th><th>총킬</th><th>순위점</th><th>합계</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+    const btn=$('cwConfirmBtn');
+    btn.textContent='캡처';btn.className='btn btn-sm btn-blue';
+    btn.onclick=function(){captureElement('cwCaptureHistory_'+hid,h.title||'history');};
+    $('cwConfirmModal').classList.remove('hidden');
+  }
+
+  // ===== 캡처 =====
+  function captureElement(elId,filename){
+    const el=$(elId);
+    if(!el){toast('캡처 대상 없음');return;}
+    if(typeof html2canvas==='undefined'){toast('캡처 모듈 로딩 실패');return;}
+    toast('캡처 중...');
+    const wrap=document.createElement('div');
+    wrap.style.cssText='padding:20px;background:#0f172a;border-radius:12px;display:inline-block;min-width:'+el.offsetWidth+'px;position:fixed;left:-99999px;top:0;';
+    const title=(D.config&&D.config.title)||'CLAN MATCH';
+    const header=document.createElement('div');
+    header.style.cssText='text-align:center;margin-bottom:12px;font-family:-apple-system,Pretendard,sans-serif;';
+    header.innerHTML='<div style="font-size:20px;font-weight:900;color:#60a5fa;letter-spacing:1px;">GRIMI CLAN MATCH</div><div style="font-size:14px;color:#94a3b8;margin-top:2px;">'+title+'</div>';
+    wrap.appendChild(header);
+    const clone=el.cloneNode(true);
+    clone.querySelectorAll('.capture-btn').forEach(function(b){b.remove();});
+    wrap.appendChild(clone);
+    $('tab-clanwar').appendChild(wrap);
+    html2canvas(wrap,{backgroundColor:'#0f172a',scale:2,useCORS:true}).then(function(canvas){
+      wrap.remove();
+      const link=document.createElement('a');
+      link.download='clanwar_'+filename+'_'+new Date().toISOString().slice(0,10)+'.png';
+      link.href=canvas.toDataURL('image/png');link.click();
+      toast('캡처 완료!');
+    }).catch(function(err){wrap.remove();console.error(err);toast('캡처 실패');});
+  }
+
+  // ===== Confirm / Toast =====
+  function showConfirm(title,msg,cb){
+    $('cwConfirmTitle').textContent=title;
+    $('cwConfirmMsg').textContent=msg;
+    confirmCb=cb;
+    const btn=$('cwConfirmBtn');
+    btn.textContent='확인';btn.className='btn btn-sm btn-red';
+    btn.onclick=function(){const c=confirmCb;closeConfirm();if(c)c();};
+    $('cwConfirmModal').classList.remove('hidden');
+  }
+  function closeConfirm(){
+    $('cwConfirmModal').classList.add('hidden');confirmCb=null;
+    const btn=$('cwConfirmBtn');btn.textContent='확인';btn.className='btn btn-sm btn-red';
+  }
+  function toast(msg){
+    const el=$('cwToast');if(!el)return;
+    el.textContent=msg;el.classList.add('show');
+    setTimeout(function(){el.classList.remove('show');},2000);
+  }
+
+  return {start:start,onTabOpen:onTabOpen,switchSubTab:switchSubTab,setInputRound:setInputRound,
+    saveScore:saveScore,saveConfig:saveConfig,resetAll:resetAll,previewLogo:previewLogo,addClan:addClan,
+    updateClanLogo:updateClanLogo,updateClanName:updateClanName,updateClanColor:updateClanColor,
+    renameClanId:renameClanId,removeClan:removeClan,addTeam:addTeam,removeTeam:removeTeam,
+    removeAllTeams:removeAllTeams,saveTeamSlot:saveTeamSlot,addRound:addRound,removeRound:removeRound,
+    saveRankPts:saveRankPts,archiveTournament:archiveTournament,deleteHistory:deleteHistory,
+    viewHistory:viewHistory,captureElement:captureElement,showConfirm:showConfirm,
+    closeConfirm:closeConfirm,toast:toast};
+})();
+
 </script>
 </body>
 </html>
