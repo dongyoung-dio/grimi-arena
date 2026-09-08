@@ -135,6 +135,7 @@ input:focus,select:focus{border-color:#3b82f6;}
 .dash-card .dash-value{font-size:22px;font-weight:800;}
 .dash-card .dash-value span{font-size:12px;color:#64748b;font-weight:400;}
 .dash-card .dash-small{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dash-card .dash-king{font-size:15px;font-weight:700;line-height:1.45;word-break:keep-all;overflow-wrap:break-word;}
 @media(max-width:500px){.dash-grid{grid-template-columns:1fr 1fr;}}
 /* 공지사항 */
 .notice-list{display:flex;flex-direction:column;gap:8px;}
@@ -2538,39 +2539,52 @@ function renderDashboard(){
       Object.entries(ps).forEach(([mid,p])=>{
         if(!p||!p.name)return;
         if(p.score){
-          if(!effData[mid])effData[mid]={name:p.name,totalScore:0,cnt:0};
-          effData[mid].totalScore+=p.score;effData[mid].cnt++;
+          if(!effData[mid])effData[mid]={name:p.name,totalScore:0,totalTarget:0,cnt:0};
+          effData[mid].totalScore+=p.score;
+          // 당시 목표점수 누적 (없으면 현재 티어 기준으로 보정)
+          effData[mid].totalTarget+=(p.target!=null?p.target:(members[mid]?mScore(members[mid]):0));
+          effData[mid].cnt++;
         }
         const kills=p.kills!=null?p.kills:Math.max(0,(p.score||0)-Math.floor((p.damage||0)/100));
         killData[p.name]=(killData[p.name]||0)+kills;
         dmgData[p.name]=(dmgData[p.name]||0)+(p.damage||0);
       });
     });
+    // 동점자 최대 6명까지 노출, 나머지는 "외 N명"
+    const DASH_MAX_NAMES=6;
+    function dashNames(list){
+      if(list.length<=DASH_MAX_NAMES)return list.join(', ');
+      return list.slice(0,DASH_MAX_NAMES).join(', ')+` <span style="color:#94a3b8;font-weight:600;">외 ${list.length-DASH_MAX_NAMES}명</span>`;
+    }
     function dashTopStr(obj,unit){
       const sorted=Object.entries(obj).sort((a,b)=>b[1]-a[1]);
       if(!sorted.length)return'-';
       const topVal=sorted[0][1];if(topVal<=0)return'-';
-      const tied=sorted.filter(e=>e[1]===topVal);
-      return tied.map(e=>e[0]).join(', ')+` <span style="color:#e2e8f0;font-size:13px;font-weight:600;">${topVal}${unit}</span>`;
+      const tied=sorted.filter(e=>e[1]===topVal).map(e=>e[0]);
+      return dashNames(tied)+` <span style="color:#e2e8f0;font-size:13px;font-weight:600;">${topVal}${unit}</span>`;
     }
     chickenName=dashTopStr(playerChickenCount,'회');
+    // 효율 = 누적 획득점수 / 누적 목표점수 (이벤트 당시 티어 기준)
     const effList=Object.entries(effData).map(([mid,d])=>{
-      const m=members[mid];const curTarget=m?mScore(m):d.totalScore;
-      const avg=curTarget>0?(d.totalScore/(curTarget*d.cnt))*100:0;
+      const avg=d.totalTarget>0?(d.totalScore/d.totalTarget)*100:0;
       return{n:d.name,avg};
     }).sort((a,b)=>b.avg-a.avg);
     const topEff=effList[0];
-    if(topEff){const topAvg=Math.round(topEff.avg);const effTied=effList.filter(e=>Math.round(e.avg)===topAvg);effName=effTied.map(e=>e.n).join(', ')+` <span style="color:#e2e8f0;font-size:13px;font-weight:600;">${topAvg}%</span>`;}
+    if(topEff&&topEff.avg>0){
+      const topAvg=Math.round(topEff.avg);
+      const effTied=effList.filter(e=>Math.round(e.avg)===topAvg).map(e=>e.n);
+      effName=dashNames(effTied)+` <span style="color:#e2e8f0;font-size:13px;font-weight:600;">${topAvg}%</span>`;
+    }
     killName=dashTopStr(killData,'킬');
     dmgName=dashTopStr(dmgData,'');
   }
   el.innerHTML=`
     <div class="dash-card"><div class="dash-label">멤버</div><div class="dash-value" style="color:#60a5fa;">${mCount}<span>명</span></div></div>
     <div class="dash-card"><div class="dash-label">이벤트</div><div class="dash-value" style="color:#a78bfa;">${totalEvents}<span>회</span></div></div>
-    <div class="dash-card"><div class="dash-label">🍗 치킨왕</div><div style="font-size:15px;font-weight:700;color:#fbbf24;">${chickenName}</div></div>
-    <div class="dash-card"><div class="dash-label">⚡ 효율왕</div><div style="font-size:15px;font-weight:700;color:#a78bfa;">${effName}</div></div>
-    <div class="dash-card"><div class="dash-label">🔫 킬왕</div><div style="font-size:15px;font-weight:700;color:#f87171;">${killName}</div></div>
-    <div class="dash-card"><div class="dash-label">💥 딜왕</div><div style="font-size:15px;font-weight:700;color:#fb923c;">${dmgName}</div></div>
+    <div class="dash-card"><div class="dash-label">🍗 치킨왕</div><div class="dash-king" style="color:#fbbf24;">${chickenName}</div></div>
+    <div class="dash-card"><div class="dash-label">⚡ 효율왕</div><div class="dash-king" style="color:#a78bfa;">${effName}</div></div>
+    <div class="dash-card"><div class="dash-label">🔫 킬왕</div><div class="dash-king" style="color:#f87171;">${killName}</div></div>
+    <div class="dash-card"><div class="dash-label">💥 딜왕</div><div class="dash-king" style="color:#fb923c;">${dmgName}</div></div>
   `;
 }
 
