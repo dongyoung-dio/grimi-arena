@@ -136,6 +136,11 @@ input:focus,select:focus{border-color:#3b82f6;}
 .dash-card .dash-value span{font-size:12px;color:#64748b;font-weight:400;}
 .dash-card .dash-small{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .dash-card .dash-king{font-size:15px;font-weight:700;line-height:1.45;word-break:keep-all;overflow-wrap:break-word;}
+/* 시즌 필터 칩 */
+.season-chip{padding:4px 11px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;background:#0f172a;color:#94a3b8;border:1px solid #334155;transition:all .15s;}
+.season-chip:hover{color:#cbd5e1;border-color:#475569;}
+.season-chip.active{background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;border-color:#3b82f6;}
+.dash-season-tag{font-size:11px;color:#64748b;font-weight:600;margin-left:5px;}
 @media(max-width:500px){.dash-grid{grid-template-columns:1fr 1fr;}}
 /* 공지사항 */
 .notice-list{display:flex;flex-direction:column;gap:8px;}
@@ -1435,10 +1440,19 @@ input:focus,select:focus{border-color:#3b82f6;}
         </div>
       </div>
       <div class="card setup-section"><h3>이벤트 관리</h3><div class="setup-row" style="gap:8px;"><button class="btn btn-sm btn-green" onclick="endEvent()">종료 (결과 저장 + 승급)</button><button class="btn btn-sm btn-red" onclick="resetEvent()">초기화</button></div><p class="setup-info" id="rulePreview">승급/강등 규칙에 따라 자동 반영</p></div>
+      <div class="card setup-section"><h3>시즌 관리</h3>
+        <p class="setup-info" style="margin-bottom:10px;">배그 경쟁전 시즌 번호 기준. 이벤트는 종료 날짜로 시즌에 자동 배정됩니다. 새 시즌이 시작되면 여기에 추가하세요.</p>
+        <div class="setup-row" style="gap:6px;flex-wrap:wrap;">
+          <input type="number" id="newSeasonNo" placeholder="시즌 번호" style="width:90px;">
+          <input type="date" id="newSeasonStart" style="width:150px;">
+          <button class="btn btn-sm btn-blue" onclick="addSeason()">+ 시즌 추가</button>
+        </div>
+        <div id="seasonListArea" style="margin-top:10px;"></div>
+      </div>
     </div>
     <div id="tab-ranking" class="hidden">
       <div class="card" style="margin-bottom:18px;"><div class="hist-title">현재 이벤트</div><div id="currentRankingList"></div><div id="noRankMsg" style="text-align:center;color:#64748b;padding:20px;font-size:15px;">아직 팀이 없습니다</div></div>
-      <div class="card"><div class="hist-title">누적 기록 <span class="hist-badge" id="histCountBadge">0회</span></div><div id="historyArea"><p style="color:#64748b;font-size:14px;">아직 완료된 이벤트가 없습니다.</p></div></div>
+      <div class="card"><div class="hist-title" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">누적 기록 <span class="hist-badge" id="histCountBadge">0회</span><span style="flex:1;"></span><div id="seasonFilterArea" style="display:flex;gap:5px;flex-wrap:wrap;"></div></div><div id="historyArea"><p style="color:#64748b;font-size:14px;">아직 완료된 이벤트가 없습니다.</p></div></div>
     </div>
     <!-- ===== 클랜전 ===== -->
     <div id="tab-clanwar" class="hidden">
@@ -2264,8 +2278,9 @@ function confirmEventEndFinal(){
   const eventNum=Object.keys(history).reduce((max,k)=>Math.max(max,parseInt(k.replace('event_',''))||0),0)+1;
   const today=new Date();
   const dateStr=(today.getMonth()+1)+'/'+(today.getDate());
+  const dateISO=today.getFullYear()+'-'+('0'+(today.getMonth()+1)).slice(-2)+'-'+('0'+today.getDate()).slice(-2);
   const rounds=appData.rounds||0;
-  const result={date:dateStr,rounds,teams:{},playerScores:{},tierSnapshot:{}};
+  const result={date:dateStr,dateISO,season:seasonOf(dateISO),rounds,teams:{},playerScores:{},tierSnapshot:{}};
   Object.keys(members).forEach(mid=>{
     result.tierSnapshot[mid]={name:members[mid].name,tier:members[mid].tier||4,subTier:members[mid].subTier||'mid'};
   });
@@ -2481,6 +2496,93 @@ function loadChickenPts(){const cp=appData.chickenPts||{};const bcEl=document.ge
   const area=document.getElementById('mapCategoryArea');if(!area)return;const bigMaps=getBigMaps();
   area.innerHTML=ALL_MAPS.map(m=>{const isBig=bigMaps.includes(m);return`<span onclick="toggleMapCategory('${m}')" style="padding:5px 12px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:2px solid ${isBig?'#f59e0b':'#334155'};background:${isBig?'rgba(245,158,11,.12)':'#0f172a'};color:${isBig?'#f59e0b':'#64748b'};">${isBig?'🗺️':'📍'} ${m}</span>`;}).join('');
 }
+let rankSeasonFilter=undefined; // 순위/결과 탭에서 선택된 시즌 (숫자 | 'all')
+function setRankSeason(sn){rankSeasonFilter=sn;renderRanking();}
+// ===== 시즌 (배그 경쟁전 시즌 번호 기준) =====
+// seasons/{no} = {no, start:'YYYY-MM-DD', end:'YYYY-MM-DD' or ''}
+// 이벤트는 날짜로 시즌에 자동 귀속. 별도 이관 없음.
+function getSeasons(){
+  const s=appData.seasons||{};
+  return Object.keys(s).map(k=>s[k]).filter(x=>x&&x.no).sort((a,b)=>b.no-a.no);
+}
+function seasonOf(iso){
+  if(!iso)return null;
+  const list=getSeasons();
+  for(const s of list){
+    if(iso>=s.start&&(!s.end||iso<s.end))return s.no;
+  }
+  return null;
+}
+function currentSeasonNo(){
+  const list=getSeasons();
+  if(!list.length)return null;
+  const today=new Date();
+  const iso=today.getFullYear()+'-'+('0'+(today.getMonth()+1)).slice(-2)+'-'+('0'+today.getDate()).slice(-2);
+  return seasonOf(iso)||list[0].no;
+}
+// 이벤트의 시즌 (season 필드 우선, 없으면 dateISO로 역산)
+function eventSeason(ev){
+  if(!ev)return null;
+  if(ev.season!=null)return ev.season;
+  return seasonOf(ev.dateISO);
+}
+function seasonLabel(no){return no!=null?('시즌 '+no):'미분류';}
+
+// 시즌 추가 : 직전 시즌의 end를 새 시즌 start로 자동 마감
+function addSeason(){
+  if(!isAdmin)return;
+  const no=parseInt(document.getElementById('newSeasonNo').value);
+  const start=document.getElementById('newSeasonStart').value;
+  if(!no||!start){alert('시즌 번호와 시작일을 입력하세요.');return;}
+  const seasons=appData.seasons||{};
+  if(seasons[no]&&!confirm('시즌 '+no+'가 이미 있습니다. 덮어쓸까요?'))return;
+  const updates={};
+  updates['seasons/'+no]={no,start,end:''};
+  // 시작일이 더 빠른 시즌 중 가장 늦은 것을 찾아 end 마감
+  let prev=null;
+  Object.keys(seasons).forEach(k=>{
+    const s=seasons[k];
+    if(!s||s.no===no)return;
+    if(s.start<start&&(!prev||s.start>prev.start))prev=s;
+  });
+  if(prev)updates['seasons/'+prev.no+'/end']=start;
+  dataRef.update(updates).then(()=>{
+    document.getElementById('newSeasonNo').value='';
+    document.getElementById('newSeasonStart').value='';
+    alert('시즌 '+no+' 추가됨'+(prev?'\n시즌 '+prev.no+' 종료일이 '+start+'로 설정되었습니다.':''));
+  });
+}
+function removeSeason(no){
+  if(!isAdmin)return;
+  const used=Object.values(appData.history||{}).filter(ev=>eventSeason(ev)===no).length;
+  if(!confirm('시즌 '+no+' 삭제?'+(used?'\n\n이 시즌에 속한 이벤트 '+used+'건이 미분류로 바뀝니다.':'')))return;
+  dataRef.child('seasons/'+no).remove();
+}
+function updateSeasonDate(no,field,val){
+  if(!isAdmin)return;
+  dataRef.child('seasons/'+no+'/'+field).set(val||'');
+}
+function renderSeasonList(){
+  const area=document.getElementById('seasonListArea');if(!area)return;
+  const list=getSeasons();
+  if(!list.length){area.innerHTML='<p style="font-size:13px;color:#475569;">등록된 시즌 없음</p>';return;}
+  const history=appData.history||{};
+  const cur=currentSeasonNo();
+  area.innerHTML=list.map(s=>{
+    const cnt=Object.values(history).filter(ev=>eventSeason(ev)===s.no).length;
+    const isCur=s.no===cur;
+    return `<div style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-bottom:1px solid #1e293b;flex-wrap:wrap;">
+      <span style="font-weight:800;color:${isCur?'#fbbf24':'#94a3b8'};min-width:64px;">시즌 ${s.no}${isCur?' ●':''}</span>
+      <input type="date" value="${s.start||''}" onchange="updateSeasonDate(${s.no},'start',this.value)" style="padding:3px 6px;font-size:12px;background:#0f172a;border:1px solid #334155;border-radius:5px;color:#e2e8f0;">
+      <span style="color:#64748b;font-size:12px;">~</span>
+      <input type="date" value="${s.end||''}" onchange="updateSeasonDate(${s.no},'end',this.value)" style="padding:3px 6px;font-size:12px;background:#0f172a;border:1px solid #334155;border-radius:5px;color:#e2e8f0;">
+      <span style="font-size:12px;color:#64748b;">${cnt}회</span>
+      <span style="flex:1;"></span>
+      <button class="btn btn-xs btn-gray" onclick="removeSeason(${s.no})" style="padding:3px 8px;font-size:11px;">삭제</button>
+    </div>`;
+  }).join('');
+}
+
 function updateScore(tid,mid,r,type,val){dataRef.child('scores/'+tid+'/'+mid+'/r'+r+'/'+type).set(parseInt(val)||0);}
 function updateChicken(tid,r,val){dataRef.child('scores/'+tid+'/_team/r'+r+'/chicken').set(parseInt(val)||0);}
 function getTeamTarget(tid){const team=(appData.teams||{})[tid];if(!team||!team.members)return 1;let t=0;Object.keys(team.members).forEach(mid=>{t+=mScore(team.members[mid]);});return t||1;}
@@ -2519,7 +2621,16 @@ function renderDashboard(){
   const mCount=Object.keys(members).length;
   const history=appData.history||{};
   let chickenName='-',effName='-',killName='-',dmgName='-';
-  const hAll=Object.values(history);
+  // 왕 지표는 현재 시즌 기준. 현재 시즌 기록이 없으면 기록이 있는 최신 시즌으로 폴백
+  const allEvents=Object.values(history);
+  const curSeason=currentSeasonNo();
+  let dashSeason=curSeason;
+  let hAll=allEvents.filter(ev=>eventSeason(ev)===dashSeason);
+  if(!hAll.length){
+    const seasonsWithData=[...new Set(allEvents.map(ev=>eventSeason(ev)))].filter(x=>x!=null).sort((a,b)=>b-a);
+    if(seasonsWithData.length){dashSeason=seasonsWithData[0];hAll=allEvents.filter(ev=>eventSeason(ev)===dashSeason);}
+    else {dashSeason=null;hAll=allEvents;}
+  }
   const totalEvents=hAll.length;
   if(totalEvents>0){
     const playerChickenCount={},effData={},killData={},dmgData={};
@@ -2578,13 +2689,14 @@ function renderDashboard(){
     killName=dashTopStr(killData,'킬');
     dmgName=dashTopStr(dmgData,'');
   }
+  const sTag=dashSeason!=null?`<span class="dash-season-tag">${seasonLabel(dashSeason)}</span>`:'';
   el.innerHTML=`
     <div class="dash-card"><div class="dash-label">멤버</div><div class="dash-value" style="color:#60a5fa;">${mCount}<span>명</span></div></div>
-    <div class="dash-card"><div class="dash-label">이벤트</div><div class="dash-value" style="color:#a78bfa;">${totalEvents}<span>회</span></div></div>
-    <div class="dash-card"><div class="dash-label">🍗 치킨왕</div><div class="dash-king" style="color:#fbbf24;">${chickenName}</div></div>
-    <div class="dash-card"><div class="dash-label">⚡ 효율왕</div><div class="dash-king" style="color:#a78bfa;">${effName}</div></div>
-    <div class="dash-card"><div class="dash-label">🔫 킬왕</div><div class="dash-king" style="color:#f87171;">${killName}</div></div>
-    <div class="dash-card"><div class="dash-label">💥 딜왕</div><div class="dash-king" style="color:#fb923c;">${dmgName}</div></div>
+    <div class="dash-card"><div class="dash-label">이벤트${sTag}</div><div class="dash-value" style="color:#a78bfa;">${totalEvents}<span>회</span></div></div>
+    <div class="dash-card"><div class="dash-label">🍗 치킨왕${sTag}</div><div class="dash-king" style="color:#fbbf24;">${chickenName}</div></div>
+    <div class="dash-card"><div class="dash-label">⚡ 효율왕${sTag}</div><div class="dash-king" style="color:#a78bfa;">${effName}</div></div>
+    <div class="dash-card"><div class="dash-label">🔫 킬왕${sTag}</div><div class="dash-king" style="color:#f87171;">${killName}</div></div>
+    <div class="dash-card"><div class="dash-label">💥 딜왕${sTag}</div><div class="dash-king" style="color:#fb923c;">${dmgName}</div></div>
   `;
 }
 
@@ -3571,7 +3683,7 @@ function applyBulkTier(){if(!isAdmin||!bulkSelected.size)return;const tier=docum
 function renderSetup(){
   renderParticipants();document.getElementById('roundDisplay').textContent=appData.rounds||0;loadRule();loadChickenPts();
   const mtSel=document.getElementById('maxTierSelect');if(mtSel&&mtSel!==document.activeElement)mtSel.value=getMaxTier();
-  loadTierScores();
+  loadTierScores();renderSeasonList();
   const la=document.getElementById('roundListArea');const rounds=appData.rounds||0;const maps=appData.roundMaps||{};
   if(!rounds){la.innerHTML='<p style="font-size:13px;color:#475569;">라운드 없음</p>';return;}
   const MAPS=['에란겔','사녹','테이고','미라마','비켄디','파라모','카라킨','론도'];
@@ -3605,9 +3717,24 @@ function renderRanking(){
   }else cList.innerHTML='';
 
   // 히스토리
-  const history=appData.history||{};const eventKeys=Object.keys(history).sort((a,b)=>parseInt(b.replace('event_',''))-parseInt(a.replace('event_','')));
-  document.getElementById('histCountBadge').textContent=eventKeys.length+'회';
+  const history=appData.history||{};let eventKeys=Object.keys(history).sort((a,b)=>parseInt(b.replace('event_',''))-parseInt(a.replace('event_','')));
   const ha=document.getElementById('historyArea');
+  // 시즌 필터 : 기록이 있는 시즌만 버튼으로 노출
+  const seasonSet=[];
+  eventKeys.forEach(ek=>{const sn=eventSeason(history[ek]);if(!seasonSet.includes(sn))seasonSet.push(sn);});
+  seasonSet.sort((a,b)=>(b==null?-1:b)-(a==null?-1:a));
+  if(rankSeasonFilter===undefined||(rankSeasonFilter!=='all'&&!seasonSet.includes(rankSeasonFilter)))rankSeasonFilter=seasonSet.length?seasonSet[0]:'all';
+  const sfa=document.getElementById('seasonFilterArea');
+  if(sfa){
+    if(seasonSet.length<=1&&seasonSet[0]==null)sfa.innerHTML='';
+    else sfa.innerHTML=seasonSet.map(sn=>{
+      const cnt=eventKeys.filter(ek=>eventSeason(history[ek])===sn).length;
+      const on=rankSeasonFilter===sn;
+      return `<button class="season-chip${on?' active':''}" onclick="setRankSeason(${sn==null?'null':sn})">${seasonLabel(sn)} <span style="opacity:.65;">${cnt}</span></button>`;
+    }).join('')+`<button class="season-chip${rankSeasonFilter==='all'?' active':''}" onclick="setRankSeason('all')">전체 <span style="opacity:.65;">${eventKeys.length}</span></button>`;
+  }
+  if(rankSeasonFilter!=='all')eventKeys=eventKeys.filter(ek=>eventSeason(history[ek])===rankSeasonFilter);
+  document.getElementById('histCountBadge').textContent=eventKeys.length+'회';
   if(!eventKeys.length){ha.innerHTML='<p style="color:#64748b;font-size:14px;">완료된 이벤트 없음</p>';return;}
   const totalEvents=eventKeys.length;const playerTotals={};const members=appData.members||{};
   eventKeys.forEach(ek=>{const ev=history[ek];const ps=ev.playerScores||{};const tc=ev.tierChanges||{};
@@ -3637,7 +3764,7 @@ function renderRanking(){
     const tks=Object.keys(ev.teams||{}).sort((a,b)=>(ev.teams[a].rank||99)-(ev.teams[b].rank||99));
     const winner=tks.length>0?ev.teams[tks[0]]:null;
     const wName=winner?winner.name:'';const wTotal=winner?winner.total:0;const wTarget=winner?winner.target:0;
-    h+=`<div class="accordion-head ${ei===0?'open':''}" onclick="toggleAccordion(this)"><div class="ac-title"><span>${ev.date||'?'}</span>${isAdmin?`<button class="hist-delete" onclick="event.stopPropagation();recalcEvent('${ek}')" style="background:#1e40af;">재계산</button><button class="hist-delete" onclick="event.stopPropagation();deleteHistory('${ek}')">삭제</button>`:''}</div><div class="ac-right"><span class="ac-detail">우승 : ${wName}</span><span class="ac-score">${wTotal}/${wTarget}</span><span class="ac-chevron">▼</span></div></div>`;
+    h+=`<div class="accordion-head ${ei===0?'open':''}" onclick="toggleAccordion(this)"><div class="ac-title"><span>${ev.date||'?'}</span>${rankSeasonFilter==='all'?`<span class="dash-season-tag">${seasonLabel(eventSeason(ev))}</span>`:''}${isAdmin?`<button class="hist-delete" onclick="event.stopPropagation();recalcEvent('${ek}')" style="background:#1e40af;">재계산</button><button class="hist-delete" onclick="event.stopPropagation();deleteHistory('${ek}')">삭제</button>`:''}</div><div class="ac-right"><span class="ac-detail">우승 : ${wName}</span><span class="ac-score">${wTotal}/${wTarget}</span><span class="ac-chevron">▼</span></div></div>`;
     h+=`<div class="accordion-body ${ei===0?'open':''}">`;
     tks.forEach(tid=>{const t=ev.teams[tid];const rank=t.rank;
       const ps=ev.playerScores||{};
