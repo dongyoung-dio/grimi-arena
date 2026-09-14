@@ -140,6 +140,13 @@ input:focus,select:focus{border-color:#3b82f6;}
 .season-chip{padding:4px 11px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;background:#0f172a;color:#94a3b8;border:1px solid #334155;transition:all .15s;}
 .season-chip:hover{color:#cbd5e1;border-color:#475569;}
 .season-chip.active{background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;border-color:#3b82f6;}
+.btn-amber{background:linear-gradient(135deg,#f59e0b,#d97706);color:#1e293b;}
+/* 시즌 결산 (명예의 전당) */
+.hof-card{background:linear-gradient(135deg,rgba(251,191,36,.07),rgba(139,92,246,.06));border:1px solid rgba(251,191,36,.25);border-radius:12px;padding:14px 16px;margin-bottom:14px;}
+.hof-head{font-size:14px;font-weight:800;color:#fbbf24;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.hof-row{display:flex;align-items:flex-start;gap:10px;padding:4px 0;font-size:13px;}
+.hof-label{color:#94a3b8;font-weight:600;min-width:74px;flex-shrink:0;}
+.hof-name{font-weight:700;line-height:1.45;word-break:keep-all;overflow-wrap:break-word;}
 .dash-season-tag{font-size:11px;color:#64748b;font-weight:600;margin-left:5px;}
 @media(max-width:500px){.dash-grid{grid-template-columns:1fr 1fr;}}
 /* 공지사항 */
@@ -1251,6 +1258,19 @@ input:focus,select:focus{border-color:#3b82f6;}
 </div>
 
 <!-- 가이드 모달 -->
+<div id="seasonEndModal" class="modal-overlay hidden" onclick="if(event.target===this)closeSeasonEnd()">
+  <div style="background:#1e293b;border-radius:16px;border:1px solid #334155;max-width:460px;width:100%;padding:24px;max-height:85vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-size:18px;font-weight:800;">시즌 종료</span>
+      <button onclick="closeSeasonEnd()" style="background:none;border:none;color:#64748b;font-size:22px;cursor:pointer;">✕</button>
+    </div>
+    <div id="seasonEndBody"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;">
+      <button class="btn btn-sm btn-gray" onclick="closeSeasonEnd()">취소</button>
+      <button class="btn btn-sm btn-amber" onclick="confirmSeasonEnd()">종료하고 다음 시즌 시작</button>
+    </div>
+  </div>
+</div>
 <div id="guideModal" class="modal-overlay hidden" onclick="if(event.target===this)closeGuide()">
   <div class="guide-modal-box">
     <div class="guide-header"><h2>📖 GRIMI ARENA 가이드</h2><button class="modal-close" onclick="closeGuide()">✕</button></div>
@@ -1446,6 +1466,8 @@ input:focus,select:focus{border-color:#3b82f6;}
           <input type="number" id="newSeasonNo" placeholder="시즌 번호" style="width:90px;">
           <input type="date" id="newSeasonStart" style="width:150px;">
           <button class="btn btn-sm btn-blue" onclick="addSeason()">+ 시즌 추가</button>
+          <span style="flex:1;"></span>
+          <button class="btn btn-sm btn-amber" onclick="openSeasonEnd()">시즌 종료</button>
         </div>
         <div id="seasonListArea" style="margin-top:10px;"></div>
       </div>
@@ -2562,6 +2584,83 @@ function updateSeasonDate(no,field,val){
   if(!isAdmin)return;
   dataRef.child('seasons/'+no+'/'+field).set(val||'');
 }
+// ===== 시즌 종료 =====
+// 현재 시즌을 마감하고 다음 시즌을 시작. 결산 스냅샷을 seasons/{no}/summary에 저장.
+function openSeasonEnd(){
+  if(!isAdmin)return;
+  const cur=currentSeasonNo();
+  if(cur==null){alert('등록된 시즌이 없습니다. 먼저 시즌을 추가하세요.');return;}
+  const s=(appData.seasons||{})[cur];
+  if(s&&s.end){alert('시즌 '+cur+'는 이미 '+s.end+'에 종료되었습니다.');return;}
+  const events=Object.values(appData.history||{}).filter(ev=>eventSeason(ev)===cur);
+  const k=computeKings(events,appData.members||{});
+  const nextNo=cur+1;
+  const body=document.getElementById('seasonEndBody');
+  body.innerHTML=`
+    <p style="font-size:14px;color:#94a3b8;margin-bottom:14px;">시즌 ${cur}를 종료하고 시즌 ${nextNo}를 시작합니다. 이벤트 ${events.length}건이 시즌 ${cur} 기록으로 확정됩니다.</p>
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px;margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:800;color:#fbbf24;margin-bottom:8px;">시즌 ${cur} 결산</div>
+      ${events.length?`
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:6px 10px;font-size:13px;">
+        <span style="color:#94a3b8;">🍗 치킨왕</span><span>${kingStr(k.chicken,'회')}</span>
+        <span style="color:#94a3b8;">⚡ 효율왕</span><span>${kingStr(k.eff,'%')}</span>
+        <span style="color:#94a3b8;">🔫 킬왕</span><span>${kingStr(k.kill,'킬')}</span>
+        <span style="color:#94a3b8;">💥 딜왕</span><span>${kingStr(k.dmg,'')}</span>
+      </div>`:'<p style="font-size:13px;color:#64748b;">이 시즌에 기록된 이벤트가 없습니다.</p>'}
+    </div>
+    <label style="font-size:13px;color:#94a3b8;display:block;margin-bottom:5px;">다음 시즌 번호</label>
+    <input type="number" id="seEndNextNo" value="${nextNo}" style="width:100%;padding:9px 12px;margin-bottom:10px;">
+    <label style="font-size:13px;color:#94a3b8;display:block;margin-bottom:5px;">다음 시즌 시작일 (배그 시즌 시작일 기준)</label>
+    <input type="date" id="seEndNextStart" style="width:100%;padding:9px 12px;">
+    <p style="font-size:12px;color:#64748b;margin-top:8px;">이 날짜가 시즌 ${cur}의 종료일이 됩니다. 티어는 변경되지 않습니다.</p>
+  `;
+  document.getElementById('seasonEndModal').classList.remove('hidden');
+}
+function closeSeasonEnd(){document.getElementById('seasonEndModal').classList.add('hidden');}
+function confirmSeasonEnd(){
+  if(!isAdmin)return;
+  const cur=currentSeasonNo();
+  if(cur==null)return;
+  const nextNo=parseInt(document.getElementById('seEndNextNo').value);
+  const nextStart=document.getElementById('seEndNextStart').value;
+  if(!nextNo||!nextStart){alert('다음 시즌 번호와 시작일을 입력하세요.');return;}
+  if(nextNo<=cur){alert('다음 시즌 번호는 '+cur+'보다 커야 합니다.');return;}
+  const s=(appData.seasons||{})[cur]||{};
+  if(s.start&&nextStart<=s.start){alert('시작일이 시즌 '+cur+' 시작일('+s.start+')보다 뒤여야 합니다.');return;}
+  if((appData.seasons||{})[nextNo]){alert('시즌 '+nextNo+'가 이미 존재합니다.');return;}
+  // 마감일 이후 이벤트가 있으면 경고
+  const late=Object.values(appData.history||{}).filter(ev=>eventSeason(ev)===cur&&ev.dateISO&&ev.dateISO>=nextStart);
+  if(late.length&&!confirm(nextStart+' 이후 이벤트 '+late.length+'건이 시즌 '+nextNo+'로 넘어갑니다.\n\n계속할까요?'))return;
+
+  const events=Object.values(appData.history||{}).filter(ev=>eventSeason(ev)===cur&&!(ev.dateISO&&ev.dateISO>=nextStart));
+  const k=computeKings(events,appData.members||{});
+  const finalTiers={};
+  Object.entries(appData.members||{}).forEach(([mid,m])=>{
+    if(!m||!m.name||m.hidden)return;
+    finalTiers[mid]={name:m.name,tier:m.tier||4,subTier:m.subTier||'mid'};
+  });
+  const updates={};
+  updates['seasons/'+cur+'/end']=nextStart;
+  updates['seasons/'+cur+'/summary']={
+    closedAt:Date.now(),events:events.length,
+    chicken:k.chicken,kill:k.kill,dmg:k.dmg,eff:k.eff,
+    finalTiers
+  };
+  updates['seasons/'+nextNo]={no:nextNo,start:nextStart,end:''};
+  dataRef.update(updates).then(()=>{
+    closeSeasonEnd();
+    rankSeasonFilter=undefined;
+    alert('시즌 '+cur+' 종료 완료\n시즌 '+nextNo+'가 '+nextStart+'부터 시작됩니다.');
+  });
+}
+function reopenSeason(no){
+  if(!isAdmin)return;
+  if(!confirm('시즌 '+no+' 종료를 취소할까요?\n\n결산 기록이 삭제되고 종료일이 비워집니다.'))return;
+  const updates={};
+  updates['seasons/'+no+'/end']='';
+  updates['seasons/'+no+'/summary']=null;
+  dataRef.update(updates);
+}
 function renderSeasonList(){
   const area=document.getElementById('seasonListArea');if(!area)return;
   const list=getSeasons();
@@ -2571,13 +2670,16 @@ function renderSeasonList(){
   area.innerHTML=list.map(s=>{
     const cnt=Object.values(history).filter(ev=>eventSeason(ev)===s.no).length;
     const isCur=s.no===cur;
+    const closed=!!s.end;
     return `<div style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-bottom:1px solid #1e293b;flex-wrap:wrap;">
       <span style="font-weight:800;color:${isCur?'#fbbf24':'#94a3b8'};min-width:64px;">시즌 ${s.no}${isCur?' ●':''}</span>
       <input type="date" value="${s.start||''}" onchange="updateSeasonDate(${s.no},'start',this.value)" style="padding:3px 6px;font-size:12px;background:#0f172a;border:1px solid #334155;border-radius:5px;color:#e2e8f0;">
       <span style="color:#64748b;font-size:12px;">~</span>
       <input type="date" value="${s.end||''}" onchange="updateSeasonDate(${s.no},'end',this.value)" style="padding:3px 6px;font-size:12px;background:#0f172a;border:1px solid #334155;border-radius:5px;color:#e2e8f0;">
       <span style="font-size:12px;color:#64748b;">${cnt}회</span>
+      ${s.summary?'<span style="font-size:11px;color:#10b981;font-weight:700;">결산 있음</span>':''}
       <span style="flex:1;"></span>
+      ${closed?`<button class="btn btn-xs btn-gray" onclick="reopenSeason(${s.no})" style="padding:3px 8px;font-size:11px;">종료취소</button>`:''}
       <button class="btn btn-xs btn-gray" onclick="removeSeason(${s.no})" style="padding:3px 8px;font-size:11px;">삭제</button>
     </div>`;
   }).join('');
@@ -2614,80 +2716,84 @@ function renderHome(){
   if(ytAdmin){ytAdmin.classList.toggle('hidden',!isAdmin);if(isAdmin)renderYtAdmin();}
 }
 
+// -- 왕 지표 집계 (대시보드 / 시즌 결산 공용) --
+// events : 집계 대상 이벤트 배열. members : 티어 보정용
+function computeKings(events,members){
+  const playerChickenCount={},effData={},killData={},dmgData={};
+  events.forEach(ev=>{
+    const ps=ev.playerScores||{};
+    // 팀별 치킨 횟수 → 해당 팀 멤버 개인에게 분배
+    Object.values(ev.teams||{}).forEach(t=>{
+      if(!t)return;
+      const cw=t.chickenWins||0;
+      if(cw>0)Object.values(t.members||{}).forEach(m=>{
+        if(m&&m.name)playerChickenCount[m.name]=(playerChickenCount[m.name]||0)+cw;
+      });
+    });
+    Object.entries(ps).forEach(([mid,p])=>{
+      if(!p||!p.name)return;
+      if(p.score){
+        if(!effData[mid])effData[mid]={name:p.name,totalScore:0,totalTarget:0,cnt:0};
+        effData[mid].totalScore+=p.score;
+        // 당시 목표점수 누적 (없으면 현재 티어 기준으로 보정)
+        effData[mid].totalTarget+=(p.target!=null?p.target:((members||{})[mid]?mScore(members[mid]):0));
+        effData[mid].cnt++;
+      }
+      const kills=p.kills!=null?p.kills:Math.max(0,(p.score||0)-Math.floor((p.damage||0)/100));
+      killData[p.name]=(killData[p.name]||0)+kills;
+      dmgData[p.name]=(dmgData[p.name]||0)+(p.damage||0);
+    });
+  });
+  function top(obj){
+    const sorted=Object.entries(obj).sort((a,b)=>b[1]-a[1]);
+    if(!sorted.length||sorted[0][1]<=0)return{names:[],value:0};
+    const v=sorted[0][1];
+    return{names:sorted.filter(e=>e[1]===v).map(e=>e[0]),value:v};
+  }
+  const effList=Object.values(effData).map(d=>({n:d.name,avg:d.totalTarget>0?(d.totalScore/d.totalTarget)*100:0}))
+    .sort((a,b)=>b.avg-a.avg);
+  let eff={names:[],value:0};
+  if(effList[0]&&effList[0].avg>0){
+    const v=Math.round(effList[0].avg);
+    eff={names:effList.filter(e=>Math.round(e.avg)===v).map(e=>e.n),value:v};
+  }
+  return{chicken:top(playerChickenCount),kill:top(killData),dmg:top(dmgData),eff};
+}
+// 동점자 최대 6명까지 노출, 나머지는 "외 N명"
+const DASH_MAX_NAMES=6;
+function dashNames(list){
+  if(!list||!list.length)return'-';
+  if(list.length<=DASH_MAX_NAMES)return list.join(', ');
+  return list.slice(0,DASH_MAX_NAMES).join(', ')+` <span style="color:#94a3b8;font-weight:600;">외 ${list.length-DASH_MAX_NAMES}명</span>`;
+}
+function kingStr(k,unit){
+  if(!k||!k.names.length)return'-';
+  return dashNames(k.names)+` <span style="color:#e2e8f0;font-size:13px;font-weight:600;">${k.value}${unit}</span>`;
+}
+
 // -- 대시보드 --
 function renderDashboard(){
   const el=document.getElementById('homeDashContent');if(!el)return;
   const members=appData.members||{};
   const mCount=Object.keys(members).length;
   const history=appData.history||{};
-  let chickenName='-',effName='-',killName='-',dmgName='-';
   // 왕 지표는 현재 시즌 기준. 현재 시즌 기록이 없으면 기록이 있는 최신 시즌으로 폴백
   const allEvents=Object.values(history);
-  const curSeason=currentSeasonNo();
-  let dashSeason=curSeason;
+  let dashSeason=currentSeasonNo();
   let hAll=allEvents.filter(ev=>eventSeason(ev)===dashSeason);
   if(!hAll.length){
-    const seasonsWithData=[...new Set(allEvents.map(ev=>eventSeason(ev)))].filter(x=>x!=null).sort((a,b)=>b-a);
-    if(seasonsWithData.length){dashSeason=seasonsWithData[0];hAll=allEvents.filter(ev=>eventSeason(ev)===dashSeason);}
-    else {dashSeason=null;hAll=allEvents;}
+    const withData=[...new Set(allEvents.map(ev=>eventSeason(ev)))].filter(x=>x!=null).sort((a,b)=>b-a);
+    if(withData.length){dashSeason=withData[0];hAll=allEvents.filter(ev=>eventSeason(ev)===dashSeason);}
+    else{dashSeason=null;hAll=allEvents;}
   }
   const totalEvents=hAll.length;
+  let chickenName='-',effName='-',killName='-',dmgName='-';
   if(totalEvents>0){
-    const playerChickenCount={},effData={},killData={},dmgData={};
-    hAll.forEach(ev=>{
-      const ps=ev.playerScores||{};
-      // 팀별 치킨 횟수 → 해당 팀 멤버 개인에게 분배
-      const evTeams=ev.teams||{};
-      Object.values(evTeams).forEach(t=>{
-        if(!t)return;
-        const cw=t.chickenWins||0;
-        if(cw>0){
-          Object.values(t.members||{}).forEach(m=>{
-            if(m&&m.name)playerChickenCount[m.name]=(playerChickenCount[m.name]||0)+cw;
-          });
-        }
-      });
-      Object.entries(ps).forEach(([mid,p])=>{
-        if(!p||!p.name)return;
-        if(p.score){
-          if(!effData[mid])effData[mid]={name:p.name,totalScore:0,totalTarget:0,cnt:0};
-          effData[mid].totalScore+=p.score;
-          // 당시 목표점수 누적 (없으면 현재 티어 기준으로 보정)
-          effData[mid].totalTarget+=(p.target!=null?p.target:(members[mid]?mScore(members[mid]):0));
-          effData[mid].cnt++;
-        }
-        const kills=p.kills!=null?p.kills:Math.max(0,(p.score||0)-Math.floor((p.damage||0)/100));
-        killData[p.name]=(killData[p.name]||0)+kills;
-        dmgData[p.name]=(dmgData[p.name]||0)+(p.damage||0);
-      });
-    });
-    // 동점자 최대 6명까지 노출, 나머지는 "외 N명"
-    const DASH_MAX_NAMES=6;
-    function dashNames(list){
-      if(list.length<=DASH_MAX_NAMES)return list.join(', ');
-      return list.slice(0,DASH_MAX_NAMES).join(', ')+` <span style="color:#94a3b8;font-weight:600;">외 ${list.length-DASH_MAX_NAMES}명</span>`;
-    }
-    function dashTopStr(obj,unit){
-      const sorted=Object.entries(obj).sort((a,b)=>b[1]-a[1]);
-      if(!sorted.length)return'-';
-      const topVal=sorted[0][1];if(topVal<=0)return'-';
-      const tied=sorted.filter(e=>e[1]===topVal).map(e=>e[0]);
-      return dashNames(tied)+` <span style="color:#e2e8f0;font-size:13px;font-weight:600;">${topVal}${unit}</span>`;
-    }
-    chickenName=dashTopStr(playerChickenCount,'회');
-    // 효율 = 누적 획득점수 / 누적 목표점수 (이벤트 당시 티어 기준)
-    const effList=Object.entries(effData).map(([mid,d])=>{
-      const avg=d.totalTarget>0?(d.totalScore/d.totalTarget)*100:0;
-      return{n:d.name,avg};
-    }).sort((a,b)=>b.avg-a.avg);
-    const topEff=effList[0];
-    if(topEff&&topEff.avg>0){
-      const topAvg=Math.round(topEff.avg);
-      const effTied=effList.filter(e=>Math.round(e.avg)===topAvg).map(e=>e.n);
-      effName=dashNames(effTied)+` <span style="color:#e2e8f0;font-size:13px;font-weight:600;">${topAvg}%</span>`;
-    }
-    killName=dashTopStr(killData,'킬');
-    dmgName=dashTopStr(dmgData,'');
+    const k=computeKings(hAll,members);
+    chickenName=kingStr(k.chicken,'회');
+    effName=kingStr(k.eff,'%');
+    killName=kingStr(k.kill,'킬');
+    dmgName=kingStr(k.dmg,'');
   }
   const sTag=dashSeason!=null?`<span class="dash-season-tag">${seasonLabel(dashSeason)}</span>`:'';
   el.innerHTML=`
@@ -3735,7 +3841,24 @@ function renderRanking(){
   }
   if(rankSeasonFilter!=='all')eventKeys=eventKeys.filter(ek=>eventSeason(history[ek])===rankSeasonFilter);
   document.getElementById('histCountBadge').textContent=eventKeys.length+'회';
-  if(!eventKeys.length){ha.innerHTML='<p style="color:#64748b;font-size:14px;">완료된 이벤트 없음</p>';return;}
+  // 종료된 시즌이면 결산 카드 (명예의 전당)
+  let summaryHtml='';
+  if(rankSeasonFilter!=='all'&&rankSeasonFilter!=null){
+    const sm=((appData.seasons||{})[rankSeasonFilter]||{}).summary;
+    if(sm){
+      const d=sm.closedAt?new Date(sm.closedAt):null;
+      const ds=d?`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`:'';
+      const row=(icon,label,k,unit,color)=>`<div class="hof-row"><span class="hof-label">${icon} ${label}</span><span class="hof-name" style="color:${color};">${kingStr(k,unit)}</span></div>`;
+      summaryHtml=`<div class="hof-card">
+        <div class="hof-head">🏆 시즌 ${rankSeasonFilter} 결산 <span style="font-size:11px;color:#64748b;font-weight:600;">${sm.events||0}회 · ${ds}</span></div>
+        ${row('🍗','치킨왕',sm.chicken,'회','#fbbf24')}
+        ${row('⚡','효율왕',sm.eff,'%','#a78bfa')}
+        ${row('🔫','킬왕',sm.kill,'킬','#f87171')}
+        ${row('💥','딜왕',sm.dmg,'','#fb923c')}
+      </div>`;
+    }
+  }
+  if(!eventKeys.length){ha.innerHTML=summaryHtml+'<p style="color:#64748b;font-size:14px;">완료된 이벤트 없음</p>';return;}
   const totalEvents=eventKeys.length;const playerTotals={};const members=appData.members||{};
   eventKeys.forEach(ek=>{const ev=history[ek];const ps=ev.playerScores||{};const tc=ev.tierChanges||{};
     Object.keys(ps).forEach(mid=>{if(!ps[mid]||!ps[mid].name)return;if(!playerTotals[mid])playerTotals[mid]={name:ps[mid].name,scores:[],wins:0,stays:0,downs:0,participated:0,totalDamage:0};
@@ -3747,7 +3870,7 @@ function renderRanking(){
   });
 
   // 누적 기록 테이블
-  let h=`<div class="hist-table-wrap"><table class="hist-table"><thead><tr><th style="text-align:left;">멤버</th><th>티어</th>`;
+  let h=summaryHtml+`<div class="hist-table-wrap"><table class="hist-table"><thead><tr><th style="text-align:left;">멤버</th><th>티어</th>`;
   eventKeys.slice().reverse().forEach(ek=>{const ev=history[ek];h+=`<th>${ev.date||'?'}</th>`;});
   h+=`<th>총점</th><th>평균</th><th>평균딜</th><th>참여</th><th>승급</th></tr></thead><tbody>`;
   const pids=Object.keys(playerTotals).sort((a,b)=>playerTotals[b].scores.reduce((s,x)=>s+x.score,0)-playerTotals[a].scores.reduce((s,x)=>s+x.score,0));
